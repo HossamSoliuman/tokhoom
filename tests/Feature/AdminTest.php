@@ -1,0 +1,82 @@
+<?php
+
+use App\Enums\ApprovalStatus;
+use App\Enums\MemberRole;
+use App\Enums\RejectionReason;
+use App\Livewire\Admin\Approvals;
+use App\Livewire\Admin\Workspaces;
+use App\Models\User;
+use App\Models\Workspace;
+use App\Notifications\WorkspaceApproved;
+use App\Notifications\WorkspaceRejected;
+use Illuminate\Support\Facades\Notification;
+use Livewire\Livewire;
+
+test('only platform admins reach the admin pages', function () {
+    [$owner] = member();
+    $admin = User::factory()->platformAdmin()->create();
+
+    $this->actingAs($owner)->get(route('admin.approvals'))->assertForbidden();
+    $this->actingAs($admin)->get(route('admin.approvals'))->assertOk();
+    $this->actingAs($admin)->get(route('admin.workspaces'))->assertOk();
+});
+
+test('an admin without a workspace lands on the approval queue', function () {
+    $admin = User::factory()->platformAdmin()->create();
+
+    $this->actingAs($admin)->get('/')->assertRedirect(route('admin.approvals'));
+});
+
+test('approving a license notifies the owner', function () {
+    Notification::fake();
+    $admin = User::factory()->platformAdmin()->create();
+    $workspace = Workspace::factory()->pending()->create();
+    [$owner] = member(MemberRole::Owner, $workspace);
+
+    Livewire::actingAs($admin)->test(Approvals::class)
+        ->assertSee($workspace->name)
+        ->call('approve', $workspace->id);
+
+    expect($workspace->fresh()->approval_status)->toBe(ApprovalStatus::Approved);
+    Notification::assertSentTo($owner, WorkspaceApproved::class);
+});
+
+test('rejecting needs a reason and records it', function () {
+    Notification::fake();
+    $admin = User::factory()->platformAdmin()->create();
+    $workspace = Workspace::factory()->pending()->create();
+    [$owner] = member(MemberRole::Owner, $workspace);
+
+    Livewire::actingAs($admin)->test(Approvals::class)
+        ->call('openReject', $workspace->id)
+        ->call('reject')
+        ->assertHasErrors('reason')
+        ->set('reason', RejectionReason::Expiring->value)
+        ->set('message', 'الترخيص ينتهي قريباً')
+        ->call('reject')
+        ->assertHasNoErrors();
+
+    $workspace->refresh();
+    expect($workspace->approval_status)->toBe(ApprovalStatus::Rejected)
+        ->and($workspace->rejection_reason)->toBe(RejectionReason::Expiring);
+    Notification::assertSentTo($owner, WorkspaceRejected::class);
+});
+
+test('workspaces can be suspended and reactivated', function () {
+    $admin = User::factory()->platformAdmin()->create();
+    $workspace = Workspace::factory()->create();
+
+    Livewire::actingAs($admin)->test(Workspaces::class)
+        ->call('confirm', $workspace->id)
+        ->assertSet('dialog', 'suspend')
+        ->call('suspend');
+
+    expect($workspace->fresh()->isSuspended())->toBeTrue();
+
+    Livewire::actingAs($admin)->test(Workspaces::class)
+        ->call('confirm', $workspace->id)
+        ->assertSet('dialog', 'reactivate')
+        ->call('reactivate');
+
+    expect($workspace->fresh()->isSuspended())->toBeFalse();
+});
