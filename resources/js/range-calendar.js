@@ -26,6 +26,20 @@ export default ({ from, to, today, method = 'applyRange' }) => ({
         return `${MONTHS[this.view.getMonth()]} ${this.view.getFullYear()}`;
     },
 
+    get label() {
+        const format = (iso, withYear) => {
+            const date = fromIso(iso);
+
+            return `${date.getDate()} ${MONTHS[date.getMonth()]}${withYear ? ' ' + date.getFullYear() : ''}`;
+        };
+
+        if (this.start === this.end) {
+            return format(this.end, true);
+        }
+
+        return `${format(this.start, this.start.slice(0, 4) !== this.end.slice(0, 4))} – ${format(this.end, true)}`;
+    },
+
     get cells() {
         const year = this.view.getFullYear();
         const month = this.view.getMonth();
