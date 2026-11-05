@@ -184,6 +184,24 @@ class Workspace extends Model
         return $this->slug.'.'.config('tokhoom.site_domain');
     }
 
+    /**
+     * The workspace whose public site lives on this host: {slug}.{site_domain}
+     * or an active custom domain.
+     */
+    public static function forSiteHost(string $host): ?self
+    {
+        $host = strtolower($host);
+        $suffix = '.'.config('tokhoom.site_domain');
+
+        if (str_ends_with($host, $suffix)) {
+            $slug = substr($host, 0, -strlen($suffix));
+
+            return str_contains($slug, '.') ? null : self::where('slug', $slug)->first();
+        }
+
+        return self::where('custom_domain', $host)->where('domain_status', DomainStatus::Active)->first();
+    }
+
     public function siteUrl(string $path = ''): string
     {
         return 'https://'.$this->siteHost().($path !== '' ? '/'.ltrim($path, '/') : '');
