@@ -54,7 +54,7 @@
                 <span class="text-body">—</span>
                 <span class="text-body">—</span>
                 <span class="flex justify-end gap-1.5">
-                    <x-ui.button variant="secondary" size="xs" class="border-line text-13" wire:click="resend({{ $invitation->id }})">إعادة الإرسال</x-ui.button>
+                    <x-ui.button variant="quiet" size="xs" class="text-13" wire:click="resend({{ $invitation->id }})">إعادة الإرسال</x-ui.button>
                     <button type="button" wire:click="cancelInvite({{ $invitation->id }})" class="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-canvas" aria-label="إلغاء الدعوة">
                         <i class="ti ti-x text-17"></i>
                     </button>

@@ -11,7 +11,6 @@ use App\Livewire\Concerns\HasDialogs;
 use App\Livewire\Concerns\InteractsWithWorkspace;
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Invitation;
-use App\Models\Membership;
 use App\Notifications\InvitationSent;
 use App\Support\Phone;
 use Illuminate\Contracts\View\View;

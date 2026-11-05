@@ -9,7 +9,6 @@ use App\Enums\SiteEventType;
 use App\Livewire\Concerns\InteractsWithWorkspace;
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Listing;
-use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;

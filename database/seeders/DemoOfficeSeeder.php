@@ -32,6 +32,7 @@ use App\Notifications\ListingMatchesRequest;
 use App\Notifications\NewInquiry;
 use App\Notifications\PaymentFailed;
 use App\Notifications\ReminderDue;
+use App\Support\Arabic;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Seeder;
 use Illuminate\Notifications\DatabaseNotification;
@@ -476,7 +477,7 @@ class DemoOfficeSeeder extends Seeder
 
             $this->office->invoices()->create([
                 'number' => 'TKH-'.$issued->format('Ym').'-0142',
-                'description' => 'اشتراك خطة المكتب — '.\App\Support\Arabic::month($issued->month).' '.$issued->year,
+                'description' => 'اشتراك خطة المكتب — '.Arabic::month($issued->month).' '.$issued->year,
                 'amount' => 349,
                 'issued_on' => $issued->toDateString(),
                 'paid_at' => $issued->copy()->addHours(3),

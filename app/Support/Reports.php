@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\DealStage;
+use App\Enums\LeadSource;
 use App\Enums\ListingStatus;
 use App\Enums\SiteEventType;
 use App\Models\Client;
@@ -39,7 +40,7 @@ class Reports
     }
 
     /**
-     * @return list<array{source: \App\Enums\LeadSource, count: int, percent: int}>
+     * @return list<array{source: LeadSource, count: int, percent: int}>
      */
     public function clientSources(): array
     {
@@ -50,7 +51,7 @@ class Reports
 
         $total = max(1, $counts->sum());
 
-        return collect(\App\Enums\LeadSource::cases())
+        return collect(LeadSource::cases())
             ->map(fn ($source) => [
                 'source' => $source,
                 'count' => $counts->get($source->value, 0),

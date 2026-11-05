@@ -11,7 +11,6 @@ use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Activity;
 use App\Models\Client;
 use App\Models\Listing;
-use App\Models\Note;
 use App\Support\Locations;
 use App\Support\Matcher;
 use Illuminate\Contracts\View\View;

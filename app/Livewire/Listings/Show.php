@@ -13,7 +13,6 @@ use App\Support\Arabic;
 use App\Support\ListingQuality;
 use App\Support\Metrics;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
