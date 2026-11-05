@@ -1,5 +1,9 @@
 <?php
 
+use App\Enums\MemberRole;
+use App\Models\Membership;
+use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +19,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -44,7 +48,19 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * A user who belongs to an approved office with the given role, already
+ * pointed at that office as their current workspace.
+ *
+ * @return array{0: User, 1: Workspace}
+ */
+function member(MemberRole $role = MemberRole::Owner, ?Workspace $workspace = null): array
 {
-    // ..
+    $workspace ??= Workspace::factory()->create();
+    $user = User::factory()->create();
+
+    Membership::factory()->for($workspace)->for($user)->create(['role' => $role]);
+    $user->forceFill(['current_workspace_id' => $workspace->id])->save();
+
+    return [$user->fresh(), $workspace];
 }

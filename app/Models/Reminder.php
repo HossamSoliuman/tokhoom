@@ -34,6 +34,14 @@ class Reminder extends Model
     }
 
     /**
+     * @return BelongsTo<Workspace, $this>
+     */
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
+    }
+
+    /**
      * @return BelongsTo<Client, $this>
      */
     public function client(): BelongsTo

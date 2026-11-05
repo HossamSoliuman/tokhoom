@@ -209,6 +209,14 @@ class Listing extends Model
     }
 
     /**
+     * WhatsApp message sending this listing to a client.
+     */
+    public function pitchFor(string $clientName): string
+    {
+        return 'السلام عليكم '.$clientName.'، هذا عقار يناسب طلبك: '.$this->title.' — '.$this->priceLabel()."\n".$this->shortUrl();
+    }
+
+    /**
      * The short link as shown to people: "tkh.sa/vi8KX2".
      */
     public function shortLink(): string

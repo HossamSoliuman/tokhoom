@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\LeadSource;
+use App\Support\Phone;
 use Database\Factories\InquiryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -34,6 +35,23 @@ class Inquiry extends Model
             'source' => LeadSource::class,
             'responded_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Workspace, $this>
+     */
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
+    }
+
+    /**
+     * WhatsApp link that opens a reply to the visitor.
+     */
+    public function replyUrl(string $workspaceName): string
+    {
+        return Phone::whatsappUrl($this->mobile, 'السلام عليكم '.$this->name.'، شكراً لتواصلك مع '.$workspaceName
+            .($this->listing ? ' بخصوص '.$this->listing->title : '').'.');
     }
 
     /**
