@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Site;
 
-use App\Enums\ListingStatus;
 use App\Livewire\Concerns\InteractsWithWorkspace;
 use App\Livewire\Concerns\ShowsToasts;
 use App\Support\Phone;
@@ -138,8 +137,7 @@ class Settings extends Component
             'logoUrl' => $this->logo?->temporaryUrl() ?? $workspace->logoUrl(),
             'coverUrl' => $this->cover?->temporaryUrl() ?? $workspace->coverUrl(),
             'previewListings' => $workspace->listings()
-                ->whereIn('status', [ListingStatus::Available, ListingStatus::Reserved])
-                ->where(fn ($query) => $query->whereNull('ad_license_expires_on')->orWhere('ad_license_expires_on', '>=', today()))
+                ->live()
                 ->with('coverPhoto')
                 ->latest('published_at')
                 ->limit(3)

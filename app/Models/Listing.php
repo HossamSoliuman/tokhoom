@@ -150,6 +150,17 @@ class Listing extends Model
     }
 
     /**
+     * Listings visitors can see on the public site: available or reserved,
+     * with an ad license that has not run out.
+     */
+    #[Scope]
+    protected function live(Builder $query): void
+    {
+        $query->whereIn('status', array_filter(ListingStatus::cases(), fn (ListingStatus $status) => $status->isPublic()))
+            ->where(fn (Builder $query) => $query->whereNull('ad_license_expires_on')->orWhereDate('ad_license_expires_on', '>=', today()));
+    }
+
+    /**
      * "فيلا للبيع — حي الملقا"
      */
     protected function title(): Attribute
@@ -171,6 +182,38 @@ class Listing extends Model
         }
 
         return Arabic::money($this->price, $this->purpose === ListingPurpose::Rent ? 'سنوياً' : '');
+    }
+
+    /**
+     * The price figure on its own, for layouts that set the unit apart: "3,200,000".
+     */
+    public function priceAmount(): string
+    {
+        return $this->price === null ? '—' : Arabic::number($this->price);
+    }
+
+    /**
+     * "ريال" or "ريال / سنوياً" for rentals.
+     */
+    public function priceUnit(): string
+    {
+        return $this->purpose === ListingPurpose::Rent ? 'ريال / سنوياً' : 'ريال';
+    }
+
+    /**
+     * "فيلا · حي الملقا"
+     */
+    public function shortTitle(): string
+    {
+        return $this->district ? $this->type->label().' · حي '.$this->district : $this->type->label();
+    }
+
+    /**
+     * "حي الملقا، الرياض"
+     */
+    public function locationLabel(): string
+    {
+        return collect([$this->district ? 'حي '.$this->district : null, $this->city])->filter()->implode('، ');
     }
 
     public function isAdLicenseExpired(): bool

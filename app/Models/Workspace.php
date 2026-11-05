@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ApprovalStatus;
 use App\Enums\DomainStatus;
+use App\Enums\MemberRole;
 use App\Enums\Plan;
 use App\Enums\RejectionReason;
 use App\Enums\WorkspaceKind;
@@ -215,6 +216,27 @@ class Workspace extends Model
     public function coverUrl(): ?string
     {
         return $this->cover_path ? Storage::disk('public')->url($this->cover_path) : null;
+    }
+
+    public function owner(): ?User
+    {
+        return once(fn () => $this->members()->wherePivot('role', MemberRole::Owner)->orderBy('memberships.id')->first());
+    }
+
+    /**
+     * WhatsApp number visitors reach: the one set in site settings, or the owner's mobile.
+     */
+    public function contactWhatsapp(): ?string
+    {
+        return $this->whatsapp ?: $this->owner()?->mobile;
+    }
+
+    /**
+     * Number visitors call: the site's phone, or the WhatsApp number.
+     */
+    public function contactPhone(): ?string
+    {
+        return $this->phone ?: $this->contactWhatsapp();
     }
 
     /**
