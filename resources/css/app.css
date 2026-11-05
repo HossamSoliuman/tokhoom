@@ -2,8 +2,150 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../../app';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: var(--font-plex), 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-plex-mono), 'IBM Plex Mono', ui-monospace, monospace;
+
+    --color-primary: #145a55;
+    --color-primary-strong: #0f4c48;
+    --color-primary-deep: #0b3a37;
+    --color-primary-mid: #2a8078;
+    --color-primary-light: #9cc5c0;
+    --color-primary-soft: #e2efed;
+    --color-primary-tint: #f2f8f7;
+    --color-primary-faint: #fafcfb;
+
+    --color-sand: #b8925a;
+    --color-sand-light: #dcc6a0;
+    --color-sand-soft: #f6eedf;
+    --color-sand-ink: #7a5a22;
+
+    --color-ink: #1c1915;
+    --color-ink-soft: #2e2a25;
+    --color-body: #4a453e;
+    --color-muted: #6b645a;
+    --color-subtle: #8c857b;
+    --color-faint: #ada69c;
+    --color-line-strong: #d2ccc2;
+    --color-line: #e6e1d9;
+    --color-divider: #f1eee9;
+    --color-skeleton: #eeeae4;
+    --color-head: #f8f6f2;
+    --color-canvas: #faf8f4;
+    --color-backdrop: #e9e5de;
+    --color-photo-a: #ece6dc;
+    --color-photo-b: #e4ddd1;
+    --color-photo-label: #6f685e;
+
+    --color-success: #2f7a4b;
+    --color-success-soft: #e5f2e9;
+    --color-whatsapp: #1f9d55;
+
+    --color-warning: #8f5800;
+    --color-warning-dot: #c98a1a;
+    --color-warning-soft: #fbefd9;
+    --color-notice: #fdf6e8;
+    --color-notice-line: #eed9ae;
+    --color-notice-ink: #4a3a14;
+    --color-notice-action-line: #e3c88f;
+    --color-notice-action: #6b4a0e;
+
+    --color-danger: #b3261e;
+    --color-danger-ink: #8c1d17;
+    --color-danger-soft: #fbe9e7;
+
+    --color-closed: #edeae5;
+    --color-closed-ink: #5c564e;
+
+    --radius-field: 10px;
+    --radius-card: 14px;
+
+    --text-11: 11px;
+    --text-12: 12px;
+    --text-13: 13px;
+    --text-14: 14px;
+    --text-15: 15px;
+    --text-16: 16px;
+    --text-17: 17px;
+    --text-18: 18px;
+    --text-20: 20px;
+    --text-22: 22px;
+    --text-24: 24px;
+    --text-26: 26px;
+    --text-28: 28px;
+
+    --shadow-pop: 0 8px 24px rgba(28, 25, 21, 0.1);
+    --shadow-fab: 0 6px 16px rgba(20, 90, 85, 0.28);
+}
+
+@layer base {
+    html {
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+        @apply bg-canvas font-sans text-ink;
+    }
+
+    a {
+        @apply text-primary;
+    }
+
+    button,
+    [role='button'] {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
+
+    input,
+    select,
+    textarea {
+        @apply text-ink outline-none;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        @apply text-subtle;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@utility photo-stripes {
+    background: repeating-linear-gradient(
+        135deg,
+        var(--color-photo-a) 0 8px,
+        var(--color-photo-b) 8px 16px
+    );
+}
+
+@utility photo-stripes-lg {
+    background: repeating-linear-gradient(
+        135deg,
+        var(--color-photo-a) 0 10px,
+        var(--color-photo-b) 10px 20px
+    );
+}
+
+@utility map-stripes {
+    background: repeating-linear-gradient(135deg, #e8e6df 0 12px, #e1ded5 12px 24px);
+}
+
+@utility scrollbar-none {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@utility field {
+    @apply h-12 w-full rounded-field border border-line-strong bg-white px-3.5 text-15 transition-colors focus:border-primary;
 }
