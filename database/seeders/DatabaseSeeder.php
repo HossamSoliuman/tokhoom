@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DemoOfficeSeeder::class,
             PlatformSeeder::class,
+            DemoAgentSeeder::class,
+            DemoHistorySeeder::class,
         ]);
     }
 }
