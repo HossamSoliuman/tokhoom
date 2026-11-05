@@ -5,7 +5,7 @@
 
     <div class="relative flex flex-wrap items-center gap-2" x-data="{ calendar: false }" x-on:keydown.escape="calendar = false">
         @foreach (['7' => 'آخر 7 أيام', '30' => 'آخر 30 يوماً', 'month' => 'هذا الشهر'] as $value => $label)
-            <x-ui.chip :active="$range === $value" class="h-10" wire:click="preset('{{ $value }}')">{{ $label }}</x-ui.chip>
+            <x-ui.chip :active="$range === (string) $value" class="h-10" wire:click="preset('{{ $value }}')">{{ $label }}</x-ui.chip>
         @endforeach
         <button type="button" x-on:click="calendar = ! calendar"
                 :class="calendar ? 'border-primary' : 'border-line-strong'"

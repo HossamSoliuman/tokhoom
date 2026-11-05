@@ -7,6 +7,7 @@ use App\Enums\DomainStatus;
 use App\Enums\Plan;
 use App\Enums\RejectionReason;
 use App\Enums\WorkspaceKind;
+use App\Support\Arabic;
 use Database\Factories\WorkspaceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -171,7 +172,7 @@ class Workspace extends Model
             return 0;
         }
 
-        return (int) ceil(Carbon::now()->diffInDays($this->trial_ends_at, true));
+        return max(1, (int) today()->diffInDays($this->trial_ends_at->copy()->startOfDay(), true));
     }
 
     public function siteHost(): string
@@ -203,7 +204,7 @@ class Workspace extends Model
      */
     public function initial(): string
     {
-        return mb_substr(preg_replace('/^مكتب\s+/u', '', $this->name) ?? $this->name, 0, 1);
+        return Arabic::initial(preg_replace('/^مكتب\s+/u', '', $this->name) ?? $this->name);
     }
 
     /**

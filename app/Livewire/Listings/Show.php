@@ -58,7 +58,7 @@ class Show extends Component
         ];
 
         $viewsKpi = $kpi('ti-eye', 'المشاهدات', $views, $count(SiteEventType::ListingView, $previousFrom, $from));
-        $viewsKpi['note'] .= ' عن الشهر السابق';
+        $viewsKpi['note'] = $viewsKpi['note'] !== '' ? $viewsKpi['note'].' عن الشهر السابق' : 'منذ النشر';
 
         return [
             $viewsKpi,

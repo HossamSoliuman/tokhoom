@@ -1,6 +1,6 @@
 <x-app.page title="اليوم">
     <x-slot:actions>
-        <x-ui.button icon="ti-plus" :href="route('listings.create')" wire:navigate class="hidden lg:inline-flex">إضافة عقار</x-ui.button>
+        <x-ui.button icon="ti-plus" :href="route('listings.create')" wire:navigate class="max-lg:hidden">إضافة عقار</x-ui.button>
     </x-slot:actions>
 
     @if ($isEmpty)

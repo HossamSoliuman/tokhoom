@@ -56,7 +56,7 @@
                         @foreach (\App\Livewire\Site\Settings::SWATCHES as $swatch)
                             <button type="button" wire:click="$set('brandColor', '{{ $swatch }}')"
                                     class="size-10 rounded-full border-[3px] border-white p-0 outline-2"
-                                    :style="`outline-style: solid; outline-color: ${$wire.brandColor.toUpperCase() === '{{ $swatch }}' ? '{{ $swatch }}' : 'transparent'}`"
+                                    :style="{ outlineStyle: 'solid', outlineColor: $wire.brandColor.toUpperCase() === '{{ $swatch }}' ? '{{ $swatch }}' : 'transparent' }"
                                     style="background: {{ $swatch }}" aria-label="{{ $swatch }}"></button>
                         @endforeach
                         <span class="flex h-10 items-center gap-2 rounded-field border border-line-strong bg-white px-2.5">

@@ -158,12 +158,13 @@ class Arabic
     }
 
     /**
-     * Signed change between two periods: "+12٪" or "−4٪".
+     * Signed change between two periods: "+12٪" or "−4٪". Empty when there is
+     * nothing to compare against.
      */
     public static function change(int|float $current, int|float $previous): string
     {
         if ($previous == 0) {
-            return $current > 0 ? '+'.self::number($current) : '0٪';
+            return '';
         }
 
         $change = (int) round(($current - $previous) / $previous * 100);

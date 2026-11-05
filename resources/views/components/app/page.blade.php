@@ -33,7 +33,7 @@
                     @endif
                     <h1 class="m-0 min-w-0 flex-1 text-22 font-bold leading-[1.4] lg:text-28">{{ $title }}</h1>
                     {{ $actions ?? '' }}
-                    <x-app.bell class="hidden lg:flex" />
+                    <x-app.bell class="max-lg:hidden" />
                 </div>
             @endif
 

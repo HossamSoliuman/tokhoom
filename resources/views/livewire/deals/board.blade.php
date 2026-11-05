@@ -31,7 +31,12 @@
                                 <span class="flex items-center gap-1.5 text-13 text-body"><i class="ti ti-home text-15 text-muted"></i>{{ $item->listing->title }}</span>
                             @endif
                             <div class="flex items-center justify-between gap-2">
-                                <span class="text-15 font-bold text-primary">{{ Arabic::money($item->value) }}{{ $item->isRental() ? ' / سنوياً' : '' }}</span>
+                                <span class="flex flex-col">
+                                    <span class="text-15 font-bold text-primary">{{ Arabic::money($item->value) }}</span>
+                                    @if ($item->isRental())
+                                        <span class="text-12 text-muted">سنوياً</span>
+                                    @endif
+                                </span>
                                 @if ($stage->isClosed())
                                     <span class="text-12 text-muted">
                                         {{ $stage === \App\Enums\DealStage::Won ? 'عمولة '.Arabic::money($item->commission) : $item->lost_reason?->label() }}

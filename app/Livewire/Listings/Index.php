@@ -75,7 +75,7 @@ class Index extends Component
             ])
             ->when($this->agent !== 'all' && $this->seesWholeWorkspace(), fn (Builder $query) => $query->where('agent_id', (int) $this->agent))
             ->when(ListingType::tryFrom($this->type), fn (Builder $query, ListingType $type) => $query->where('type', $type))
-            ->latest('updated_at')
+            ->latest('created_at')
             ->latest('id');
 
         $listings = $query->get();
