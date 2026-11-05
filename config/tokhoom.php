@@ -4,6 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Dashboard domain
+    |--------------------------------------------------------------------------
+    |
+    | The host serving the dashboard. Requests on any other host are treated
+    | as a visit to a workspace's public site.
+    |
+    */
+
+    'app_domain' => env('TOKHOOM_APP_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+
+    /*
+    |--------------------------------------------------------------------------
     | Public site domain
     |--------------------------------------------------------------------------
     |
