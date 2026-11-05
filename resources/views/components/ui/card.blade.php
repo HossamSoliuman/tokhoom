@@ -7,7 +7,9 @@
 ]) }}>
     @if ($title || isset($heading))
         <div @class(['flex items-center justify-between gap-2', 'px-4 pb-2 pt-4' => $flush])>
-            <h2 class="m-0 text-16 font-bold">{{ $title }}</h2>
+            @if ($title)
+                <h2 class="m-0 text-16 font-bold">{{ $title }}</h2>
+            @endif
             @isset($heading)
                 {{ $heading }}
             @endisset
