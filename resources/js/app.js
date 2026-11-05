@@ -1,5 +1,6 @@
 import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
 import toasts from './toasts';
+import copy from './copy';
 import rangeCalendar from './range-calendar';
 import locationPicker from './location-picker';
 
@@ -11,14 +12,7 @@ Alpine.store('shell', {
     unread: false,
 });
 
-Alpine.magic('copy', () => async (text, message = 'تم النسخ') => {
-    try {
-        await navigator.clipboard.writeText(text);
-        Alpine.store('toasts').push({ message, kind: 'info' });
-    } catch (error) {
-        Alpine.store('toasts').push({ message: 'تعذّر النسخ، انسخ النص يدوياً', kind: 'err' });
-    }
-});
+Alpine.magic('copy', () => copy(Alpine));
 
 Alpine.data('rangeCalendar', rangeCalendar);
 Alpine.data('locationPicker', locationPicker);
