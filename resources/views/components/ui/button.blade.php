@@ -20,6 +20,8 @@
         'ghost' => 'bg-transparent text-primary hover:bg-primary-tint',
         'danger' => 'bg-danger text-white hover:bg-danger-ink disabled:bg-line disabled:text-subtle',
         'danger-outline' => 'border border-line bg-white text-danger hover:bg-danger-soft',
+        'primary-outline' => 'border border-line bg-white text-primary hover:bg-primary-tint',
+        'quiet' => 'border border-line bg-white text-ink hover:bg-canvas',
         'whatsapp' => 'bg-whatsapp text-white hover:brightness-95',
     ];
 
