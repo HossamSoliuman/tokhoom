@@ -215,3 +215,17 @@ test('the listings grid shows only live listings of its site', function () {
     Livewire::test(ListingBrowser::class, ['workspace' => $workspace])
         ->assertViewHas('listings', fn ($listings) => $listings->modelKeys() === [$live->id]);
 });
+
+test('social accounts link to their profiles whether saved as handles or pasted links', function () {
+    $workspace = Workspace::factory()->create([
+        'x_handle' => '@alrashid_re',
+        'instagram' => 'https://www.instagram.com/alrashid/?igsh=abc123',
+        'tiktok' => 'https://www.tiktok.com/@alrashid.sa',
+    ]);
+
+    $this->get(siteUrl($workspace))
+        ->assertOk()
+        ->assertSee('href="https://x.com/alrashid_re"', false)
+        ->assertSee('href="https://instagram.com/alrashid"', false)
+        ->assertSee('href="https://tiktok.com/@alrashid.sa"', false);
+});

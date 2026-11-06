@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'kind', 'name', 'slug', 'city', 'cr_number', 'fal_number', 'license_expires_on',
@@ -240,13 +241,14 @@ class Workspace extends Model
     }
 
     /**
-     * Social accounts set in site settings, as links.
+     * Social accounts set in site settings, as links. Each may be saved as
+     * "@name", "name" or a pasted profile link.
      *
      * @return list<array{icon: string, label: string, url: string}>
      */
     public function socialLinks(): array
     {
-        $handle = fn (?string $value): string => ltrim(trim((string) $value), '@');
+        $handle = fn (?string $value): string => ltrim(Str::afterLast(rtrim(Str::before(trim((string) $value), '?'), '/'), '/'), '@');
 
         return array_values(array_filter([
             $this->x_handle ? ['icon' => 'ti-brand-x', 'label' => 'X', 'url' => 'https://x.com/'.$handle($this->x_handle)] : null,
