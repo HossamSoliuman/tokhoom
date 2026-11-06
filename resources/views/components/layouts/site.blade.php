@@ -39,7 +39,7 @@
     @vite(['resources/css/app.css', 'resources/js/site.js'])
     @livewireStyles
 </head>
-<body class="flex min-h-dvh flex-col bg-canvas">
+<body class="flex min-h-dvh flex-col bg-canvas" x-data>
     <header class="border-b border-line bg-white">
         <div class="mx-auto flex h-16 max-w-[1248px] items-center justify-between gap-3 px-4 lg:h-20 lg:px-6">
             <a href="{{ route('site.home') }}" class="flex min-w-0 items-center gap-2.5 text-ink hover:text-ink lg:gap-3">
