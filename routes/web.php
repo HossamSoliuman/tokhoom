@@ -7,6 +7,7 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\ReportExportController;
 use App\Http\Controllers\ShortLinkController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SiteEventController;
 use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Middleware\EnsureWorkspace;
 use App\Http\Middleware\ResolveSite;
@@ -84,5 +85,7 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
 
 Route::middleware(ResolveSite::class)->name('site.')->group(function () {
     Route::get('/', [SiteController::class, 'home'])->name('home');
+    Route::get('/agents/{agent}', [SiteController::class, 'agent'])->whereNumber('agent')->name('agent');
     Route::get('/listings/{code}', [SiteController::class, 'listing'])->name('listing');
+    Route::post('/events', SiteEventController::class)->middleware('throttle:60,1')->name('events');
 });

@@ -240,6 +240,23 @@ class Workspace extends Model
     }
 
     /**
+     * Social accounts set in site settings, as links.
+     *
+     * @return list<array{icon: string, label: string, url: string}>
+     */
+    public function socialLinks(): array
+    {
+        $handle = fn (?string $value): string => ltrim(trim((string) $value), '@');
+
+        return array_values(array_filter([
+            $this->x_handle ? ['icon' => 'ti-brand-x', 'label' => 'X', 'url' => 'https://x.com/'.$handle($this->x_handle)] : null,
+            $this->instagram ? ['icon' => 'ti-brand-instagram', 'label' => 'إنستغرام', 'url' => 'https://instagram.com/'.$handle($this->instagram)] : null,
+            $this->snapchat ? ['icon' => 'ti-brand-snapchat', 'label' => 'سناب شات', 'url' => 'https://snapchat.com/add/'.$handle($this->snapchat)] : null,
+            $this->tiktok ? ['icon' => 'ti-brand-tiktok', 'label' => 'تيك توك', 'url' => 'https://tiktok.com/@'.$handle($this->tiktok)] : null,
+        ]));
+    }
+
+    /**
      * The letter shown in place of a logo.
      */
     public function initial(): string
