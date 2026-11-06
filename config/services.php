@@ -39,4 +39,10 @@ return [
         'driver' => env('SMS_DRIVER', 'log'),
     ],
 
+    'tap' => [
+        'secret_key' => env('TAP_SECRET_KEY'),
+        'merchant_id' => env('TAP_MERCHANT_ID'),
+        'base_url' => env('TAP_BASE_URL', 'https://api.tap.company/v2'),
+    ],
+
 ];
