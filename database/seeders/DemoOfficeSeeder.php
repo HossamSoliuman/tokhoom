@@ -501,7 +501,11 @@ class DemoOfficeSeeder extends Seeder
             'about' => 'فرع مكتب الراشد العقاري في جدة.',
             'whatsapp' => '0501234567',
         ]);
-        $branch->forceFill(['approval_status' => 'approved', 'approved_at' => now()->subMonths(2)])->save();
+        $branch->forceFill([
+            'approval_status' => 'approved',
+            'approved_at' => now()->subMonths(2),
+            'paid_until' => now()->addMonthNoOverflow()->startOfMonth()->toDateString(),
+        ])->save();
 
         Membership::create([
             'workspace_id' => $branch->id,

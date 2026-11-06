@@ -302,6 +302,10 @@ class DemoAgentSeeder extends Seeder
                 'paid_at' => $issued->copy()->addHours(3),
             ]);
         }
+
+        if ($this->workspace->invoices()->exists()) {
+            $this->workspace->forceFill(['paid_until' => now()->addMonthNoOverflow()->startOfMonth()->toDateString()])->save();
+        }
     }
 
     /**

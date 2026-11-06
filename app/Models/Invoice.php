@@ -20,6 +20,8 @@ class Invoice extends Model
             'amount' => 'integer',
             'issued_on' => 'date',
             'paid_at' => 'datetime',
+            'payment_attempts' => 'integer',
+            'last_attempted_at' => 'datetime',
         ];
     }
 

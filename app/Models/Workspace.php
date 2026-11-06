@@ -48,6 +48,7 @@ class Workspace extends Model
             'rejected_at' => 'datetime',
             'suspended_at' => 'datetime',
             'trial_ends_at' => 'datetime',
+            'paid_until' => 'date',
             'domain_checked_at' => 'datetime',
         ];
     }
@@ -284,13 +285,26 @@ class Workspace extends Model
         return $this->plan->monthlyPrice() + $this->extraSeats() * Plan::EXTRA_SEAT_PRICE;
     }
 
+    /**
+     * When the next month is charged: the end of the paid month, else the end
+     * of the trial. A date in the past means a payment is overdue.
+     */
     public function nextChargeDate(): Carbon
     {
-        if ($this->isOnTrial()) {
-            return $this->trial_ends_at->copy();
-        }
+        return ($this->paid_until ?? $this->trial_ends_at ?? Carbon::today())->copy()->startOfDay();
+    }
 
-        return Carbon::now()->addMonthNoOverflow()->startOfMonth();
+    public function isBillingDue(): bool
+    {
+        return $this->nextChargeDate()->lte(Carbon::today());
+    }
+
+    /**
+     * Whether a card is saved with Tap for charging renewals without the owner.
+     */
+    public function hasSavedCard(): bool
+    {
+        return filled($this->tap_card_id) && filled($this->tap_customer_id) && filled($this->tap_payment_agreement_id);
     }
 
     /**

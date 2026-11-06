@@ -70,6 +70,7 @@ class PlatformSeeder extends Seeder
                     'plan' => $plan,
                     'seats' => max($members, $plan->includedSeats()),
                     'trial_ends_at' => $state === 'trial' ? now()->addDays(11) : now()->subMonths(3),
+                    'paid_until' => $state === 'trial' ? null : now()->addMonthNoOverflow()->startOfMonth()->toDateString(),
                     'suspended_at' => $state === 'suspended' ? now()->subDays(2) : null,
                 ])->save();
 
