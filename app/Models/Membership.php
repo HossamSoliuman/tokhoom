@@ -62,6 +62,17 @@ class Membership extends Model
     }
 
     /**
+     * The public page this member shares: an office agent's own page, or the
+     * whole site for owners, managers and independent agents.
+     */
+    public function publicUrl(): string
+    {
+        return $this->role === MemberRole::Agent && $this->workspace->isOffice()
+            ? $this->workspace->siteUrl('/agents/'.$this->user_id)
+            : $this->workspace->siteUrl();
+    }
+
+    /**
      * Whether the member's FAL license runs out within the given number of days.
      */
     public function falExpiresWithin(int $days): bool

@@ -8,6 +8,7 @@ use App\Http\Controllers\ReportExportController;
 use App\Http\Controllers\ShortLinkController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteEventController;
+use App\Http\Controllers\SiteQrController;
 use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Middleware\EnsureWorkspace;
 use App\Http\Middleware\ResolveSite;
@@ -74,6 +75,7 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
             Route::get('/billing/invoices/{invoice}', InvoiceController::class)->name('billing.invoice')->can('manage-billing');
 
             Route::livewire('/more', More::class)->name('more');
+            Route::get('/share/qr.{format}', SiteQrController::class)->whereIn('format', ['svg', 'png'])->name('share.qr');
         });
 
         Route::middleware('can:platform-admin')->prefix('admin')->name('admin.')->group(function () {
