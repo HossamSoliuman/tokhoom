@@ -13,10 +13,7 @@ class Phone
      */
     public static function normalize(?string $input): string
     {
-        $digits = preg_replace('/\D/', '', strtr((string) $input, [
-            '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
-            '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
-        ])) ?? '';
+        $digits = self::digits($input);
 
         if (str_starts_with($digits, '00966')) {
             $digits = substr($digits, 5);
@@ -29,6 +26,17 @@ class Phone
         }
 
         return $digits;
+    }
+
+    /**
+     * The Latin digits typed, with Arabic-Indic digits converted and everything else dropped.
+     */
+    public static function digits(?string $input): string
+    {
+        return preg_replace('/\D/', '', strtr((string) $input, [
+            '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+            '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+        ])) ?? '';
     }
 
     public static function isMobile(string $normalized): bool
