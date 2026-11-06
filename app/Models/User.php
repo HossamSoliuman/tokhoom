@@ -98,4 +98,12 @@ class User extends Authenticatable
     {
         return $this->currentWorkspace?->approval_status === ApprovalStatus::Pending;
     }
+
+    /**
+     * The number text messages go to.
+     */
+    public function routeNotificationForSms(): ?string
+    {
+        return $this->mobile;
+    }
 }
