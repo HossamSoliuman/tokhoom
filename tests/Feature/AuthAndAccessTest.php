@@ -13,6 +13,7 @@ use App\Models\Workspace;
 use App\Notifications\ApprovalRequested;
 use App\Notifications\LoginCode;
 use App\Notifications\ResetPasswordLink;
+use App\Support\Totp;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Features\SupportTesting\Testable;
@@ -347,4 +348,119 @@ test('changing the password needs the current one', function () {
         ->assertHasNoErrors();
 
     expect(Hash::check('new-password-123', $user->fresh()->password))->toBeTrue();
+});
+
+/**
+ * A member with two-step verification on and one known recovery code.
+ */
+function twoFactorUser(): User
+{
+    return tap(User::factory()->create(['email' => 'k.alrashid@alrashid.sa', 'mobile' => '0551234567']), function (User $user) {
+        $user->forceFill([
+            'two_factor_secret' => Totp::generateSecret(),
+            'two_factor_recovery_codes' => [Hash::make('abcde-12345')],
+            'two_factor_confirmed_at' => now(),
+        ])->save();
+    });
+}
+
+function passwordStep(): Testable
+{
+    return Livewire::test(Login::class)
+        ->set('email', 'k.alrashid@alrashid.sa')
+        ->set('password', 'password')
+        ->call('login');
+}
+
+test('members turn on two-step verification from their account', function () {
+    [$user] = member();
+
+    $account = Livewire::actingAs($user)->test(Account::class)->call('startTwoFactor');
+    $secret = $user->fresh()->two_factor_secret;
+
+    $account->set('twoFactorCode', Totp::code($secret) === '000000' ? '111111' : '000000')
+        ->call('confirmTwoFactor')
+        ->assertHasErrors('twoFactorCode');
+    expect($user->fresh()->hasTwoFactor())->toBeFalse();
+
+    $account->set('twoFactorCode', Totp::code($secret))
+        ->call('confirmTwoFactor')
+        ->assertHasNoErrors()
+        ->assertCount('recoveryCodes', 8);
+    expect($user->fresh()->hasTwoFactor())->toBeTrue();
+});
+
+test('with two-step verification the password alone does not sign in', function () {
+    $user = twoFactorUser();
+
+    $login = passwordStep()->assertSet('twoFactorUserId', $user->id);
+    $this->assertGuest();
+
+    $login->set('twoFactorCode', Totp::code($user->two_factor_secret))
+        ->call('verifyTwoFactor')
+        ->assertRedirect(route('home'));
+    $this->assertAuthenticatedAs($user);
+});
+
+test('a texted code is also followed by the authenticator step', function () {
+    Notification::fake();
+    $user = twoFactorUser();
+
+    [$login, $code] = requestLoginCode($user);
+    $login->set('code', $code)->call('verifyCode')->assertSet('twoFactorUserId', $user->id);
+
+    $this->assertGuest();
+});
+
+test('an authenticator code cannot be used twice', function () {
+    $user = twoFactorUser();
+    $code = Totp::code($user->two_factor_secret);
+    passwordStep()->set('twoFactorCode', $code)->call('verifyTwoFactor');
+    auth()->logout();
+
+    passwordStep()->set('twoFactorCode', $code)->call('verifyTwoFactor')->assertHasErrors('twoFactorCode');
+
+    $this->assertGuest();
+});
+
+test('a recovery code signs in once', function () {
+    twoFactorUser();
+    passwordStep()->set('twoFactorCode', 'ABCDE-12345')->call('verifyTwoFactor')->assertRedirect(route('home'));
+    auth()->logout();
+
+    passwordStep()->set('twoFactorCode', 'abcde-12345')->call('verifyTwoFactor')->assertHasErrors('twoFactorCode');
+
+    $this->assertGuest();
+});
+
+test('authenticator guesses are limited to five', function () {
+    $user = twoFactorUser();
+    $code = Totp::code($user->two_factor_secret);
+    $login = passwordStep();
+
+    foreach (range(1, 5) as $guess) {
+        $login->set('twoFactorCode', 'wrong-'.$guess)->call('verifyTwoFactor');
+    }
+    $login->set('twoFactorCode', $code)->call('verifyTwoFactor')->assertSee('محاولات كثيرة');
+
+    $this->assertGuest();
+});
+
+test('turning two-step verification off needs the current password', function () {
+    [$user] = member();
+    $user->forceFill(['two_factor_secret' => Totp::generateSecret(), 'two_factor_confirmed_at' => now()])->save();
+
+    Livewire::actingAs($user)->test(Account::class)
+        ->set('disablePassword', 'wrong-password')
+        ->call('disableTwoFactor')
+        ->assertHasErrors('disablePassword');
+    expect($user->fresh()->hasTwoFactor())->toBeTrue();
+
+    Livewire::actingAs($user)->test(Account::class)
+        ->set('disablePassword', 'password')
+        ->call('disableTwoFactor')
+        ->assertHasNoErrors();
+    expect($user->fresh())
+        ->hasTwoFactor()->toBeFalse()
+        ->two_factor_secret->toBeNull();
 });

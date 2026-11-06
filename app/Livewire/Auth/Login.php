@@ -32,6 +32,8 @@ class Login extends Component
 
     private const WINDOW_SECONDS = 600;
 
+    private const TWO_FACTOR_GUESSES_PER_WINDOW = 5;
+
     public string $method = 'email';
 
     public string $email = '';
@@ -50,6 +52,17 @@ class Login extends Component
 
     public bool $remember = true;
 
+    public string $twoFactorCode = '';
+
+    /**
+     * The member who passed the first step and still owes an authenticator code.
+     */
+    #[Locked]
+    public ?int $twoFactorUserId = null;
+
+    #[Locked]
+    public int $twoFactorExpiresAt = 0;
+
     public function login(): void
     {
         $this->validate([
@@ -65,7 +78,7 @@ class Login extends Component
             return;
         }
 
-        if (! Auth::attempt(['email' => Str::lower($this->email), 'password' => $this->password], $this->remember)) {
+        if (! Auth::validate(['email' => Str::lower($this->email), 'password' => $this->password])) {
             RateLimiter::hit($key);
             $this->addError('email', 'البريد الإلكتروني أو كلمة المرور غير صحيحة.');
 
@@ -73,7 +86,7 @@ class Login extends Component
         }
 
         RateLimiter::clear($key);
-        $this->signedIn();
+        $this->passedFirstStep(Auth::getLastAttempted());
     }
 
     public function sendCode(): void
@@ -138,8 +151,54 @@ class Login extends Component
         }
 
         RateLimiter::clear($key);
+        $this->passedFirstStep($user);
+    }
+
+    public function verifyTwoFactor(): void
+    {
+        abort_if($this->twoFactorUserId === null || $this->twoFactorExpiresAt < now()->timestamp, 404);
+
+        $this->validate(['twoFactorCode' => ['required', 'string', 'max:20']], [
+            'twoFactorCode.required' => 'أدخل الرمز من تطبيق المصادقة',
+        ]);
+
+        $key = 'two-factor:'.$this->twoFactorUserId;
+
+        if (RateLimiter::tooManyAttempts($key, self::TWO_FACTOR_GUESSES_PER_WINDOW)) {
+            $this->addError('twoFactorCode', 'محاولات كثيرة. حاول مرة أخرى بعد '.RateLimiter::availableIn($key).' ثانية.');
+
+            return;
+        }
+
+        $user = User::findOrFail($this->twoFactorUserId);
+
+        if (! $user->passesTwoFactor($this->twoFactorCode)) {
+            RateLimiter::hit($key, self::WINDOW_SECONDS);
+            $this->addError('twoFactorCode', 'الرمز غير صحيح.');
+
+            return;
+        }
+
+        RateLimiter::clear($key);
         Auth::login($user, $this->remember);
         $this->signedIn();
+    }
+
+    /**
+     * Sign in now, or ask for the authenticator code first when the member set one up.
+     */
+    private function passedFirstStep(User $user): void
+    {
+        if (! $user->hasTwoFactor()) {
+            Auth::login($user, $this->remember);
+            $this->signedIn();
+
+            return;
+        }
+
+        $this->twoFactorUserId = $user->id;
+        $this->twoFactorExpiresAt = now()->addMinutes(10)->timestamp;
+        $this->resetErrorBag();
     }
 
     /**
