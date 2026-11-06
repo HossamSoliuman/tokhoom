@@ -87,20 +87,60 @@ class Subscriptions
             $workspace = $invoice->workspace;
             $from = $workspace->nextChargeDate()->max(Carbon::today());
 
-            $workspace->forceFill(array_filter([
+            $workspace->forceFill([
                 'paid_until' => $from->copy()->addMonthNoOverflow()->toDateString(),
-                'tap_customer_id' => data_get($charge, 'customer.id'),
-                'tap_card_id' => data_get($charge, 'card.id'),
-                'tap_payment_agreement_id' => data_get($charge, 'payment_agreement.id'),
-                'card_brand' => data_get($charge, 'card.brand') ?? data_get($charge, 'card.scheme'),
-                'card_last_four' => data_get($charge, 'card.last_four'),
-                'card_expiry' => data_get($charge, 'card.exp_month') && data_get($charge, 'card.exp_year')
-                    ? str_pad((string) data_get($charge, 'card.exp_month'), 2, '0', STR_PAD_LEFT).'/'.data_get($charge, 'card.exp_year')
-                    : null,
-            ]))->save();
+                ...self::cardDetails($charge),
+            ])->save();
 
             return $invoice;
         });
+    }
+
+    /**
+     * Keep the card from an authorization Tap confirmed, made to save a card
+     * when there was no invoice to pay. Returns the workspace it belongs to.
+     *
+     * @param  array<string, mixed>  $authorization
+     */
+    public static function saveCard(array $authorization): ?Workspace
+    {
+        $workspace = Workspace::find((int) data_get($authorization, 'metadata.workspace'));
+
+        if (! $workspace || ! str_starts_with((string) data_get($authorization, 'reference.transaction'), 'CARD-'.$workspace->id.'-')) {
+            return null;
+        }
+
+        if (data_get($authorization, 'status') === 'AUTHORIZED') {
+            $workspace->forceFill(self::cardDetails($authorization))->save();
+        }
+
+        return $workspace;
+    }
+
+    /**
+     * The Tap customer and saved card a payment returned. A new card replaces
+     * every field of the old one, including its payment agreement.
+     *
+     * @param  array<string, mixed>  $payment
+     * @return array<string, ?string>
+     */
+    private static function cardDetails(array $payment): array
+    {
+        $customer = array_filter(['tap_customer_id' => data_get($payment, 'customer.id')]);
+
+        if (! data_get($payment, 'card.id')) {
+            return $customer;
+        }
+
+        return $customer + [
+            'tap_card_id' => data_get($payment, 'card.id'),
+            'tap_payment_agreement_id' => data_get($payment, 'payment_agreement.id'),
+            'card_brand' => data_get($payment, 'card.brand') ?? data_get($payment, 'card.scheme'),
+            'card_last_four' => data_get($payment, 'card.last_four'),
+            'card_expiry' => data_get($payment, 'card.exp_month') && data_get($payment, 'card.exp_year')
+                ? str_pad((string) data_get($payment, 'card.exp_month'), 2, '0', STR_PAD_LEFT).'/'.data_get($payment, 'card.exp_year')
+                : null,
+        ];
     }
 
     /**

@@ -35,12 +35,42 @@ class Tap
             'threeDSecure' => true,
             'save_card' => true,
             'source' => ['id' => 'src_all'],
-            'customer' => $workspace->tap_customer_id ? ['id' => $workspace->tap_customer_id] : array_filter([
-                'first_name' => $owner->name,
-                'email' => $owner->email,
-                'phone' => $owner->mobile ? ['country_code' => '966', 'number' => ltrim($owner->mobile, '0')] : null,
-            ]),
+            'customer' => self::customer($workspace, $owner),
         ])->json();
+    }
+
+    /**
+     * Save a card without an invoice to pay, such as during the trial: Tap
+     * holds 1 riyal on its page and releases the hold within the hour.
+     *
+     * @return array<string, mixed>
+     */
+    public static function authorizeCard(Workspace $workspace, User $owner, string $redirectUrl, string $webhookUrl): array
+    {
+        return self::client()->post('/authorize', array_filter([
+            'amount' => 1.0,
+            'currency' => 'SAR',
+            'customer_initiated' => true,
+            'threeDSecure' => true,
+            'save_card' => true,
+            'auto' => ['type' => 'VOID', 'time' => 1],
+            'description' => 'التحقق من البطاقة لتجديد الاشتراك تلقائياً',
+            'metadata' => ['workspace' => (string) $workspace->id],
+            'reference' => ['transaction' => 'CARD-'.$workspace->id.'-'.now()->timestamp],
+            'merchant' => config('services.tap.merchant_id') ? ['id' => config('services.tap.merchant_id')] : null,
+            'source' => ['id' => 'src_all'],
+            'customer' => self::customer($workspace, $owner),
+            'post' => ['url' => $webhookUrl],
+            'redirect' => ['url' => $redirectUrl],
+        ]))->json();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function authorization(string $authorizeId): array
+    {
+        return self::client()->get('/authorize/'.rawurlencode($authorizeId))->json();
     }
 
     /**
@@ -77,7 +107,7 @@ class Tap
 
     /**
      * Whether a webhook really came from Tap: its "hashstring" header is an
-     * HMAC-SHA256 of the charge's key fields with the secret key.
+     * HMAC-SHA256 of the charge's or authorization's key fields with the secret key.
      *
      * @param  array<string, mixed>  $charge
      */
@@ -96,6 +126,20 @@ class Tap
             .'x_created'.data_get($charge, 'transaction.created');
 
         return hash_equals(hash_hmac('sha256', $fields, config('services.tap.secret_key')), $hashstring);
+    }
+
+    /**
+     * The workspace's Tap customer, or the owner's details for a first payment.
+     *
+     * @return array<string, mixed>
+     */
+    private static function customer(Workspace $workspace, User $owner): array
+    {
+        return $workspace->tap_customer_id ? ['id' => $workspace->tap_customer_id] : array_filter([
+            'first_name' => $owner->name,
+            'email' => $owner->email,
+            'phone' => $owner->mobile ? ['country_code' => '966', 'number' => ltrim($owner->mobile, '0')] : null,
+        ]);
     }
 
     /**
