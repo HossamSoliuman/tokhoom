@@ -9,7 +9,10 @@ use App\Livewire\Concerns\InteractsWithWorkspace;
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Workspace;
 use App\Support\DomainVerifier;
+use App\Support\Tap;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Title;
@@ -89,9 +92,51 @@ class Index extends Component
         $this->toast('أصبح لديك '.$this->seats.' مقاعد');
     }
 
+    /**
+     * Pay an open invoice on Tap's page. The card used is saved for renewals.
+     */
+    public function payInvoice(int $invoiceId): void
+    {
+        $invoice = $this->workspace()->invoices()->whereNull('paid_at')->findOrFail($invoiceId);
+
+        if (! Tap::configured()) {
+            $this->toast('سيتوفر الدفع بعد ربط بوابة الدفع', 'info');
+
+            return;
+        }
+
+        try {
+            $charge = Tap::checkout($invoice, $this->user(), route('billing.tap-return'), route('webhooks.tap'));
+        } catch (ConnectionException|RequestException $exception) {
+            report($exception);
+            $charge = [];
+        }
+
+        $url = data_get($charge, 'transaction.url');
+
+        if (! $url) {
+            $this->toast('تعذّر فتح صفحة الدفع. حاول مرة أخرى بعد قليل', 'err');
+
+            return;
+        }
+
+        $this->redirect($url);
+    }
+
+    /**
+     * A card is saved, or replaced, by paying an invoice with it.
+     */
     public function changeCard(): void
     {
-        $this->toast('سيتوفر تحديث البطاقة بعد ربط بوابة الدفع', 'info');
+        $open = $this->workspace()->invoices()->whereNull('paid_at')->latest('id')->first();
+
+        if ($open && Tap::configured()) {
+            $this->payInvoice($open->id);
+
+            return;
+        }
+
+        $this->toast(Tap::configured() ? 'تُحفظ البطاقة عند دفع الفاتورة القادمة' : 'سيتوفر تحديث البطاقة بعد ربط بوابة الدفع', 'info');
     }
 
     public function verifyDomain(DomainVerifier $verifier): void
@@ -144,7 +189,8 @@ class Index extends Component
             'extraSeats' => $extra,
             'extraCost' => $extra * Plan::EXTRA_SEAT_PRICE,
             'minimumSeats' => $this->minimumSeats($workspace),
-            'invoices' => $workspace->invoices()->latest('issued_on')->limit(12)->get(),
+            'invoices' => $workspace->invoices()->latest('issued_on')->latest('id')->limit(12)->get(),
+            'canPay' => Tap::configured(),
             'recordName' => DomainVerifier::recordName($previewDomain),
             'domainStatus' => $workspace->custom_domain ? ($workspace->domain_status ?? DomainStatus::Pending) : null,
         ]);

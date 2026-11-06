@@ -65,6 +65,9 @@
                         'bg-success-soft text-success' => $invoice->paid_at,
                         'bg-warning-soft text-warning' => ! $invoice->paid_at,
                     ])>{{ $invoice->paid_at ? 'مدفوعة' : 'مستحقة' }}</span>
+                    @if (! $invoice->paid_at && $canPay)
+                        <x-ui.button size="xs" icon="ti-credit-card" class="text-13" wire:click="payInvoice({{ $invoice->id }})">ادفع</x-ui.button>
+                    @endif
                     <a href="{{ route('billing.invoice', $invoice) }}" target="_blank" class="flex size-9 items-center justify-center rounded-lg text-ink hover:bg-canvas" aria-label="تنزيل الفاتورة">
                         <i class="ti ti-download text-18"></i>
                     </a>

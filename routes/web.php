@@ -10,6 +10,8 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteEventController;
 use App\Http\Controllers\SiteQrController;
 use App\Http\Controllers\SwitchWorkspaceController;
+use App\Http\Controllers\TapReturnController;
+use App\Http\Controllers\TapWebhookController;
 use App\Http\Middleware\EnsureWorkspace;
 use App\Http\Middleware\ResolveSite;
 use App\Livewire\Account;
@@ -38,6 +40,7 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
     Route::get('/s/{code}', ShortLinkController::class)->name('short-link');
 
     Route::get('/', HomeController::class)->name('home');
+    Route::post('/webhooks/tap', TapWebhookController::class)->name('webhooks.tap');
 
     Route::middleware('guest')->group(function () {
         Route::livewire('/login', Login::class)->name('login');
@@ -78,6 +81,7 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
 
             Route::livewire('/billing', Billing\Index::class)->name('billing')->can('manage-billing');
             Route::get('/billing/invoices/{invoice}', InvoiceController::class)->name('billing.invoice')->can('manage-billing');
+            Route::get('/billing/tap/return', TapReturnController::class)->name('billing.tap-return')->can('manage-billing');
 
             Route::livewire('/more', More::class)->name('more');
             Route::livewire('/account', Account::class)->name('account');
