@@ -124,19 +124,41 @@ class Index extends Component
     }
 
     /**
-     * A card is saved, or replaced, by paying an invoice with it.
+     * Save or replace the card: by paying the open invoice with it, or,
+     * with nothing to pay, by a 1 riyal hold that Tap releases.
      */
     public function changeCard(): void
     {
+        if (! Tap::configured()) {
+            $this->toast('سيتوفر تحديث البطاقة بعد ربط بوابة الدفع', 'info');
+
+            return;
+        }
+
         $open = $this->workspace()->invoices()->whereNull('paid_at')->latest('id')->first();
 
-        if ($open && Tap::configured()) {
+        if ($open) {
             $this->payInvoice($open->id);
 
             return;
         }
 
-        $this->toast(Tap::configured() ? 'تُحفظ البطاقة عند دفع الفاتورة القادمة' : 'سيتوفر تحديث البطاقة بعد ربط بوابة الدفع', 'info');
+        try {
+            $authorization = Tap::authorizeCard($this->workspace(), $this->user(), route('billing.tap-return'), route('webhooks.tap'));
+        } catch (ConnectionException|RequestException $exception) {
+            report($exception);
+            $authorization = [];
+        }
+
+        $url = data_get($authorization, 'transaction.url');
+
+        if (! $url) {
+            $this->toast('تعذّر فتح صفحة الدفع. حاول مرة أخرى بعد قليل', 'err');
+
+            return;
+        }
+
+        $this->redirect($url);
     }
 
     public function verifyDomain(DomainVerifier $verifier): void

@@ -18,9 +18,11 @@ class TapWebhookController extends Controller
 
         abort_unless(Tap::validWebhook($charge, $request->header('hashstring')), 403);
 
-        if (data_get($charge, 'object') === 'charge') {
-            Subscriptions::settle($charge);
-        }
+        match (data_get($charge, 'object')) {
+            'charge' => Subscriptions::settle($charge),
+            'authorize' => Subscriptions::saveCard($charge),
+            default => null,
+        };
 
         return response()->noContent(200);
     }

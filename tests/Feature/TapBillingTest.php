@@ -222,3 +222,87 @@ test('suspended and unapproved workspaces are not billed', function (Closure $ma
     'suspended' => fn () => Workspace::factory()->suspended()->create(),
     'pending approval' => fn () => Workspace::factory()->pending()->create(),
 ]);
+
+/**
+ * A card hold as Tap reports it, for a workspace.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function tapAuthorization(Workspace $workspace, array $overrides = []): array
+{
+    return array_replace_recursive([
+        'id' => 'auth_'.$workspace->id,
+        'object' => 'authorize',
+        'status' => 'AUTHORIZED',
+        'amount' => 1.0,
+        'currency' => 'SAR',
+        'metadata' => ['workspace' => (string) $workspace->id],
+        'reference' => ['transaction' => 'CARD-'.$workspace->id.'-1730900000', 'gateway' => '123456', 'payment' => '9876543'],
+        'transaction' => ['created' => '1730900000000'],
+        'customer' => ['id' => 'cus_1'],
+        'card' => ['id' => 'card_1', 'brand' => 'VISA', 'last_four' => '1111'],
+        'payment_agreement' => ['id' => 'payment_agreement_1'],
+    ], $overrides);
+}
+
+test('with nothing to pay a card is saved through a 1 riyal hold that Tap voids', function () {
+    Http::fake(['api.tap.company/v2/authorize' => Http::response(['id' => 'auth_1', 'status' => 'INITIATED', 'transaction' => ['url' => 'https://checkout.tap.company/hold']])]);
+    [$owner, $workspace] = member();
+
+    Livewire::actingAs($owner)->test(Billing::class)
+        ->call('changeCard')
+        ->assertRedirect('https://checkout.tap.company/hold');
+
+    Http::assertSent(fn (Request $request) => $request->url() === 'https://api.tap.company/v2/authorize'
+        && $request['amount'] == 1
+        && $request['save_card'] === true
+        && $request['auto'] === ['type' => 'VOID', 'time' => 1]
+        && $request['metadata']['workspace'] === (string) $workspace->id);
+});
+
+test('returning from a confirmed hold keeps the card without paying anything', function () {
+    [$owner, $workspace] = member();
+    Http::fake(['api.tap.company/v2/authorize/auth_'.$workspace->id => Http::response(tapAuthorization($workspace))]);
+
+    $this->actingAs($owner)
+        ->get(route('billing.tap-return', ['tap_id' => 'auth_'.$workspace->id]))
+        ->assertRedirect(route('billing'));
+
+    expect($workspace->fresh())
+        ->hasSavedCard()->toBeTrue()
+        ->card_last_four->toBe('1111')
+        ->paid_until->toBeNull()
+        ->and($workspace->invoices()->count())->toBe(0);
+});
+
+test('a hold Tap did not authorize saves no card', function () {
+    [$owner, $workspace] = member();
+    Http::fake(['api.tap.company/v2/authorize/*' => Http::response(tapAuthorization($workspace, ['status' => 'DECLINED']))]);
+
+    $this->actingAs($owner)->get(route('billing.tap-return', ['tap_id' => 'auth_'.$workspace->id]))->assertRedirect(route('billing'));
+
+    expect($workspace->fresh()->hasSavedCard())->toBeFalse();
+});
+
+test('a new card without a payment agreement replaces the old card entirely', function () {
+    [, $workspace] = dueWorkspace(savedCard: true);
+
+    Subscriptions::saveCard(tapAuthorization($workspace, ['card' => ['id' => 'card_2'], 'payment_agreement' => null]));
+
+    expect($workspace->fresh())
+        ->tap_card_id->toBe('card_2')
+        ->tap_payment_agreement_id->toBeNull()
+        ->hasSavedCard()->toBeFalse();
+});
+
+test('the Tap webhook saves a card from a signed authorization', function () {
+    [, $workspace] = member();
+    $authorization = tapAuthorization($workspace);
+    $signed = 'x_id'.$authorization['id'].'x_amount1.00x_currencySAR'
+        .'x_gateway_reference123456x_payment_reference9876543x_statusAUTHORIZEDx_created1730900000000';
+
+    $this->postJson(route('webhooks.tap'), $authorization, ['hashstring' => hash_hmac('sha256', $signed, TAP_KEY)])->assertOk();
+
+    expect($workspace->fresh()->hasSavedCard())->toBeTrue();
+});
