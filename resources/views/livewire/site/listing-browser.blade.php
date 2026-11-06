@@ -6,6 +6,7 @@
         'desc' => ['السعر: من الأعلى إلى الأقل', 'السعر: الأعلى'],
     ];
     $on = 'border-brand bg-brand text-brand-ink';
+    $filterTargets = 'purpose,type,district,min,max,beds,sort,clearFilters';
     $off = 'border-line-strong bg-white text-ink';
 @endphp
 
@@ -114,28 +115,41 @@
                 @endif
             </div>
 
-            @if ($listings->isEmpty())
-                <div class="mt-1 flex flex-col items-center gap-3.5 rounded-card border border-dashed border-line-strong bg-white px-5 py-10 text-center lg:mt-0 lg:rounded-2xl lg:px-6 lg:py-16">
-                    <span class="flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand-text lg:size-16">
-                        <i class="ti ti-search-off text-[26px] lg:text-[30px]"></i>
-                    </span>
-                    <div class="text-17 font-semibold lg:text-20">لا توجد عقارات تطابق التصفية</div>
-                    <button type="button" wire:click="clearFilters" class="h-11 rounded-field border border-line-strong bg-white px-5 text-15 font-semibold">مسح التصفية</button>
-                </div>
-            @else
-                <div class="mt-1 grid gap-4 transition-opacity sm:grid-cols-2 lg:mt-0 lg:grid-cols-3 lg:gap-6" wire:loading.class="opacity-60">
-                    @foreach ($listings as $listing)
-                        <x-site.listing-card :listing="$listing" :show-agent="$showAgent" wire:key="listing-{{ $listing->id }}" />
-                    @endforeach
-                </div>
+            {{-- Skeleton cards while a filter or the sorting applies --}}
+            <div wire:loading.grid wire:target="{{ $filterTargets }}" class="mt-1 gap-4 sm:grid-cols-2 lg:mt-0 lg:grid-cols-3 lg:gap-6" aria-hidden="true">
+                @foreach (range(1, 3) as $placeholder)
+                    <div class="flex flex-col gap-3">
+                        <div class="aspect-[4/3] rounded-card bg-skeleton"></div>
+                        <div class="h-5 w-1/2 rounded-md bg-skeleton"></div>
+                        <div class="h-3.5 w-[70%] rounded-md bg-divider"></div>
+                    </div>
+                @endforeach
+            </div>
 
-                @if ($listings->count() < $total)
-                    <button type="button" wire:click="showMore"
-                            class="mx-auto mt-2 flex h-11 items-center gap-2 rounded-field border border-line-strong bg-white px-6 text-15 font-semibold data-loading:opacity-60">
-                        عرض المزيد
-                    </button>
+            <div wire:loading.remove wire:target="{{ $filterTargets }}" class="flex flex-col gap-3.5 lg:gap-5">
+                @if ($listings->isEmpty())
+                    <div class="mt-1 flex flex-col items-center gap-3.5 rounded-card border border-dashed border-line-strong bg-white px-5 py-10 text-center lg:mt-0 lg:rounded-2xl lg:px-6 lg:py-16">
+                        <span class="flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand-text lg:size-16">
+                            <i class="ti ti-search-off text-[26px] lg:text-[30px]"></i>
+                        </span>
+                        <div class="text-17 font-semibold lg:text-20">لا توجد عقارات تطابق التصفية</div>
+                        <button type="button" wire:click="clearFilters" class="h-11 rounded-field border border-line-strong bg-white px-5 text-15 font-semibold">مسح التصفية</button>
+                    </div>
+                @else
+                    <div class="mt-1 grid gap-4 sm:grid-cols-2 lg:mt-0 lg:grid-cols-3 lg:gap-6">
+                        @foreach ($listings as $listing)
+                            <x-site.listing-card :listing="$listing" :show-agent="$showAgent" wire:key="listing-{{ $listing->id }}" />
+                        @endforeach
+                    </div>
+
+                    @if ($listings->count() < $total)
+                        <button type="button" wire:click="showMore"
+                                class="mx-auto mt-2 flex h-11 items-center gap-2 rounded-field border border-line-strong bg-white px-6 text-15 font-semibold data-loading:opacity-60">
+                            عرض المزيد
+                        </button>
+                    @endif
                 @endif
-            @endif
+            </div>
         </div>
 
         {{-- Phones: filter sheet --}}
