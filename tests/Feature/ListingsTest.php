@@ -182,3 +182,16 @@ test('the share dialog opens for a visible listing and the QR downloads', functi
         ->assertOk()
         ->assertHeader('Content-Type', 'image/svg+xml');
 });
+
+test('seeded sample photos resolve to a bundled demo image that exists', function () {
+    $listing = Listing::factory()->create();
+
+    foreach (['villa facade', 'land plot', 'master bedroom', 'street view', 'commercial frontage'] as $position => $caption) {
+        $url = $listing->photos()->create(['path' => 'sample:'.$caption, 'position' => $position])->url();
+
+        expect($url)->toContain('/images/samples/')
+            ->and(public_path(parse_url($url, PHP_URL_PATH)))->toBeFile();
+    }
+
+    expect($listing->photos()->create(['path' => 'sample:unknown', 'position' => 9])->url())->toBeNull();
+});
