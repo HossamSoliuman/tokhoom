@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Workspaces that already paid keep the next charge date they had: the start of next month.
+     * Workspaces past their trial keep the next charge date they had: the start of next month.
      */
     public function up(): void
     {
@@ -26,7 +26,7 @@ return new class extends Migration
         });
 
         DB::table('workspaces')
-            ->whereIn('id', DB::table('invoices')->whereNotNull('paid_at')->select('workspace_id'))
+            ->where(fn ($query) => $query->whereNull('trial_ends_at')->orWhere('trial_ends_at', '<=', now()))
             ->update(['paid_until' => now()->addMonthNoOverflow()->startOfMonth()->toDateString()]);
     }
 
