@@ -80,6 +80,14 @@
     --shadow-fab: 0 6px 16px rgba(20, 90, 85, 0.28);
 }
 
+/* Public sites take their colour from the office's brand colour, set on <html>. */
+@theme inline {
+    --color-brand: var(--brand, #145a55);
+    --color-brand-ink: var(--brand-ink, #ffffff);
+    --color-brand-text: var(--brand-text, #145a55);
+    --color-brand-soft: color-mix(in oklch, var(--brand, #145a55) 10%, #fff);
+}
+
 @layer base {
     html {
         -webkit-font-smoothing: antialiased;
