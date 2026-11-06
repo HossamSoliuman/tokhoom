@@ -89,6 +89,22 @@ test('publishing requires the ad license number', function () {
     expect(Listing::count())->toBe(0);
 });
 
+test('tour and video links must be web addresses', function (string $link) {
+    [$user] = member();
+
+    Livewire::actingAs($user)->test(Editor::class)
+        ->set('district', 'النرجس')
+        ->set('tourUrl', $link)
+        ->set('videoUrl', $link)
+        ->call('saveDraft')
+        ->assertHasErrors(['tourUrl' => 'url', 'videoUrl' => 'url']);
+
+    expect(Listing::count())->toBe(0);
+})->with([
+    'data link' => 'data://text/html;base64,PHNjcmlwdD4=',
+    'file link' => 'file://server/share/tour.html',
+]);
+
 test('a listing can be saved as a draft without a license', function () {
     [$user] = member();
 

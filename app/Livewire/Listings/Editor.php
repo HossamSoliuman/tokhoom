@@ -287,8 +287,8 @@ class Editor extends Component
             'adLicenseNumber' => [$required, 'digits:10'],
             'adLicenseExpiresOn' => ['nullable', 'date'],
             'brokerageContractNumber' => ['nullable', 'string', 'max:30'],
-            'tourUrl' => ['nullable', 'url', 'max:255'],
-            'videoUrl' => ['nullable', 'url', 'max:255'],
+            'tourUrl' => ['nullable', 'url:http,https', 'max:255'],
+            'videoUrl' => ['nullable', 'url:http,https', 'max:255'],
         ];
     }
 
