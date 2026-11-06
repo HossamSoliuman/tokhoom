@@ -13,7 +13,9 @@ use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Middleware\EnsureWorkspace;
 use App\Http\Middleware\ResolveSite;
 use App\Livewire\Admin;
+use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
+use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\Signup;
 use App\Livewire\Billing;
 use App\Livewire\Clients;
@@ -39,6 +41,8 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
     Route::middleware('guest')->group(function () {
         Route::livewire('/login', Login::class)->name('login');
         Route::livewire('/signup', Signup::class)->name('signup');
+        Route::livewire('/forgot-password', ForgotPassword::class)->name('password.request');
+        Route::livewire('/reset-password/{token}', ResetPassword::class)->name('password.reset');
     });
 
     Route::livewire('/invitations/{token}', Invitations\Accept::class)->name('invitations.accept');

@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\ApprovalStatus;
+use App\Notifications\ResetPasswordLink;
 use App\Support\Arabic;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -97,6 +98,14 @@ class User extends Authenticatable
     public function isPendingApproval(): bool
     {
         return $this->currentWorkspace?->approval_status === ApprovalStatus::Pending;
+    }
+
+    /**
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordLink($token));
     }
 
     /**

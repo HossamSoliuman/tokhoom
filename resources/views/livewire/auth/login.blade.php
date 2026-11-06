@@ -51,10 +51,13 @@
                     <input type="password" wire:model="password" class="field text-right" dir="ltr" autocomplete="current-password">
                 </x-ui.field>
 
-                <button type="button" wire:click="$toggle('remember')" class="flex items-center gap-2.5 self-start text-14 text-ink">
-                    <x-ui.checkbox :checked="$remember" size="sm" />
-                    تذكرني على هذا الجهاز
-                </button>
+                <div class="flex items-center justify-between gap-3">
+                    <button type="button" wire:click="$toggle('remember')" class="flex items-center gap-2.5 text-14 text-ink">
+                        <x-ui.checkbox :checked="$remember" size="sm" />
+                        تذكرني على هذا الجهاز
+                    </button>
+                    <a href="{{ route('password.request') }}" wire:navigate class="text-14 font-semibold">نسيت كلمة المرور؟</a>
+                </div>
 
                 <x-ui.button type="submit" size="lg" class="mt-1 w-full">تسجيل الدخول</x-ui.button>
             </form>

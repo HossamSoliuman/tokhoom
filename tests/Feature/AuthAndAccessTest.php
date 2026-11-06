@@ -3,12 +3,16 @@
 use App\Enums\ApprovalStatus;
 use App\Enums\MemberRole;
 use App\Enums\Plan;
+use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
+use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\Signup;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Notifications\ApprovalRequested;
 use App\Notifications\LoginCode;
+use App\Notifications\ResetPasswordLink;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
@@ -143,6 +147,60 @@ test('mobile sign in is hidden in production until an SMS provider is set', func
         ->set('mobile', '0551234567')
         ->call('sendCode')
         ->assertNotFound();
+});
+
+test('a forgotten password is reset from the emailed link', function () {
+    Notification::fake();
+    $user = User::factory()->create(['email' => 'k.alrashid@alrashid.sa']);
+
+    Livewire::test(ForgotPassword::class)
+        ->set('email', 'K.Alrashid@alrashid.sa')
+        ->call('send')
+        ->assertSet('sent', true);
+
+    $token = null;
+    Notification::assertSentTo($user, ResetPasswordLink::class, function (ResetPasswordLink $notification) use (&$token) {
+        $token = $notification->token;
+
+        return true;
+    });
+
+    $this->get(route('password.reset', ['token' => $token, 'email' => $user->email]))->assertOk();
+
+    Livewire::withQueryParams(['email' => $user->email])
+        ->test(ResetPassword::class, ['token' => $token])
+        ->set('password', 'new-password-123')
+        ->set('password_confirmation', 'new-password-123')
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertRedirect(route('login'));
+
+    expect(Hash::check('new-password-123', $user->fresh()->password))->toBeTrue();
+});
+
+test('an unknown email gets the same answer and no link', function () {
+    Notification::fake();
+
+    Livewire::test(ForgotPassword::class)
+        ->set('email', 'nobody@example.com')
+        ->call('send')
+        ->assertHasNoErrors()
+        ->assertSet('sent', true);
+
+    Notification::assertNothingSent();
+});
+
+test('a wrong reset token leaves the password unchanged', function () {
+    $user = User::factory()->create();
+
+    Livewire::withQueryParams(['email' => $user->email])
+        ->test(ResetPassword::class, ['token' => 'not-a-real-token'])
+        ->set('password', 'new-password-123')
+        ->set('password_confirmation', 'new-password-123')
+        ->call('save')
+        ->assertHasErrors('email');
+
+    expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
 });
 
 test('an office signs up step by step and waits for approval', function () {
