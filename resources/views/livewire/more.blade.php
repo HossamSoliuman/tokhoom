@@ -6,6 +6,11 @@
             <span class="flex-1">مشاركة موقعي</span>
             <i class="ti ti-chevron-left text-subtle"></i>
         </button>
+        <a href="{{ route('account') }}" wire:navigate class="flex h-14 w-full items-center gap-3 border-b border-divider px-4 text-15 font-medium text-ink last:border-b-0 hover:bg-canvas hover:no-underline">
+            <i class="ti ti-user-circle text-[21px] text-body"></i>
+            <span class="flex-1">حسابي</span>
+            <i class="ti ti-chevron-left text-subtle"></i>
+        </a>
         @foreach ($items as $item)
             <a href="{{ $item['url'] }}" wire:navigate class="flex h-14 w-full items-center gap-3 border-b border-divider px-4 text-15 font-medium text-ink last:border-b-0 hover:bg-canvas hover:no-underline">
                 <i class="ti {{ $item['icon'] }} text-[21px] text-body"></i>

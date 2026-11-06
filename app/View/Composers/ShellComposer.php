@@ -78,7 +78,7 @@ class ShellComposer
     private function workspaceTabs(): array
     {
         $more = $this->item('المزيد', 'ti-dots', 'more', 'more');
-        $more['active'] = Request::routeIs('more', 'team', 'reports', 'site', 'billing');
+        $more['active'] = Request::routeIs('more', 'account', 'team', 'reports', 'site', 'billing');
 
         return [
             $this->item('اليوم', 'ti-sun', 'today', 'today'),

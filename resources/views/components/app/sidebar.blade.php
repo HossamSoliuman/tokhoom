@@ -46,11 +46,13 @@
     </nav>
 
     <div class="mt-auto flex items-center gap-2.5 border-t border-divider px-2 pt-3">
-        <x-ui.avatar :initial="$shell['user']->initials()" :size="36" tone="brand" />
-        <span class="flex min-w-0 flex-1 flex-col">
-            <span class="truncate text-14 font-semibold">{{ $shell['user']->name }}</span>
-            <span class="truncate text-12 text-muted">{{ $shell['roleLabel'] }}</span>
-        </span>
+        <a href="{{ route('account') }}" wire:navigate class="-m-1 flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 text-ink hover:bg-canvas hover:no-underline" aria-label="حسابي">
+            <x-ui.avatar :initial="$shell['user']->initials()" :size="36" tone="brand" />
+            <span class="flex min-w-0 flex-1 flex-col">
+                <span class="truncate text-14 font-semibold">{{ $shell['user']->name }}</span>
+                <span class="truncate text-12 text-muted">{{ $shell['roleLabel'] }}</span>
+            </span>
+        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-canvas" aria-label="تسجيل الخروج">

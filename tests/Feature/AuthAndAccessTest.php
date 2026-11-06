@@ -3,6 +3,7 @@
 use App\Enums\ApprovalStatus;
 use App\Enums\MemberRole;
 use App\Enums\Plan;
+use App\Livewire\Account;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\ResetPassword;
@@ -295,4 +296,55 @@ test('the more page lists only what the member may manage', function () {
         ->assertOk()
         ->assertSee('تسجيل الخروج')
         ->assertDontSee('الاشتراك والنطاق');
+});
+
+test('members update their own details', function () {
+    [$user] = member(MemberRole::Agent);
+
+    $this->actingAs($user)->get(route('account'))->assertOk();
+
+    Livewire::actingAs($user)->test(Account::class)
+        ->set('name', 'سارة القحطاني')
+        ->set('email', 'Sara@Example.com')
+        ->set('mobile', '055 999 8877')
+        ->call('saveDetails')
+        ->assertHasNoErrors();
+
+    expect($user->fresh())
+        ->name->toBe('سارة القحطاني')
+        ->email->toBe('sara@example.com')
+        ->mobile->toBe('0559998877');
+});
+
+test('an email or mobile used by another account is refused', function () {
+    [$user] = member();
+    User::factory()->create(['email' => 'taken@example.com', 'mobile' => '0551112233']);
+
+    Livewire::actingAs($user)->test(Account::class)
+        ->set('email', 'taken@example.com')
+        ->set('mobile', '0551112233')
+        ->call('saveDetails')
+        ->assertHasErrors(['email' => 'unique', 'mobile' => 'unique']);
+});
+
+test('changing the password needs the current one', function () {
+    [$user] = member();
+
+    Livewire::actingAs($user)->test(Account::class)
+        ->set('currentPassword', 'wrong-password')
+        ->set('newPassword', 'new-password-123')
+        ->set('newPassword_confirmation', 'new-password-123')
+        ->call('changePassword')
+        ->assertHasErrors(['currentPassword' => 'current_password']);
+
+    expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
+
+    Livewire::actingAs($user)->test(Account::class)
+        ->set('currentPassword', 'password')
+        ->set('newPassword', 'new-password-123')
+        ->set('newPassword_confirmation', 'new-password-123')
+        ->call('changePassword')
+        ->assertHasNoErrors();
+
+    expect(Hash::check('new-password-123', $user->fresh()->password))->toBeTrue();
 });

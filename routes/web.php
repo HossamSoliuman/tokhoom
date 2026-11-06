@@ -12,6 +12,7 @@ use App\Http\Controllers\SiteQrController;
 use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Middleware\EnsureWorkspace;
 use App\Http\Middleware\ResolveSite;
+use App\Livewire\Account;
 use App\Livewire\Admin;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
@@ -79,6 +80,7 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
             Route::get('/billing/invoices/{invoice}', InvoiceController::class)->name('billing.invoice')->can('manage-billing');
 
             Route::livewire('/more', More::class)->name('more');
+            Route::livewire('/account', Account::class)->name('account');
             Route::get('/share/qr.{format}', SiteQrController::class)->whereIn('format', ['svg', 'png'])->name('share.qr');
         });
 
