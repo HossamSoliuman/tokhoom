@@ -80,3 +80,13 @@ test('workspaces can be suspended and reactivated', function () {
 
     expect($workspace->fresh()->isSuspended())->toBeFalse();
 });
+
+test('admins see which workspaces owe a payment', function () {
+    $admin = User::factory()->platformAdmin()->create();
+    $owing = Workspace::factory()->create(['name' => 'مكتب المتأخر', 'trial_ends_at' => now()->subMonth()]);
+    $owing->invoices()->create(['number' => 'TKH-1', 'description' => 'اشتراك', 'amount' => 349, 'issued_on' => today()]);
+    Workspace::factory()->create(['name' => 'مكتب المنتظم', 'trial_ends_at' => now()->subMonth()]);
+
+    Livewire::actingAs($admin)->test(Workspaces::class)
+        ->assertSeeInOrder(['مكتب المتأخر', 'دفعة مستحقة', 'مكتب المنتظم', 'نشط']);
+});

@@ -8,6 +8,7 @@
             @php($members = $workspace->memberships->count())
             @php($suspended = $workspace->isSuspended())
             @php($trial = ! $suspended && $workspace->isOnTrial())
+            @php($unpaid = ! $suspended && ! $trial && $workspace->has_open_invoice)
             <div class="grid grid-cols-2 items-center gap-x-4 gap-y-1.5 border-t border-divider px-5 py-3.5 text-14 first:border-t-0 lg:grid-cols-[2fr_1.6fr_1fr_1fr_1fr_130px] lg:first:border-t" wire:key="workspace-{{ $workspace->id }}">
                 <span class="col-span-2 flex items-center gap-2.5 lg:col-span-1">
                     <x-ui.avatar :initial="$workspace->initial()" :size="36" square />
@@ -26,8 +27,9 @@
                         'inline-flex h-[26px] items-center rounded-full px-2.5 text-13 font-semibold',
                         'bg-danger-soft text-danger' => $suspended,
                         'bg-primary-soft text-primary-strong' => $trial,
-                        'bg-success-soft text-success' => ! $suspended && ! $trial,
-                    ])>{{ $suspended ? 'موقوف' : ($trial ? 'فترة تجريبية' : 'نشط') }}</span>
+                        'bg-warning-soft text-warning' => $unpaid,
+                        'bg-success-soft text-success' => ! $suspended && ! $trial && ! $unpaid,
+                    ])>{{ $suspended ? 'موقوف' : ($trial ? 'فترة تجريبية' : ($unpaid ? 'دفعة مستحقة' : 'نشط')) }}</span>
                 </span>
                 <span class="flex justify-end">
                     <x-ui.button :variant="$suspended ? 'primary-outline' : 'danger-outline'" size="xs" class="text-13" wire:click="confirm({{ $workspace->id }})">

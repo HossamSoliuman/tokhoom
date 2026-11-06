@@ -57,6 +57,7 @@ class Workspaces extends Component
             'workspaces' => Workspace::where('approval_status', ApprovalStatus::Approved)
                 ->with(['memberships' => fn ($query) => $query->whereNull('deactivated_at')->with('user')])
                 ->withCount('listings')
+                ->withExists(['invoices as has_open_invoice' => fn ($query) => $query->whereNull('paid_at')])
                 ->orderBy('name')
                 ->get(),
             'target' => $this->workspaceId && $this->dialog ? Workspace::find($this->workspaceId) : null,
