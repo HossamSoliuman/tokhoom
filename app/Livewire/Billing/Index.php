@@ -213,6 +213,7 @@ class Index extends Component
             'minimumSeats' => $this->minimumSeats($workspace),
             'invoices' => $workspace->invoices()->latest('issued_on')->latest('id')->limit(12)->get(),
             'canPay' => Tap::configured(),
+            'openInvoice' => $workspace->invoices()->whereNull('paid_at')->latest('id')->first(),
             'recordName' => DomainVerifier::recordName($previewDomain),
             'domainStatus' => $workspace->custom_domain ? ($workspace->domain_status ?? DomainStatus::Pending) : null,
         ]);

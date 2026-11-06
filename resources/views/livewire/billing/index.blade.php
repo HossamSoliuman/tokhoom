@@ -1,5 +1,13 @@
 <x-app.page title="الاشتراك والنطاق">
-    @if ($workspace->isOnTrial())
+    @if ($openInvoice)
+        <div class="flex flex-wrap items-center gap-2.5 rounded-xl border border-notice-line bg-notice px-3.5 py-3 text-14 text-notice-ink">
+            <i class="ti ti-file-invoice text-20"></i>
+            <span class="flex-1">فاتورة بقيمة {{ Arabic::money($openInvoice->amount) }} بانتظار الدفع منذ {{ Arabic::date($openInvoice->issued_on) }}</span>
+            @if ($canPay)
+                <x-ui.button size="xs" icon="ti-credit-card" class="text-13" wire:click="payInvoice({{ $openInvoice->id }})">ادفع الآن</x-ui.button>
+            @endif
+        </div>
+    @elseif ($workspace->isOnTrial())
         <div class="flex items-center gap-2.5 rounded-xl bg-primary-soft px-3.5 py-3 text-14 text-primary-strong">
             <i class="ti ti-clock text-20"></i>
             <span class="flex-1">تبقّى {{ Arabic::days($workspace->trialDaysLeft()) }} من الفترة التجريبية · لن تُخصم أي رسوم قبل {{ Arabic::date($workspace->trial_ends_at) }}</span>
@@ -27,7 +35,7 @@
             </div>
             <div class="flex justify-between border-t border-divider pt-3 text-14">
                 <span class="text-muted">الخصم القادم</span>
-                <span class="font-semibold">{{ Arabic::date($workspace->nextChargeDate()) }} · {{ Arabic::money($workspace->monthlyTotal()) }}</span>
+                <span class="font-semibold">{{ $workspace->isBillingDue() ? 'مستحق الآن' : Arabic::date($workspace->nextChargeDate()) }} · {{ Arabic::money($workspace->monthlyTotal()) }}</span>
             </div>
             <div class="flex gap-2">
                 <x-ui.button class="flex-1 text-14" wire:click="openPlan">تغيير الخطة</x-ui.button>

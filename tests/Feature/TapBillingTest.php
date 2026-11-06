@@ -306,3 +306,13 @@ test('the Tap webhook saves a card from a signed authorization', function () {
 
     expect($workspace->fresh()->hasSavedCard())->toBeTrue();
 });
+
+test('the billing page shows an open invoice with a way to pay it', function () {
+    [$owner, $workspace] = dueWorkspace();
+    $invoice = Subscriptions::dueInvoice($workspace);
+
+    Livewire::actingAs($owner)->test(Billing::class)
+        ->assertSee('بانتظار الدفع')
+        ->assertSee('مستحق الآن')
+        ->assertSeeHtml('wire:click="payInvoice('.$invoice->id.')"');
+});
