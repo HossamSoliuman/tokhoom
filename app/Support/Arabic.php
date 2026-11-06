@@ -143,13 +143,13 @@ class Arabic
         return number_format($number);
     }
 
-    public static function money(int|float|null $amount, string $suffix = ''): string
+    public static function money(int|float|null $amount, string $suffix = '', int $decimals = 0): string
     {
         if ($amount === null) {
             return '—';
         }
 
-        return number_format($amount).' ريال'.($suffix !== '' ? ' '.$suffix : '');
+        return number_format($amount, $decimals).' ريال'.($suffix !== '' ? ' '.$suffix : '');
     }
 
     public static function percent(int|float $value, int $decimals = 0): string
