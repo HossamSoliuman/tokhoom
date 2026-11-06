@@ -4,6 +4,7 @@ use App\Enums\DomainStatus;
 use App\Enums\MemberRole;
 use App\Enums\Plan;
 use App\Livewire\Billing\Index as Billing;
+use App\Livewire\ShareSite;
 use App\Livewire\Site\Settings;
 use App\Models\Invoice;
 use App\Models\Workspace;
@@ -123,4 +124,27 @@ test('invoices open only for their own workspace', function () {
 
     $this->actingAs($owner)->get(route('billing.invoice', $invoice))->assertOk()->assertSee('TKH-1');
     $this->actingAs($owner)->get(route('billing.invoice', $foreign))->assertNotFound();
+});
+
+test('members share their own public page', function (MemberRole $role, Closure $makeWorkspace, string $path) {
+    [$user, $workspace] = member($role, $makeWorkspace());
+
+    Livewire::actingAs($user)
+        ->test(ShareSite::class)
+        ->call('openDialog')
+        ->assertViewHas('url', $workspace->siteUrl(str_replace('{id}', (string) $user->id, $path)));
+})->with([
+    'office agent' => [MemberRole::Agent, fn () => Workspace::factory()->create(), '/agents/{id}'],
+    'office manager' => [MemberRole::Manager, fn () => Workspace::factory()->create(), ''],
+    'independent agent' => [MemberRole::Owner, fn () => Workspace::factory()->independentAgent()->create(), ''],
+]);
+
+test('the site QR code downloads for signed-in members only', function () {
+    [$agent] = member(MemberRole::Agent);
+
+    $this->get(route('share.qr', 'png'))->assertRedirect(route('login'));
+    $this->actingAs($agent)->get(route('share.qr', 'png'))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'image/png')
+        ->assertDownload();
 });

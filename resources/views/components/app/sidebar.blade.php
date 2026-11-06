@@ -36,6 +36,13 @@
                 @endif
             </a>
         @endforeach
+        @unless ($shell['admin'])
+            <button type="button" x-on:click="$dispatch('open-site-share')"
+                    class="flex h-11 items-center gap-3 rounded-field px-3 text-start text-15 font-medium text-body hover:bg-canvas">
+                <i class="ti ti-share text-20"></i>
+                <span class="flex-1">مشاركة موقعي</span>
+            </button>
+        @endunless
     </nav>
 
     <div class="mt-auto flex items-center gap-2.5 border-t border-divider px-2 pt-3">

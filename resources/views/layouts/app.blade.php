@@ -34,6 +34,7 @@
 
     @unless ($shell['admin'])
         <x-app.workspace-menu :shell="$shell" />
+        <livewire:share-site />
     @endunless
 
     <livewire:notifications-panel />
