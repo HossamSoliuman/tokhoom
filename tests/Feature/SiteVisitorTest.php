@@ -14,6 +14,7 @@ use App\Models\SiteEvent;
 use App\Models\Workspace;
 use App\Notifications\NewInquiry;
 use Illuminate\Support\Facades\Notification;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 
 /**
@@ -228,4 +229,16 @@ test('social accounts link to their profiles whether saved as handles or pasted 
         ->assertSee('href="https://x.com/alrashid_re"', false)
         ->assertSee('href="https://instagram.com/alrashid"', false)
         ->assertSee('href="https://tiktok.com/@alrashid.sa"', false);
+});
+
+test('visitors load more listings a page at a time', function () {
+    $workspace = Workspace::factory()->create();
+    Listing::factory()->for($workspace)->count(ListingBrowser::PER_PAGE + 1)->create();
+
+    $browser = Livewire::test(ListingBrowser::class, ['workspace' => $workspace])
+        ->assertViewHas('listings', fn ($listings) => $listings->count() === ListingBrowser::PER_PAGE)
+        ->call('showMore')
+        ->assertViewHas('listings', fn ($listings) => $listings->count() === ListingBrowser::PER_PAGE + 1);
+
+    expect(fn () => $browser->set('limit', 1000))->toThrow(CannotUpdateLockedPropertyException::class);
 });

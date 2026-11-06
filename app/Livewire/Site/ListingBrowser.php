@@ -51,6 +51,7 @@ class ListingBrowser extends Component
     #[Url(except: 'new')]
     public string $sort = 'new';
 
+    #[Locked]
     public int $limit = self::PER_PAGE;
 
     public function updated(string $property): void
