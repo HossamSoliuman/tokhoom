@@ -82,3 +82,15 @@ test('the local hosts file gets one entry per workspace subdomain', function () 
         ->toContain('127.0.0.1 '.config('tokhoom.short_domain'))
         ->and(substr_count($contents, '# tokhoom sites start'))->toBe(1);
 });
+
+test('pages carry the browser security headers', function (Closure $url) {
+    Workspace::factory()->create(['slug' => 'alrashid']);
+
+    $this->get($url())
+        ->assertHeader('X-Content-Type-Options', 'nosniff')
+        ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
+        ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+})->with([
+    'public site' => fn () => hostUrl(siteSubdomain('alrashid')),
+    'dashboard sign in' => fn () => hostUrl(config('tokhoom.app_domain'), '/login'),
+]);
