@@ -126,6 +126,42 @@ test('invoices open only for their own workspace', function () {
     $this->actingAs($owner)->get(route('billing.invoice', $foreign))->assertNotFound();
 });
 
+test('a VAT registered invoice shows the VAT and carries the ZATCA QR fields', function () {
+    config(['tokhoom.seller.name' => 'تخوم', 'tokhoom.seller.vat_number' => '300000000000003']);
+    [$owner, $workspace] = member();
+    $invoice = Invoice::create(['workspace_id' => $workspace->id, 'number' => 'TKH-1', 'description' => 'اشتراك', 'amount' => 349, 'issued_on' => '2026-10-01']);
+
+    $this->actingAs($owner)->get(route('billing.invoice', $invoice))
+        ->assertOk()
+        ->assertSee('فاتورة ضريبية مبسطة')
+        ->assertSee('300000000000003')
+        ->assertSeeInOrder(['303.48 ريال', '45.52 ريال', '349.00 ريال']);
+
+    $tlv = base64_decode($invoice->zatcaPayload());
+    $fields = [];
+    for ($offset = 0; $offset < strlen($tlv); $offset += 2 + ord($tlv[$offset + 1])) {
+        $fields[ord($tlv[$offset])] = substr($tlv, $offset + 2, ord($tlv[$offset + 1]));
+    }
+
+    expect($fields)->toHaveCount(5)
+        ->and($fields[1])->toBe('تخوم')
+        ->and($fields[2])->toBe('300000000000003')
+        ->and($fields[3])->toStartWith('2026-')
+        ->and($fields[4])->toBe('349.00')
+        ->and($fields[5])->toBe('45.52');
+});
+
+test('without a VAT number the invoice is a plain invoice', function () {
+    config(['tokhoom.seller.vat_number' => null]);
+    [$owner, $workspace] = member();
+    $invoice = Invoice::create(['workspace_id' => $workspace->id, 'number' => 'TKH-1', 'description' => 'اشتراك', 'amount' => 349, 'issued_on' => today()]);
+
+    $this->actingAs($owner)->get(route('billing.invoice', $invoice))
+        ->assertOk()
+        ->assertDontSee('فاتورة ضريبية مبسطة')
+        ->assertDontSee('ضريبة القيمة المضافة');
+});
+
 test('members share their own public page', function (MemberRole $role, Closure $makeWorkspace, string $path) {
     [$user, $workspace] = member($role, $makeWorkspace());
 

@@ -68,4 +68,24 @@ return [
 
     'trial_days' => 14,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Invoicing
+    |--------------------------------------------------------------------------
+    |
+    | Tokhoom's details printed on subscription invoices. With a VAT number
+    | set, invoices become simplified tax invoices with the ZATCA QR code and
+    | the VAT included in plan prices shown separately.
+    |
+    */
+
+    'seller' => [
+        'name' => env('TOKHOOM_SELLER_NAME', 'تخوم'),
+        'vat_number' => env('TOKHOOM_VAT_NUMBER'),
+        'cr_number' => env('TOKHOOM_CR_NUMBER'),
+        'address' => env('TOKHOOM_SELLER_ADDRESS'),
+    ],
+
+    'vat_rate' => 15,
+
 ];
