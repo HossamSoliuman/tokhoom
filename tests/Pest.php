@@ -64,3 +64,21 @@ function member(MemberRole $role = MemberRole::Owner, ?Workspace $workspace = nu
 
     return [$user->fresh(), $workspace];
 }
+
+function hostUrl(string $host, string $path = '/'): string
+{
+    return 'http://'.$host.$path;
+}
+
+/**
+ * A page on a workspace's public site.
+ */
+function siteUrl(Workspace $workspace, string $path = '/'): string
+{
+    return hostUrl(siteSubdomain($workspace->slug), $path);
+}
+
+function siteSubdomain(string $slug): string
+{
+    return $slug.'.'.config('tokhoom.site_domain');
+}

@@ -4,16 +4,6 @@ use App\Enums\DomainStatus;
 use App\Models\Listing;
 use App\Models\Workspace;
 
-function hostUrl(string $host, string $path = '/'): string
-{
-    return 'http://'.$host.$path;
-}
-
-function siteSubdomain(string $slug): string
-{
-    return $slug.'.'.config('tokhoom.site_domain');
-}
-
 test('a workspace subdomain shows its live listings only', function () {
     $workspace = Workspace::factory()->create(['slug' => 'alrashid']);
     $live = Listing::factory()->for($workspace)->create(['district' => 'الملقا']);
@@ -24,10 +14,10 @@ test('a workspace subdomain shows its live listings only', function () {
     $this->get(hostUrl(siteSubdomain('alrashid')))
         ->assertOk()
         ->assertSee($workspace->name)
-        ->assertSee($live->title)
-        ->assertDontSee($draft->title)
-        ->assertDontSee($expired->title)
-        ->assertDontSee($otherOffice->title);
+        ->assertSee($live->shortTitle())
+        ->assertDontSee($draft->shortTitle())
+        ->assertDontSee($expired->shortTitle())
+        ->assertDontSee($otherOffice->shortTitle());
 });
 
 test('a listing opens on its office site but not on another', function () {
@@ -46,9 +36,9 @@ test('unknown, pending and suspended sites are not found', function (Closure $ma
 
     $this->get(hostUrl(siteSubdomain('hidden')))->assertNotFound();
 })->with([
-    'unknown' => fn () => fn () => null,
-    'pending approval' => fn () => fn () => Workspace::factory()->pending()->create(['slug' => 'hidden']),
-    'suspended' => fn () => fn () => Workspace::factory()->suspended()->create(['slug' => 'hidden']),
+    'unknown' => fn () => null,
+    'pending approval' => fn () => Workspace::factory()->pending()->create(['slug' => 'hidden']),
+    'suspended' => fn () => Workspace::factory()->suspended()->create(['slug' => 'hidden']),
 ]);
 
 test('a custom domain serves the site only once it is active', function (DomainStatus $status, int $expected) {
