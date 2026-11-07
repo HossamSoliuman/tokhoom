@@ -12,6 +12,7 @@ use App\Http\Controllers\SiteQrController;
 use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Controllers\TapReturnController;
 use App\Http\Controllers\TapWebhookController;
+use App\Http\Controllers\WwwRedirectController;
 use App\Http\Middleware\EnsureWorkspace;
 use App\Http\Middleware\ResolveSite;
 use App\Livewire\Account;
@@ -34,6 +35,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::domain(config('tokhoom.short_domain'))->group(function () {
     Route::get('/{code}', ShortLinkController::class)->name('short-link.domain');
+});
+
+Route::domain('www.'.config('tokhoom.app_domain'))->group(function () {
+    Route::get('/{path?}', WwwRedirectController::class)->where('path', '.*')->name('www-redirect');
 });
 
 Route::domain(config('tokhoom.app_domain'))->group(function () {

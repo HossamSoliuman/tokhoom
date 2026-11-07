@@ -57,6 +57,12 @@ test('dashboard pages are not served on a site host', function () {
     $this->get(hostUrl(config('tokhoom.app_domain'), '/login'))->assertOk();
 });
 
+test('www on the dashboard domain redirects to the bare domain', function () {
+    $this->get(hostUrl('www.'.config('tokhoom.app_domain'), '/login?next=today'))
+        ->assertMovedPermanently()
+        ->assertRedirect(hostUrl(config('tokhoom.app_domain'), '/login?next=today'));
+});
+
 test('short links redirect to the listing on its office site', function () {
     $listing = Listing::factory()->create();
 
