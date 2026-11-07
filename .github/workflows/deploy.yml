@@ -1,0 +1,62 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: deploy
+
+env:
+  APP_PATH: /www/wwwroot/tokhoom.tech
+  SSH_HOST: 187.126.26.99
+  SSH_PORT: 22
+  SSH_USER: root
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload assets
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: public/build
+          target: ${{ env.APP_PATH }}/public
+          strip_components: 1
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            set -e
+            cd ${{ env.APP_PATH }}
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            php artisan optimize:clear
+            php artisan migrate --force
+            chown -R www:www storage bootstrap/cache public/build
