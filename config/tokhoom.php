@@ -1,5 +1,9 @@
 <?php
 
+$appDomain = env('TOKHOOM_APP_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST));
+
+$siteDomain = env('TOKHOOM_SITE_DOMAIN', $appDomain);
+
 return [
 
     /*
@@ -8,11 +12,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | The host serving the dashboard. Requests on any other host are treated
-    | as a visit to a workspace's public site.
+    | as a visit to a workspace's public site. www.{app_domain} redirects here.
     |
     */
 
-    'app_domain' => env('TOKHOOM_APP_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+    'app_domain' => $appDomain,
 
     /*
     |--------------------------------------------------------------------------
@@ -20,11 +24,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Every workspace gets a public site at {slug}.{site_domain} unless it has
-    | an active custom domain.
+    | an active custom domain. Defaults to the dashboard domain, so a wildcard
+    | DNS record and server name for *.{app_domain} serve every office.
     |
     */
 
-    'site_domain' => env('TOKHOOM_SITE_DOMAIN', 'tokhoom.sa'),
+    'site_domain' => $siteDomain,
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +52,7 @@ return [
     |
     */
 
-    'cname_target' => env('TOKHOOM_CNAME_TARGET', 'sites.tokhoom.sa'),
+    'cname_target' => env('TOKHOOM_CNAME_TARGET', 'sites.'.$siteDomain),
 
     /*
     |--------------------------------------------------------------------------
