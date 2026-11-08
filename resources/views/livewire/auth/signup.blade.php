@@ -97,9 +97,9 @@
             @php($state = $this->slugState)
             <div @class([
                 'flex h-[52px] items-center overflow-hidden rounded-field border-[1.5px] bg-white',
-                'border-danger' => $state === 'taken',
+                'border-danger' => in_array($state, ['taken', 'reserved']),
                 'border-success' => $state === 'available',
-                'border-line-strong focus-within:border-primary' => ! in_array($state, ['taken', 'available']),
+                'border-line-strong focus-within:border-primary' => ! in_array($state, ['taken', 'reserved', 'available']),
             ]) dir="ltr">
                 <input type="text" wire:model.live.debounce.400ms="slug" placeholder="alrashid" autocomplete="off" autocapitalize="none" spellcheck="false"
                        class="h-full min-w-0 flex-1 border-0 px-3.5 font-mono text-16">
@@ -128,6 +128,11 @@
                                     class="h-9 rounded-full border border-line-strong bg-white px-3.5 font-mono text-13 text-ink hover:bg-canvas">{{ $suggestion }}</button>
                         @endforeach
                     </div>
+                @elseif ($state === 'reserved')
+                    <span class="flex items-center gap-1.5 text-14 font-semibold text-danger">
+                        <i class="ti ti-circle-x text-18"></i>
+                        هذا العنوان غير متاح.
+                    </span>
                 @elseif ($state === 'invalid')
                     <span class="text-14 text-muted">استخدم أحرفاً إنجليزية صغيرة وأرقاماً وشرطة، 3 أحرف على الأقل.</span>
                 @endif

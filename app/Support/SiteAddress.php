@@ -24,10 +24,31 @@ class SiteAddress
 
     /**
      * Lowercase latin letters, digits and inner hyphens, 3 to 30 characters.
+     * A pasted link such as https://alrashid.tokhoom.sa/ keeps only its first label.
      */
     public static function clean(string $input): string
     {
-        return substr(preg_replace('/[^a-z0-9-]/', '', strtolower(trim($input))) ?? '', 0, 30);
+        $input = strtolower(trim($input));
+
+        if (str_contains($input, '.') || str_contains($input, '/')) {
+            $host = preg_replace('#^[a-z][a-z0-9+.-]*://#', '', $input) ?? '';
+            $input = explode('.', explode('/', $host)[0])[0];
+        }
+
+        return substr(preg_replace('/[^a-z0-9-]/', '', $input) ?? '', 0, 30);
+    }
+
+    /**
+     * Whether the raw input has Arabic letters, which cleaning would drop.
+     */
+    public static function hasArabic(string $input): bool
+    {
+        return (bool) preg_match('/\p{Arabic}/u', $input);
+    }
+
+    public static function isReserved(string $slug): bool
+    {
+        return in_array($slug, config('tokhoom.reserved_slugs'), true);
     }
 
     public static function isValid(string $slug): bool
@@ -38,18 +59,19 @@ class SiteAddress
     public static function isAvailable(string $slug): bool
     {
         return self::isValid($slug)
-            && ! in_array($slug, config('tokhoom.reserved_slugs'), true)
+            && ! self::isReserved($slug)
             && Workspace::where('slug', $slug)->doesntExist();
     }
 
     /**
-     * Where an address stands for the picker: empty, invalid, available or taken.
+     * Where an address stands for the picker: empty, invalid, reserved, available or taken.
      */
     public static function state(string $slug): string
     {
         return match (true) {
             $slug === '' => 'empty',
             ! self::isValid($slug) => 'invalid',
+            self::isReserved($slug) => 'reserved',
             self::isAvailable($slug) => 'available',
             default => 'taken',
         };
