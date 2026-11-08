@@ -93,4 +93,23 @@ return [
 
     'vat_rate' => 15,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Landing page
+    |--------------------------------------------------------------------------
+    |
+    | The sample office site linked from the landing page, and the support
+    | contacts shown there. Anything left empty is hidden.
+    |
+    */
+
+    'demo_site_url' => env('TOKHOOM_DEMO_SITE_URL'),
+
+    'support' => [
+        'whatsapp' => env('TOKHOOM_SUPPORT_WHATSAPP'),
+        'phone' => env('TOKHOOM_SUPPORT_PHONE'),
+        'email' => env('TOKHOOM_SUPPORT_EMAIL'),
+        'hours' => env('TOKHOOM_SUPPORT_HOURS', 'الأحد إلى الخميس، 9 ص – 6 م'),
+    ],
+
 ];
