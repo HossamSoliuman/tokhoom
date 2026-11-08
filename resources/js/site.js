@@ -2,8 +2,12 @@ import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.e
 import toasts from './toasts';
 import copy from './copy';
 import loadLeaflet from './leaflet';
+import claim from './claim';
 
 Alpine.store('toasts', toasts);
+Alpine.store('claim', claim);
+
+window.addEventListener('site-address', (event) => Alpine.store('claim').update(event.detail));
 
 Alpine.magic('copy', () => copy(Alpine));
 
