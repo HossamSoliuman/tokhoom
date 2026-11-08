@@ -9,9 +9,12 @@
                 <div class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-card border border-line bg-white p-4" wire:key="queue-{{ $workspace->id }}">
                     <div class="flex flex-[1_1_220px] items-center gap-3">
                         <span class="flex size-11 shrink-0 items-center justify-center rounded-field bg-divider"><i class="ti {{ $workspace->kind->icon() }} text-22 text-body"></i></span>
-                        <div class="flex flex-col gap-0.5">
-                            <span class="text-15 font-semibold">{{ $workspace->name }}</span>
-                            <span class="text-13 text-muted">{{ $workspace->kind->label($owner?->gender) }} · {{ $workspace->city }} · قُدّم {{ Arabic::date($workspace->created_at, false) }}</span>
+                        <div class="flex min-w-0 flex-col gap-0.5">
+                            <a href="{{ route('admin.workspaces.show', $workspace) }}" wire:navigate class="text-15 font-semibold text-ink">{{ $workspace->name }}</a>
+                            <span class="text-13 text-muted">{{ $workspace->kind->label($owner?->gender) }} · {{ $workspace->city }} · قُدّم {{ Arabic::ago($workspace->created_at) }}</span>
+                            @if ($owner)
+                                <span class="text-13 text-body">{{ $owner->name }}@if ($owner->mobile) · <span dir="ltr">{{ Phone::display($owner->mobile) }}</span>@endif</span>
+                            @endif
                         </div>
                     </div>
                     <div class="grid flex-[2_1_360px] grid-cols-3 gap-2 text-13">

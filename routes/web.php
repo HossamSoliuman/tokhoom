@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\WorkspaceExportController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ListingQrController;
@@ -95,7 +96,11 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
 
         Route::middleware('can:platform-admin')->prefix('admin')->name('admin.')->group(function () {
             Route::livewire('/approvals', Admin\Approvals::class)->name('approvals');
-            Route::livewire('/workspaces', Admin\Workspaces::class)->name('workspaces');
+            Route::livewire('/workspaces', Admin\Workspaces\Index::class)->name('workspaces');
+            Route::get('/workspaces/export', WorkspaceExportController::class)->name('workspaces.export');
+            Route::livewire('/workspaces/{workspace}', Admin\Workspaces\Show::class)->name('workspaces.show');
+            Route::livewire('/users', Admin\Users\Index::class)->name('users');
+            Route::livewire('/users/{user}', Admin\Users\Show::class)->name('users.show');
         });
     });
 });

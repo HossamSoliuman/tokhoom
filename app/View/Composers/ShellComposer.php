@@ -99,7 +99,8 @@ class ShellComposer
 
         return [
             $approvals,
-            $this->item('مساحات العمل', 'ti-building-community', 'admin.workspaces', 'admin.workspaces'),
+            $this->item('مساحات العمل', 'ti-building-community', 'admin.workspaces', 'admin.workspaces*'),
+            $this->item('المستخدمون', 'ti-users', 'admin.users', 'admin.users*'),
         ];
     }
 
@@ -110,7 +111,7 @@ class ShellComposer
     {
         return [
             $this->item('الاعتماد', 'ti-certificate', 'admin.approvals', 'admin.approvals'),
-            $this->item('مساحات العمل', 'ti-building-community', 'admin.workspaces', 'admin.workspaces'),
+            $this->item('مساحات العمل', 'ti-building-community', 'admin.workspaces', 'admin.workspaces*'),
         ];
     }
 

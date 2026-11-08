@@ -4,7 +4,8 @@ use App\Enums\ApprovalStatus;
 use App\Enums\MemberRole;
 use App\Enums\RejectionReason;
 use App\Livewire\Admin\Approvals;
-use App\Livewire\Admin\Workspaces;
+use App\Livewire\Admin\Workspaces\Index as WorkspaceList;
+use App\Livewire\Admin\Workspaces\Show as WorkspacePage;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Notifications\WorkspaceApproved;
@@ -62,19 +63,21 @@ test('rejecting needs a reason and records it', function () {
     Notification::assertSentTo($owner, WorkspaceRejected::class);
 });
 
-test('workspaces can be suspended and reactivated', function () {
+test('workspaces can be suspended with a reason and reactivated', function () {
     $admin = User::factory()->platformAdmin()->create();
     $workspace = Workspace::factory()->create();
 
-    Livewire::actingAs($admin)->test(Workspaces::class)
-        ->call('confirm', $workspace->id)
+    Livewire::actingAs($admin)->test(WorkspacePage::class, ['workspace' => $workspace])
+        ->call('openSuspend')
         ->assertSet('dialog', 'suspend')
-        ->call('suspend');
+        ->set('suspendReason', 'شكوى من الهيئة')
+        ->call('suspend')
+        ->assertSee('السبب: شكوى من الهيئة');
 
     expect($workspace->fresh()->isSuspended())->toBeTrue();
 
-    Livewire::actingAs($admin)->test(Workspaces::class)
-        ->call('confirm', $workspace->id)
+    Livewire::actingAs($admin)->test(WorkspacePage::class, ['workspace' => $workspace->fresh()])
+        ->call('openSuspend')
         ->assertSet('dialog', 'reactivate')
         ->call('reactivate');
 
@@ -87,6 +90,6 @@ test('admins see which workspaces owe a payment', function () {
     $owing->invoices()->create(['number' => 'TKH-1', 'description' => 'اشتراك', 'amount' => 349, 'issued_on' => today()]);
     Workspace::factory()->create(['name' => 'مكتب المنتظم', 'trial_ends_at' => now()->subMonth()]);
 
-    Livewire::actingAs($admin)->test(Workspaces::class)
+    Livewire::actingAs($admin)->test(WorkspaceList::class)
         ->assertSeeInOrder(['مكتب المتأخر', 'دفعة مستحقة', 'مكتب المنتظم', 'نشط']);
 });
