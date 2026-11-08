@@ -98,6 +98,16 @@ class User extends Authenticatable
         $this->unsetRelation('currentWorkspace');
     }
 
+    /**
+     * Admin actions taken on this account.
+     *
+     * @return HasMany<AdminAction, $this>
+     */
+    public function adminActions(): HasMany
+    {
+        return $this->hasMany(AdminAction::class);
+    }
+
     public function initials(): string
     {
         return Arabic::initial($this->name);

@@ -143,6 +143,14 @@ class Workspace extends Model
         return $this->hasMany(CommissionTarget::class);
     }
 
+    /**
+     * @return HasMany<AdminAction, $this>
+     */
+    public function adminActions(): HasMany
+    {
+        return $this->hasMany(AdminAction::class);
+    }
+
     #[Scope]
     protected function pendingApproval(Builder $query): void
     {
