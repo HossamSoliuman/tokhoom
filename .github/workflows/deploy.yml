@@ -29,6 +29,9 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - name: Install PHP dependencies
+        run: composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist --ignore-platform-reqs
+
       - name: Build assets
         run: |
           npm ci
