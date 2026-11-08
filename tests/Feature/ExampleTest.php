@@ -12,6 +12,8 @@ test('guests see the landing page with every plan', function () {
 });
 
 test('the sample site link shows only when one is set', function () {
+    config(['tokhoom.demo_site_url' => null]);
+
     $this->get('/')->assertDontSee('زر موقعاً نموذجياً');
 
     config(['tokhoom.demo_site_url' => 'https://alrashid.example.test']);
