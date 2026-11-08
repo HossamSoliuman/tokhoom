@@ -47,7 +47,7 @@ class Overview extends Component
                 'icon' => 'ti-repeat',
                 'label' => 'الإيراد الشهري المتكرر',
                 'value' => Arabic::money($stats->monthlyRecurringRevenue()),
-                'note' => Arabic::countWithNumber($counts['active'] + $counts['overdue'], 'مشترك يدفع', 'مشتركين يدفعون', 'مشتركاً يدفعون'),
+                'note' => Arabic::count($counts['active'] + $counts['overdue'], 'مشترك واحد يدفع', 'مشتركان يدفعان', 'مشتركين يدفعون', 'مشتركاً يدفعون'),
                 'tone' => 'neutral',
             ],
             [
@@ -61,7 +61,7 @@ class Overview extends Component
                 'icon' => 'ti-file-invoice',
                 'label' => 'بانتظار الدفع',
                 'value' => Arabic::money((int) (clone $outstanding)->sum('amount')),
-                'note' => Arabic::countWithNumber((clone $outstanding)->count(), 'فاتورة', 'فواتير', 'فاتورة'),
+                'note' => Arabic::count((clone $outstanding)->count(), 'فاتورة واحدة', 'فاتورتان', 'فواتير', 'فاتورة'),
                 'tone' => (clone $outstanding)->exists() ? 'down' : 'neutral',
             ],
             [

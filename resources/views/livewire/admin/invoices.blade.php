@@ -63,7 +63,7 @@
                                 <span class="truncate text-12 text-muted" title="{{ $invoice->payment_note }}">{{ $invoice->payment_note }}</span>
                             @endif
                         @elseif ($invoice->payment_attempts)
-                            <span>{{ Arabic::countWithNumber($invoice->payment_attempts, 'محاولة', 'محاولات', 'محاولة') }} · آخرها {{ Arabic::shortDate($invoice->last_attempted_at ?? $invoice->updated_at) }}</span>
+                            <span>{{ Arabic::count($invoice->payment_attempts, 'محاولة واحدة', 'محاولتان', 'محاولات', 'محاولة') }} · آخرها {{ Arabic::shortDate($invoice->last_attempted_at ?? $invoice->updated_at) }}</span>
                         @else
                             <span class="text-muted">—</span>
                         @endif

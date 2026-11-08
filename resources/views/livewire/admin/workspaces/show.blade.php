@@ -209,7 +209,7 @@
                     <div class="flex items-center gap-2.5 border-t border-divider px-4 py-2.5 text-14" wire:key="invoice-{{ $invoice->id }}">
                         <span class="flex min-w-0 flex-1 flex-col">
                             <span class="font-semibold" dir="ltr">{{ $invoice->number }}</span>
-                            <span class="text-12 text-muted">{{ Arabic::date($invoice->issued_on) }}{{ ! $invoice->paid_at && $invoice->payment_attempts ? ' · '.Arabic::countWithNumber($invoice->payment_attempts, 'محاولة تحصيل', 'محاولات تحصيل', 'محاولة تحصيل') : '' }}</span>
+                            <span class="text-12 text-muted">{{ Arabic::date($invoice->issued_on) }}{{ ! $invoice->paid_at && $invoice->payment_attempts ? ' · '.Arabic::count($invoice->payment_attempts, 'محاولة تحصيل واحدة', 'محاولتا تحصيل', 'محاولات تحصيل', 'محاولة تحصيل') : '' }}</span>
                         </span>
                         <span class="font-semibold">{{ Arabic::money($invoice->amount) }}</span>
                         <x-admin.invoice-status :invoice="$invoice" />

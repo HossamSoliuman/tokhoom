@@ -97,7 +97,7 @@ class Invoices extends Component
             [
                 'label' => 'بانتظار الدفع',
                 'value' => Arabic::money((int) (clone $open)->sum('amount')),
-                'note' => Arabic::countWithNumber((clone $open)->count(), 'فاتورة', 'فواتير', 'فاتورة'),
+                'note' => Arabic::count((clone $open)->count(), 'فاتورة واحدة', 'فاتورتان', 'فواتير', 'فاتورة'),
                 'tone' => 'neutral',
             ],
             [
