@@ -60,6 +60,7 @@ class Listing extends Model
             'ad_license_expires_on' => 'date',
             'published_at' => 'datetime',
             'price_changed_at' => 'datetime',
+            'removed_at' => 'datetime',
         ];
     }
 
@@ -151,12 +152,13 @@ class Listing extends Model
 
     /**
      * Listings visitors can see on the public site: available or reserved,
-     * with an ad license that has not run out.
+     * with an ad license that has not run out, and not taken down by the platform.
      */
     #[Scope]
     protected function live(Builder $query): void
     {
         $query->whereIn('status', array_filter(ListingStatus::cases(), fn (ListingStatus $status) => $status->isPublic()))
+            ->whereNull('removed_at')
             ->where(fn (Builder $query) => $query->whereNull('ad_license_expires_on')->orWhereDate('ad_license_expires_on', '>=', today()));
     }
 
@@ -231,7 +233,15 @@ class Listing extends Model
      */
     public function isLive(): bool
     {
-        return $this->status->isPublic() && ! $this->isAdLicenseExpired();
+        return $this->status->isPublic() && ! $this->isAdLicenseExpired() && ! $this->isRemoved();
+    }
+
+    /**
+     * Whether a platform admin took the listing off the public site.
+     */
+    public function isRemoved(): bool
+    {
+        return $this->removed_at !== null;
     }
 
     public function daysSincePriceChange(): ?int

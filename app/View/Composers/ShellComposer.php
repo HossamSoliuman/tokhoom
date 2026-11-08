@@ -102,6 +102,7 @@ class ShellComposer
             $this->item('مساحات العمل', 'ti-building-community', 'admin.workspaces', 'admin.workspaces*'),
             $this->item('المستخدمون', 'ti-users', 'admin.users', 'admin.users*'),
             $this->item('الفواتير', 'ti-file-invoice', 'admin.invoices', 'admin.invoices*'),
+            $this->item('العقارات', 'ti-home-search', 'admin.listings', 'admin.listings'),
         ];
     }
 

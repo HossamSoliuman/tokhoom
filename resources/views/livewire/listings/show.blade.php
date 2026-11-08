@@ -1,4 +1,11 @@
 <x-app.page :title="$listing->title" :back="route('listings.index')" back-label="العقارات">
+    @if ($listing->isRemoved())
+        <div class="flex items-start gap-3 rounded-xl bg-danger-soft px-3.5 py-3 text-14 leading-[22px] text-danger-ink">
+            <i class="ti ti-eye-off shrink-0 text-20"></i>
+            <span class="flex-1">أوقفت إدارة المنصة عرض هذا العقار على موقعك{{ $listing->removal_reason ? ': '.$listing->removal_reason : '' }}. تواصل مع الدعم لمراجعته.</span>
+        </div>
+    @endif
+
     <div class="flex flex-wrap items-center gap-4 rounded-card border border-line bg-white p-3.5">
         <x-ui.photo :photo="$listing->coverPhoto" class="h-[84px] w-[120px] shrink-0 rounded-field" />
         <div class="flex min-w-0 flex-[1_1_220px] flex-col gap-1.5">

@@ -20,6 +20,12 @@ class ChangeListingStatus
             return;
         }
 
+        if ($status->isPublic() && $listing->isRemoved()) {
+            throw ValidationException::withMessages([
+                'status' => 'أوقفت إدارة المنصة عرض هذا العقار. تواصل مع الدعم لإعادته.',
+            ]);
+        }
+
         if ($status->isPublic() && ! $listing->ad_license_number) {
             throw ValidationException::withMessages([
                 'status' => 'أدخل رقم ترخيص الإعلان قبل نشر العقار.',
