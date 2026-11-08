@@ -15,6 +15,9 @@ class More extends Component
 {
     public function render(ShellComposer $shell): View
     {
-        return view('livewire.more', ['items' => $shell->settingsItems()]);
+        return view('livewire.more', [
+            'items' => $shell->settingsItems(),
+            'switch' => $shell->switchLink(auth()->user(), false, true),
+        ]);
     }
 }

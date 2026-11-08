@@ -21,7 +21,7 @@ class HomeController extends Controller
         }
 
         if ($user->is_platform_admin && $user->memberships()->whereNull('deactivated_at')->doesntExist()) {
-            return redirect()->route('admin.approvals');
+            return redirect()->route('admin.overview');
         }
 
         return redirect()->route('today');

@@ -22,10 +22,11 @@ test('only platform admins reach the admin pages', function () {
     $this->actingAs($admin)->get(route('admin.workspaces'))->assertOk();
 });
 
-test('an admin without a workspace lands on the approval queue', function () {
+test('an admin without a workspace lands on the overview', function () {
     $admin = User::factory()->platformAdmin()->create();
 
-    $this->actingAs($admin)->get('/')->assertRedirect(route('admin.approvals'));
+    $this->actingAs($admin)->get('/')->assertRedirect(route('admin.overview'));
+    $this->actingAs($admin)->get(route('today'))->assertRedirect(route('admin.overview'));
 });
 
 test('approving a license notifies the owner', function () {

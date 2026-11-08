@@ -24,7 +24,7 @@ class EnsureWorkspace
 
         if (! $membership) {
             return $user->is_platform_admin
-                ? redirect()->route('admin.approvals')
+                ? redirect()->route('admin.overview')
                 : redirect()->route('workspaces.create');
         }
 

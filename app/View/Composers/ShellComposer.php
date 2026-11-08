@@ -39,7 +39,30 @@ class ShellComposer
             'workspaces' => $admin ? collect() : $user->workspaces()->orderBy('memberships.id')->get(),
             'unread' => $user->unreadNotifications()->count(),
             'fab' => ! $admin && Request::routeIs('today', 'listings.index'),
+            'accountUrl' => route($admin ? 'admin.account' : 'account'),
+            'switch' => $this->switchLink($user, $admin, $membership !== null),
         ]);
+    }
+
+    /**
+     * For platform admins who also belong to a workspace: the way between the
+     * admin panel and their workspace.
+     *
+     * @return array{label: string, icon: string, url: string}|null
+     */
+    public function switchLink(User $user, bool $admin, bool $hasWorkspace): ?array
+    {
+        if (! $user->is_platform_admin) {
+            return null;
+        }
+
+        if (! $admin) {
+            return ['label' => 'إدارة المنصة', 'icon' => 'ti-shield', 'url' => route('admin.overview')];
+        }
+
+        $hasWorkspace = $hasWorkspace || $user->memberships()->whereNull('deactivated_at')->exists();
+
+        return $hasWorkspace ? ['label' => 'العودة إلى مساحة العمل', 'icon' => 'ti-arrow-back-up', 'url' => route('today')] : null;
     }
 
     /**
@@ -98,10 +121,23 @@ class ShellComposer
         $approvals['badge'] = Workspace::pendingApproval()->count();
 
         return [
+            $this->item('نظرة عامة', 'ti-layout-dashboard', 'admin.overview', 'admin.overview'),
             $approvals,
             $this->item('مساحات العمل', 'ti-building-community', 'admin.workspaces', 'admin.workspaces*'),
-            $this->item('المستخدمون', 'ti-users', 'admin.users', 'admin.users*'),
+            ...$this->adminMoreItems(),
+        ];
+    }
+
+    /**
+     * Admin pages that live under "More" on mobile.
+     *
+     * @return list<array{label: string, icon: string, url: string, active: bool}>
+     */
+    public function adminMoreItems(): array
+    {
+        return [
             $this->item('الفواتير', 'ti-file-invoice', 'admin.invoices', 'admin.invoices*'),
+            $this->item('المستخدمون', 'ti-users', 'admin.users', 'admin.users*'),
             $this->item('العقارات', 'ti-home-search', 'admin.listings', 'admin.listings'),
             $this->item('التراخيص', 'ti-id-badge-2', 'admin.licenses', 'admin.licenses'),
         ];
@@ -112,9 +148,15 @@ class ShellComposer
      */
     private function adminTabs(): array
     {
+        $more = $this->item('المزيد', 'ti-dots', 'admin.more', 'admin.more');
+        $more['active'] = Request::routeIs('admin.more', 'admin.account', 'admin.users*', 'admin.listings', 'admin.licenses');
+
         return [
+            $this->item('نظرة عامة', 'ti-layout-dashboard', 'admin.overview', 'admin.overview'),
             $this->item('الاعتماد', 'ti-certificate', 'admin.approvals', 'admin.approvals'),
             $this->item('مساحات العمل', 'ti-building-community', 'admin.workspaces', 'admin.workspaces*'),
+            $this->item('الفواتير', 'ti-file-invoice', 'admin.invoices', 'admin.invoices*'),
+            $more,
         ];
     }
 
