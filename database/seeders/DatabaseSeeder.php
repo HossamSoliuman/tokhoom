@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             PlatformSeeder::class,
             DemoAgentSeeder::class,
             DemoHistorySeeder::class,
+            AdminDemoSeeder::class,
         ]);
     }
 }
