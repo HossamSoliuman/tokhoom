@@ -15,6 +15,12 @@
         ['التجربة', config('tokhoom.trial_days').' يوماً، ويظهر الموقع بعد مراجعة الترخيص'],
     ];
 
+    $heroPoints = [
+        ['ti-world', 'موقع يعرض عقاراتك وحدها، بشعارك ولونك وعلى عنوانك.'],
+        ['ti-layout-dashboard', 'لوحة تحكم للعقارات والعملاء والصفقات والفريق، من الجوال أو الحاسب.'],
+        ['ti-certificate', 'رخصة فال وترخيص الإعلان يظهران للزوار، ولا يُنشر عقار بدون ترخيصه.'],
+    ];
+
     $isList = [
         'موقع مستقل لكل مكتب أو وسيط، بعنوانه وشعاره ولونه.',
         'لوحة تحكم للعقارات والعملاء والصفقات والفريق والتقارير.',
@@ -155,59 +161,86 @@
 
     <main>
         {{-- Hero --}}
-        <section class="mx-auto max-w-[1160px] px-4 pt-12 lg:px-5 lg:pt-24">
-            <div class="grid items-end gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
-                <h1 class="text-[clamp(34px,5vw,56px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
-                <div class="flex flex-wrap gap-2.5 lg:justify-end lg:pb-2">
-                    <a href="{{ route('signup') }}" class="flex h-13 items-center gap-2 whitespace-nowrap rounded-field bg-primary px-6 text-16 font-semibold text-white hover:bg-primary-strong hover:text-white hover:no-underline">
-                        ابدأ تجربة {{ config('tokhoom.trial_days') }} يوماً<i class="ti ti-arrow-left text-[19px]"></i>
-                    </a>
+        <section class="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-10 px-4 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-14 lg:px-5 lg:pt-16"
+                 x-data="{ address: '', get host() { return (this.address.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30) || 'alrashid') + @js('.'.config('tokhoom.site_domain')) } }"
+                 x-on:site-address="address = $event.detail">
+            <div class="flex flex-col gap-7">
+                <h1 class="text-[clamp(32px,4.2vw,50px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
+
+                <ul class="flex flex-col gap-3.5">
+                    @foreach ($heroPoints as [$icon, $text])
+                        <li class="flex items-start gap-3 text-16 leading-[1.7] text-ink-soft">
+                            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary"><i class="ti {{ $icon }} text-18"></i></span>
+                            <span class="pt-0.5">{{ $text }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="flex flex-col gap-4">
+                    <div class="rounded-card border border-line bg-white p-4 sm:p-5">
+                        <livewire:claim-site-address />
+                    </div>
                     @if ($demoSite)
-                        <a href="{{ $demoSite }}" class="flex h-13 items-center whitespace-nowrap rounded-field border border-line-strong bg-white px-5 text-16 font-semibold text-ink hover:no-underline">زر موقعاً نموذجياً</a>
+                        <a href="{{ $demoSite }}" class="flex w-fit items-center gap-1.5 text-15 font-semibold">
+                            <i class="ti ti-external-link text-18"></i>زر موقعاً نموذجياً
+                        </a>
                     @endif
                 </div>
             </div>
 
-            <div class="mt-10 overflow-hidden rounded-2xl border border-line bg-white lg:mt-16" aria-hidden="true">
-                <div class="flex min-h-10 items-center gap-3 bg-divider px-3.5 py-2">
-                    <span class="flex gap-1.5"><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span></span>
-                    <span class="rounded-md bg-white px-3 py-0.5 font-mono text-12 text-body" dir="ltr">alrashid.{{ config('tokhoom.site_domain') }}</span>
+            <div class="relative rounded-[24px] bg-primary-soft p-3 sm:p-5" aria-hidden="true">
+                <div class="overflow-hidden rounded-2xl border border-line bg-white shadow-pop">
+                    <div class="flex items-center gap-3 bg-divider px-3.5 py-2.5">
+                        <span class="flex shrink-0 gap-1.5"><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span></span>
+                        <span class="flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 font-mono text-12 text-body" dir="ltr">
+                            <i class="ti ti-lock text-13 text-success"></i><span class="truncate" x-text="host">alrashid.{{ config('tokhoom.site_domain') }}</span>
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 border-b border-divider px-4 py-3">
+                        <span class="flex items-center gap-2.5">
+                            <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary font-bold text-white">ر</span>
+                            <span class="flex flex-col"><span class="text-14 font-semibold">مكتب الراشد العقاري</span><span class="text-11 text-muted">رخصة فال 1200045678</span></span>
+                        </span>
+                        <span class="flex items-center gap-1 rounded-lg bg-whatsapp px-3 py-1.5 text-12 font-semibold text-white"><i class="ti ti-brand-whatsapp text-15"></i>واتساب</span>
+                    </div>
+
+                    <div class="flex flex-col gap-3 p-4">
+                        <div class="photo-stripes-lg flex aspect-[16/5] items-end rounded-field p-3">
+                            <span class="rounded-lg bg-white/90 px-3 py-1.5 text-13 font-bold">عقارات للبيع والإيجار في الرياض</span>
+                        </div>
+                        <div class="flex gap-1.5 text-12 font-semibold">
+                            <span class="rounded-full bg-primary px-3 py-1 text-white">الكل</span>
+                            <span class="rounded-full border border-line px-3 py-1 text-body">للبيع</span>
+                            <span class="rounded-full border border-line px-3 py-1 text-body">للإيجار</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            @foreach ([['للبيع', '3,200,000 ريال', 'فيلا · حي الملقا', '450 م² · 5 غرف'], ['للإيجار', '65,000 ريال سنوياً', 'شقة · حي النرجس', '160 م² · 3 غرف']] as [$purpose, $price, $text, $meta])
+                                <div class="overflow-hidden rounded-field border border-line">
+                                    <div class="photo-stripes relative aspect-[16/10]"><span class="absolute right-2 top-2 rounded-full bg-white px-2.5 py-0.5 text-11 font-bold text-primary">{{ $purpose }}</span></div>
+                                    <div class="flex flex-col gap-0.5 px-3 py-2.5"><span class="text-14 font-bold">{{ $price }}</span><span class="text-12 text-body">{{ $text }}</span><span class="text-12 text-muted">{{ $meta }}</span></div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
-                <div class="grid md:grid-cols-3">
-                    <div class="flex flex-col gap-3.5 border-divider p-5 md:border-l">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="flex items-center gap-2 text-14 font-semibold"><span class="flex size-7.5 items-center justify-center rounded-lg bg-primary font-bold text-white">ر</span>مكتب الراشد العقاري</span>
-                            <span class="flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-12 font-semibold text-white"><i class="ti ti-brand-whatsapp text-15"></i>واتساب</span>
-                        </div>
-                        <div class="photo-stripes-lg aspect-video rounded-field"></div>
-                        <div class="flex flex-wrap justify-between gap-2 rounded-lg border border-line px-2.5 py-2 text-12 text-body"><span>رخصة فال 1200045678</span><span>س.ت 1010567890</span></div>
-                    </div>
-                    <div class="flex flex-col gap-3 border-t border-divider p-5 md:border-t-0 md:border-l">
-                        <span class="text-13 font-semibold text-muted">العقارات · 6</span>
-                        @foreach ([['3,200,000 ريال', 'فيلا · حي الملقا · 450 م²', 'للبيع'], ['65,000 ريال سنوياً', 'شقة · حي النرجس · 160 م²', 'للإيجار'], ['2,100,000 ريال', 'أرض · حي حطين · 600 م²', 'للبيع']] as [$price, $text, $purpose])
-                            <div class="flex items-center gap-3">
-                                <span class="photo-stripes h-12 w-16 shrink-0 rounded-lg"></span>
-                                <span class="flex min-w-0 flex-1 flex-col"><span class="text-14 font-bold">{{ $price }}</span><span class="text-12 text-body">{{ $text }}</span></span>
-                                <span class="rounded-full bg-primary-soft px-2 py-0.5 text-11 font-semibold text-primary">{{ $purpose }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="flex flex-col gap-3 border-t border-divider bg-canvas p-5 md:border-t-0">
-                        <span class="text-13 font-semibold text-muted">لوحة التحكم · اليوم</span>
-                        <div class="flex flex-col gap-2 rounded-field border border-line bg-white p-3">
-                            <span class="flex items-center gap-1.5 text-12 font-bold text-warning"><i class="ti ti-clock text-15"></i>بانتظار الرد منذ 5 دقائق</span>
-                            <span class="text-14 font-semibold">منيرة السبيعي</span>
-                            <span class="text-12 text-body">تسأل عن فيلا للبيع — حي الملقا</span>
-                        </div>
-                        <div class="flex flex-col gap-2 rounded-field border border-line bg-white p-3">
-                            <span class="flex items-center gap-1.5 text-12 font-bold text-primary"><i class="ti ti-arrows-exchange text-15"></i>تطابق جديد</span>
-                            <span class="text-13 leading-relaxed">شقة النرجس تناسب طلب عبدالله الدوسري (50–70 ألف سنوياً)</span>
-                        </div>
-                    </div>
+
+                <div class="absolute -top-4 end-6 hidden items-center gap-2 rounded-full border border-line bg-white py-1.5 pe-3.5 ps-1.5 text-13 font-semibold shadow-pop lg:flex">
+                    <span class="flex size-7 items-center justify-center rounded-full bg-primary-soft text-primary"><i class="ti ti-arrows-exchange text-16"></i></span>
+                    شقة النرجس تناسب طلب عبدالله
+                </div>
+
+                <div class="mt-3 flex flex-col gap-2 rounded-card border border-line bg-white p-3.5 shadow-pop lg:absolute lg:-bottom-8 lg:-start-10 lg:mt-0 lg:w-[270px]">
+                    <span class="flex items-center gap-1.5 text-12 font-bold text-warning"><i class="ti ti-clock text-15"></i>استفسار جديد · منذ 5 دقائق</span>
+                    <span class="text-14 font-semibold">منيرة السبيعي</span>
+                    <span class="text-12 text-body">تسأل عن فيلا للبيع في حي الملقا</span>
+                    <span class="flex items-center justify-center gap-1 rounded-lg bg-whatsapp py-2 text-12 font-semibold text-white"><i class="ti ti-brand-whatsapp text-15"></i>رد عبر واتساب</span>
                 </div>
             </div>
+        </section>
 
-            <dl class="grid grid-cols-1 gap-x-8 gap-y-5 pt-7 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="mx-auto max-w-[1160px] px-4 pt-14 lg:px-5 lg:pt-24">
+            <dl class="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($facts as [$label, $value])
                     <div class="flex flex-col gap-1 border-t border-line-strong pt-3.5">
                         <dt class="text-13 text-muted">{{ $label }}</dt>
@@ -215,7 +248,7 @@
                     </div>
                 @endforeach
             </dl>
-        </section>
+        </div>
 
         {{-- What it is and isn't --}}
         <section class="mx-auto flex max-w-[1160px] flex-col gap-7 px-4 pt-18 lg:px-5 lg:pt-30">
