@@ -208,7 +208,7 @@ class Workspace extends Model
         }
 
         $like = '%'.$term.'%';
-        $digits = Phone::digits($term);
+        $digits = preg_match('/^[\d٠-٩\s+()-]+$/u', $term) ? Phone::digits($term) : '';
 
         $query->where(fn (Builder $query) => $query
             ->where('name', 'like', $like)

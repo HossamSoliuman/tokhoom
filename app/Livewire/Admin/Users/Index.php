@@ -51,7 +51,7 @@ class Index extends Component
     private function searched(): Builder
     {
         $term = trim($this->search);
-        $digits = Phone::digits($term);
+        $digits = preg_match('/^[\d٠-٩\s+()-]+$/u', $term) ? Phone::digits($term) : '';
 
         return User::query()->when($term !== '', fn (Builder $query) => $query->where(fn (Builder $query) => $query
             ->where('name', 'like', '%'.$term.'%')
