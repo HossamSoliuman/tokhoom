@@ -2,7 +2,9 @@
 
 use App\Livewire\Billing\Index as Billing;
 use App\Models\Invoice;
+use App\Models\User;
 use App\Models\Workspace;
+use App\Notifications\CollectionFailed;
 use App\Notifications\InvoiceDue;
 use App\Notifications\PaymentFailed;
 use App\Support\Subscriptions;
@@ -173,6 +175,7 @@ test('a declined renewal is retried once a day, three times, and the owner is to
         'api.tap.company/v2/charges' => fn (Request $request) => Http::response(tapCharge(Invoice::findOrFail((int) $request['metadata']['invoice']), ['status' => 'DECLINED'])),
     ]);
     [$owner, $workspace] = dueWorkspace(savedCard: true);
+    $admin = User::factory()->platformAdmin()->create();
 
     $this->artisan('tokhoom:renew-subscriptions');
     $this->artisan('tokhoom:renew-subscriptions');
@@ -185,6 +188,7 @@ test('a declined renewal is retried once a day, three times, and the owner is to
         ->paid_at->toBeNull()
         ->payment_attempts->toBe(Subscriptions::MAX_AUTOMATIC_ATTEMPTS);
     Notification::assertSentToTimes($owner, PaymentFailed::class, Subscriptions::MAX_AUTOMATIC_ATTEMPTS);
+    Notification::assertSentToTimes($admin, CollectionFailed::class, 1);
 });
 
 test('without a saved card the owner is asked once to pay', function () {

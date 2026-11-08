@@ -5,12 +5,14 @@ namespace App\Support;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Notifications\CollectionFailed;
 use App\Notifications\InvoiceDue;
 use App\Notifications\PaymentFailed;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 /**
@@ -197,6 +199,10 @@ class Subscriptions
 
         if (! self::settle($charge)?->paid_at) {
             $owner?->notify(new PaymentFailed);
+
+            if ($invoice->payment_attempts >= self::MAX_AUTOMATIC_ATTEMPTS) {
+                Notification::send(User::where('is_platform_admin', true)->get(), new CollectionFailed($workspace, $invoice->payment_attempts));
+            }
         }
     }
 }
