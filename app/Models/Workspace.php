@@ -8,7 +8,9 @@ use App\Enums\MemberRole;
 use App\Enums\Plan;
 use App\Enums\RejectionReason;
 use App\Enums\WorkspaceKind;
+use App\Enums\WorkspaceStatus;
 use App\Support\Arabic;
+use App\Support\Phone;
 use Database\Factories\WorkspaceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -155,6 +157,108 @@ class Workspace extends Model
     protected function pendingApproval(Builder $query): void
     {
         $query->where('approval_status', ApprovalStatus::Pending);
+    }
+
+    /**
+     * Workspaces in the given admin status. Matches status() below.
+     */
+    #[Scope]
+    protected function inStatus(Builder $query, WorkspaceStatus $status): void
+    {
+        if ($status === WorkspaceStatus::Pending || $status === WorkspaceStatus::Rejected) {
+            $query->where('approval_status', $status === WorkspaceStatus::Pending ? ApprovalStatus::Pending : ApprovalStatus::Rejected);
+
+            return;
+        }
+
+        $query->where('approval_status', ApprovalStatus::Approved);
+
+        if ($status === WorkspaceStatus::Suspended) {
+            $query->whereNotNull('suspended_at');
+
+            return;
+        }
+
+        $query->whereNull('suspended_at');
+
+        if ($status === WorkspaceStatus::Trial) {
+            $query->where('trial_ends_at', '>', now());
+
+            return;
+        }
+
+        $query->where(fn (Builder $query) => $query->whereNull('trial_ends_at')->orWhere('trial_ends_at', '<=', now()));
+
+        $status === WorkspaceStatus::Overdue
+            ? $query->whereHas('invoices', fn (Builder $query) => $query->whereNull('paid_at'))
+            : $query->whereDoesntHave('invoices', fn (Builder $query) => $query->whereNull('paid_at'));
+    }
+
+    /**
+     * Admin search: the workspace's name, site address, license numbers or
+     * custom domain, or its owner's name, email or mobile.
+     */
+    #[Scope]
+    protected function matching(Builder $query, string $term): void
+    {
+        $term = trim($term);
+
+        if ($term === '') {
+            return;
+        }
+
+        $like = '%'.$term.'%';
+        $digits = Phone::digits($term);
+
+        $query->where(fn (Builder $query) => $query
+            ->where('name', 'like', $like)
+            ->orWhere('slug', 'like', $like)
+            ->orWhere('custom_domain', 'like', $like)
+            ->when($digits !== '', fn (Builder $query) => $query
+                ->orWhere('fal_number', 'like', '%'.$digits.'%')
+                ->orWhere('cr_number', 'like', '%'.$digits.'%'))
+            ->orWhereHas('memberships', fn (Builder $query) => $query
+                ->where('role', MemberRole::Owner)
+                ->whereHas('user', fn (Builder $query) => $query
+                    ->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->when(strlen($digits) >= 4, fn (Builder $query) => $query->orWhere('mobile', 'like', '%'.Phone::normalize($digits).'%')))));
+    }
+
+    /**
+     * Approved, not suspended and past the trial: the workspaces that pay.
+     */
+    #[Scope]
+    protected function paying(Builder $query): void
+    {
+        $query->where('approval_status', ApprovalStatus::Approved)
+            ->whereNull('suspended_at')
+            ->where(fn (Builder $query) => $query->whereNull('trial_ends_at')->orWhere('trial_ends_at', '<=', now()));
+    }
+
+    public function status(): WorkspaceStatus
+    {
+        return match (true) {
+            $this->approval_status === ApprovalStatus::Pending => WorkspaceStatus::Pending,
+            $this->approval_status === ApprovalStatus::Rejected => WorkspaceStatus::Rejected,
+            $this->isSuspended() => WorkspaceStatus::Suspended,
+            $this->isOnTrial() => WorkspaceStatus::Trial,
+            $this->hasOpenInvoice() => WorkspaceStatus::Overdue,
+            default => WorkspaceStatus::Active,
+        };
+    }
+
+    /**
+     * Whether an invoice is waiting to be paid. Uses a has_open_invoice
+     * attribute loaded with withExists() when there is one.
+     */
+    public function hasOpenInvoice(): bool
+    {
+        if (array_key_exists('has_open_invoice', $this->attributes)) {
+            return (bool) $this->attributes['has_open_invoice'];
+        }
+
+        return $this->invoices()->whereNull('paid_at')->exists();
     }
 
     public function isOffice(): bool
