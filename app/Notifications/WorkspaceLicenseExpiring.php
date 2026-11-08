@@ -29,6 +29,6 @@ class WorkspaceLicenseExpiring extends DashboardNotification
 
     protected function url(): string
     {
-        return route('admin.workspaces');
+        return route('admin.workspaces.show', $this->workspace);
     }
 }

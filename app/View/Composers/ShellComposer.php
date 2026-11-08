@@ -103,6 +103,7 @@ class ShellComposer
             $this->item('المستخدمون', 'ti-users', 'admin.users', 'admin.users*'),
             $this->item('الفواتير', 'ti-file-invoice', 'admin.invoices', 'admin.invoices*'),
             $this->item('العقارات', 'ti-home-search', 'admin.listings', 'admin.listings'),
+            $this->item('التراخيص', 'ti-id-badge-2', 'admin.licenses', 'admin.licenses'),
         ];
     }
 

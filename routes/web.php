@@ -105,6 +105,7 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
             Route::get('/invoices/export', AdminHttp\InvoiceExportController::class)->name('invoices.export');
             Route::get('/invoices/{invoice}', AdminHttp\InvoiceController::class)->name('invoices.show');
             Route::livewire('/listings', Admin\Listings::class)->name('listings');
+            Route::livewire('/licenses', Admin\Licenses::class)->name('licenses');
         });
     });
 });
