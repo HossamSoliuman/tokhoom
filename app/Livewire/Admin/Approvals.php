@@ -2,14 +2,13 @@
 
 namespace App\Livewire\Admin;
 
-use App\Enums\ApprovalStatus;
+use App\Actions\ApproveWorkspace;
+use App\Actions\RejectWorkspace;
 use App\Enums\MemberRole;
 use App\Enums\RejectionReason;
 use App\Livewire\Concerns\HasDialogs;
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Workspace;
-use App\Notifications\WorkspaceApproved;
-use App\Notifications\WorkspaceRejected;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -42,16 +41,11 @@ class Approvals extends Component
         return Workspace::pendingApproval()->findOrFail($id);
     }
 
-    public function approve(int $id): void
+    public function approve(int $id, ApproveWorkspace $approveWorkspace): void
     {
         $workspace = $this->pending($id);
 
-        $workspace->forceFill([
-            'approval_status' => ApprovalStatus::Approved,
-            'approved_at' => now(),
-        ])->save();
-
-        $this->owner($workspace)?->notify(new WorkspaceApproved($workspace));
+        $approveWorkspace->handle($workspace);
 
         $this->toast('تم اعتماد '.$workspace->name);
     }
@@ -63,31 +57,17 @@ class Approvals extends Component
         $this->openDialog('reject');
     }
 
-    public function reject(): void
+    public function reject(RejectWorkspace $rejectWorkspace): void
     {
         $this->validate([
             'reason' => ['required', Rule::enum(RejectionReason::class)],
             'message' => ['nullable', 'string', 'max:1000'],
         ], ['reason.required' => 'اختر سبب الرفض.']);
 
-        $workspace = $this->pending($this->workspaceId);
-
-        $workspace->forceFill([
-            'approval_status' => ApprovalStatus::Rejected,
-            'rejected_at' => now(),
-            'rejection_reason' => RejectionReason::from($this->reason),
-            'rejection_message' => trim($this->message) ?: null,
-        ])->save();
-
-        $this->owner($workspace)?->notify(new WorkspaceRejected($workspace));
+        $rejectWorkspace->handle($this->pending($this->workspaceId), RejectionReason::from($this->reason), $this->message);
 
         $this->closeDialog();
         $this->toast('تم رفض الطلب وإبلاغ المتقدم', 'info');
-    }
-
-    private function owner(Workspace $workspace)
-    {
-        return $workspace->memberships()->where('role', MemberRole::Owner)->with('user')->first()?->user;
     }
 
     public function render(): View
