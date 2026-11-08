@@ -15,10 +15,18 @@
         ['التجربة', config('tokhoom.trial_days').' يوماً، ويظهر الموقع بعد مراجعة الترخيص'],
     ];
 
-    $heroPoints = [
-        ['ti-world', 'موقع يعرض عقاراتك وحدها، بشعارك ولونك وعلى عنوانك.'],
-        ['ti-layout-dashboard', 'لوحة تحكم للعقارات والعملاء والصفقات والفريق، من الجوال أو الحاسب.'],
-        ['ti-certificate', 'رخصة فال وترخيص الإعلان يظهران للزوار، ولا يُنشر عقار بدون ترخيصه.'],
+    $siteDomain = config('tokhoom.site_domain');
+
+    $steps = [
+        ['اختر عنوانك', 'موقع يعرض عقاراتك وحدها، على عنوان باسمك:'],
+        ['أضف رخصة فال وشعارك ولونك', 'تظهر رخصة فال للزوار في رأس الموقع، ويُنشر الموقع بعد مراجعة الترخيص.'],
+        ['أضف عقاراتك وشارك الرابط', 'أضف العقار من الجوال مع ترخيص إعلانه، وشارك رابطه في واتساب بصورة ووصف، أو اطبع رمز QR.'],
+    ];
+
+    $addressRows = [
+        ['.'.$siteDomain, 'موقع مكتبك، جاهز من اليوم الأول.', 'كل الخطط'],
+        ['.'.$siteDomain.'/agents/12', 'صفحة لكل وسيط في مكتبك بعقاراته ورقم رخصته.', 'المكتب والمكتب بلس'],
+        ['.sa', 'اربط نطاقك الخاص، ويبقى عنوان تخوم يعمل.', 'المكتب بلس'],
     ];
 
     $isList = [
@@ -36,18 +44,18 @@
 
     $parts = [
         [
-            'n' => '01', 'kicker' => 'الموقع العام', 'mock' => 'site',
+            'mock' => 'site',
             'title' => 'موقع يعرض عقاراتك وحدها',
             'body' => 'يرفع المكتب شعاره ويختار لوناً واحداً، ويتكيّف الموقع معه. لكل وسيط صفحة بعقاراته ورقم رخصته، ولكل عقار صفحة فيها الصور والتفاصيل وزر واتساب.',
             'specs' => [
-                ['العنوان', 'alrashid.'.config('tokhoom.site_domain').' أو نطاقك الخاص'],
+                ['العنوان', 'alrashid.'.$siteDomain.' أو نطاقك الخاص'],
                 ['صفحات الوسطاء', 'صفحة لكل وسيط في المكتب'],
                 ['البحث والتصفية', 'الغرض، النوع، الحي، السعر، الغرف'],
                 ['التواصل', 'واتساب، اتصال، ونموذج استفسار'],
             ],
         ],
         [
-            'n' => '02', 'kicker' => 'إضافة العقار', 'mock' => 'editor',
+            'mock' => 'editor',
             'title' => 'أضف عقاراً من الجوال في شاشة واحدة',
             'body' => 'ارفع الصور ورتّبها، واختر الغرض والنوع والحي، وأدخل السعر والمساحة. زر النشر لا يعمل قبل إدخال رقم ترخيص الإعلان.',
             'specs' => [
@@ -58,7 +66,7 @@
             ],
         ],
         [
-            'n' => '03', 'kicker' => 'العملاء والصفقات', 'mock' => 'crm',
+            'mock' => 'crm',
             'title' => 'تابع كل عميل حتى إغلاق الصفقة',
             'body' => 'سجّل طلب العميل مرة واحدة، ويخبرك تخوم عندما يُضاف عقار يناسبه. انقل الصفقة بين المراحل وسجّل السعر النهائي والعمولة عند الإغلاق.',
             'specs' => [
@@ -103,6 +111,12 @@
             ['ماذا يحدث بعد انتهاء التجربة؟', 'تصدر فاتورة الشهر الأول، وتدفعها بمدى أو Apple Pay أو البطاقة من صفحة الاشتراك. لا نخصم من بطاقة لم تحفظها بنفسك.'],
             ['هل يمكنني تغيير الخطة أو إضافة مقاعد؟', 'نعم من صفحة الاشتراك. المقعد الإضافي بـ '.Plan::EXTRA_SEAT_PRICE.' ريالاً شهرياً.'],
         ]],
+        'domain' => ['العنوان والنطاق', [
+            ['هل أستطيع تغيير عنوان موقعي لاحقاً؟', 'لا. يثبت العنوان بعد إنشاء الحساب، لذلك اختره بعناية. ويمكنك ربط نطاقك الخاص في خطة المكتب بلس.'],
+            ['هل أحتاج نطاقاً خاصاً؟', 'لا. يعمل كل موقع على عنوانه في '.$siteDomain.' من اليوم الأول.'],
+            ['كيف أربط نطاقي الخاص؟', 'أضف سجل CNAME واحداً عند مزوّد نطاقك. تعرض لك لوحة التحكم السجل المطلوب بالضبط وتتحقق منه بنفسها.'],
+            ['ماذا يحدث لعنوان تخوم بعد ربط نطاقي؟', 'يبقى العنوانان يعملان، ويفتح كلاهما موقعك نفسه.'],
+        ]],
         'data' => ['البيانات', [
             ['لمن تعود بيانات العملاء؟', 'للمكتب. لا نستخدم بيانات عملائك في أي مكان آخر، ولا نعرض عقاراتك خارج موقعك.'],
             ['هل يمكنني تصدير تقاريري؟', 'نعم. صدّر تقرير أداء الوسطاء لأي فترة بملف يفتح في Excel.'],
@@ -138,8 +152,8 @@
     @vite(['resources/css/app.css', 'resources/js/site.js'])
     @livewireStyles
 </head>
-<body class="bg-canvas">
-    <header class="sticky top-0 z-20 border-b border-line bg-canvas/95 backdrop-blur">
+<body class="bg-canvas" data-site-domain="{{ $siteDomain }}" data-signup-url="{{ route('signup') }}">
+    <header class="sticky top-0 z-20 border-b border-line bg-canvas/95 backdrop-blur" x-data>
         <div class="mx-auto flex min-h-[68px] max-w-[1160px] items-center gap-8 px-4 lg:px-5">
             <a href="{{ route('home') }}" class="flex items-center gap-2.5 hover:no-underline">
                 <x-logo class="size-8" />
@@ -154,30 +168,19 @@
             </nav>
             <div class="ms-auto flex items-center gap-1.5">
                 <a href="{{ route('login') }}" class="flex h-11 items-center whitespace-nowrap px-3.5 text-15 font-semibold text-ink">دخول</a>
-                <a href="{{ route('signup') }}" class="flex h-11 items-center whitespace-nowrap rounded-field bg-primary px-4.5 text-15 font-semibold text-white hover:bg-primary-strong hover:text-white hover:no-underline">ابدأ التجربة</a>
+                <a href="{{ route('signup') }}" x-on:click="$store.claim.start($event)" class="flex h-11 items-center whitespace-nowrap rounded-field bg-primary px-4.5 text-15 font-semibold text-white hover:bg-primary-strong hover:text-white hover:no-underline">ابدأ التجربة</a>
             </div>
         </div>
     </header>
 
-    <main>
+    <main x-data>
         {{-- Hero --}}
-        <section class="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-10 px-4 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-14 lg:px-5 lg:pt-16"
-                 x-data="{ address: '', get host() { return (this.address.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30) || 'alrashid') + @js('.'.config('tokhoom.site_domain')) } }"
-                 x-on:site-address="address = $event.detail">
-            <div class="flex flex-col gap-7">
-                <h1 class="text-[clamp(32px,4.2vw,50px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
-
-                <ul class="flex flex-col gap-3.5">
-                    @foreach ($heroPoints as [$icon, $text])
-                        <li class="flex items-start gap-3 text-16 leading-[1.7] text-ink-soft">
-                            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary"><i class="ti {{ $icon }} text-18"></i></span>
-                            <span class="pt-0.5">{{ $text }}</span>
-                        </li>
-                    @endforeach
-                </ul>
+        <section class="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-10 px-4 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-14 lg:px-5 lg:pt-16">
+            <div class="flex flex-col gap-5 lg:gap-7">
+                <h1 class="text-[clamp(28px,4.2vw,50px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
 
                 <div class="flex flex-col gap-4">
-                    <div class="rounded-card border border-line bg-white p-4 sm:p-5">
+                    <div id="start" class="scroll-mt-24 rounded-card border border-line bg-white p-4 sm:p-5">
                         <livewire:claim-site-address />
                     </div>
                     @if ($demoSite)
@@ -193,14 +196,19 @@
                     <div class="flex items-center gap-3 bg-divider px-3.5 py-2.5">
                         <span class="flex shrink-0 gap-1.5"><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span></span>
                         <span class="flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 font-mono text-12 text-body" dir="ltr">
-                            <i class="ti ti-lock text-13 text-success"></i><span class="truncate" x-text="host">alrashid.{{ config('tokhoom.site_domain') }}</span>
+                            <i class="ti ti-lock text-13 text-success"></i><span class="truncate" x-text="$store.claim.host">alrashid.{{ $siteDomain }}</span>
+                            <i x-show="$store.claim.state === 'available'" x-cloak class="ti ti-circle-check-filled text-14 text-success"></i>
                         </span>
                     </div>
 
                     <div class="flex items-center justify-between gap-2 border-b border-divider px-4 py-3">
-                        <span class="flex items-center gap-2.5">
+                        <span class="flex min-w-0 items-center gap-2.5" x-show="$store.claim.kind !== 'agent'">
                             <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary font-bold text-white">ر</span>
-                            <span class="flex flex-col"><span class="text-14 font-semibold">مكتب الراشد العقاري</span><span class="text-11 text-muted">رخصة فال 1200045678</span></span>
+                            <span class="flex min-w-0 flex-col items-start gap-0.5"><span class="text-14 font-semibold">مكتب الراشد العقاري</span><span class="flex items-center gap-1 rounded-full bg-primary-soft px-2 py-px text-11 font-semibold text-primary-strong"><i class="ti ti-certificate text-12"></i>فال 1200045678</span></span>
+                        </span>
+                        <span class="flex min-w-0 items-center gap-2.5" x-show="$store.claim.kind === 'agent'" x-cloak>
+                            <span class="photo-stripes size-9 shrink-0 rounded-full"></span>
+                            <span class="flex min-w-0 flex-col items-start gap-0.5"><span class="text-14 font-semibold">سارة القحطاني</span><span class="flex items-center gap-1 rounded-full bg-primary-soft px-2 py-px text-11 font-semibold text-primary-strong"><i class="ti ti-certificate text-12"></i>فال 1100012345</span></span>
                         </span>
                         <span class="flex items-center gap-1 rounded-lg bg-whatsapp px-3 py-1.5 text-12 font-semibold text-white"><i class="ti ti-brand-whatsapp text-15"></i>واتساب</span>
                     </div>
@@ -250,23 +258,25 @@
             </dl>
         </div>
 
-        {{-- What it is and isn't --}}
-        <section class="mx-auto flex max-w-[1160px] flex-col gap-7 px-4 pt-18 lg:px-5 lg:pt-30">
-            <h2 class="text-[clamp(26px,3vw,34px)] font-bold leading-[1.4] text-balance">ما هو تخوم، وما ليس هو</h2>
-            <div class="grid gap-x-12 gap-y-6 md:grid-cols-2">
-                <div class="flex flex-col">
-                    <span class="border-b-2 border-primary pb-3 text-14 font-bold text-primary">تخوم هو</span>
-                    @foreach ($isList as $line)
-                        <p class="border-b border-line py-3.5 text-16 leading-[1.75]">{{ $line }}</p>
-                    @endforeach
-                </div>
-                <div class="flex flex-col">
-                    <span class="border-b-2 border-faint pb-3 text-14 font-bold text-muted">تخوم ليس</span>
-                    @foreach ($notList as $line)
-                        <p class="border-b border-line py-3.5 text-16 leading-[1.75] text-body">{{ $line }}</p>
-                    @endforeach
-                </div>
-            </div>
+        {{-- How it works --}}
+        <section class="mx-auto flex max-w-[1160px] flex-col gap-8 px-4 pt-18 lg:px-5 lg:pt-30">
+            <h2 class="text-[clamp(26px,3vw,34px)] font-bold leading-[1.4] text-balance">ثلاث خطوات حتى يظهر موقعك</h2>
+            <ol class="grid gap-x-8 gap-y-6 md:grid-cols-3">
+                @foreach ($steps as [$title, $body])
+                    <li class="flex flex-col gap-3 border-t-2 border-primary pt-5">
+                        <span class="flex items-center gap-3">
+                            <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-16 font-bold text-primary">{{ $loop->iteration }}</span>
+                            <h3 class="text-[19px] font-bold leading-snug">{{ $title }}</h3>
+                        </span>
+                        <p class="text-16 leading-[1.8] text-body text-pretty">
+                            {{ $body }}
+                            @if ($loop->first)
+                                <span class="mt-1 block truncate text-start font-mono text-15 font-semibold text-ink" dir="ltr" x-text="$store.claim.host">alrashid.{{ $siteDomain }}</span>
+                            @endif
+                        </p>
+                    </li>
+                @endforeach
+            </ol>
         </section>
 
         {{-- Product --}}
@@ -274,7 +284,6 @@
             @foreach ($parts as $part)
                 <article class="grid items-start gap-7 border-t border-line-strong pt-7 lg:grid-cols-2 lg:gap-14">
                     <div class="flex flex-col gap-4.5">
-                        <span class="text-14 font-semibold text-sand-ink">{{ $part['n'] }} · {{ $part['kicker'] }}</span>
                         <h2 class="text-[clamp(24px,2.8vw,32px)] font-bold leading-[1.4] text-balance">{{ $part['title'] }}</h2>
                         <p class="max-w-[520px] text-16 leading-[1.85] text-body text-pretty">{{ $part['body'] }}</p>
                         <dl class="mt-1.5 flex flex-col">
@@ -342,6 +351,20 @@
             @endforeach
         </section>
 
+        {{-- Address --}}
+        <section class="mx-auto flex max-w-[1160px] flex-col gap-8 px-4 pt-18 lg:px-5 lg:pt-30">
+            <h2 class="text-[clamp(26px,3vw,34px)] font-bold leading-[1.4] text-balance">عنوانك يكبر معك</h2>
+            <div class="overflow-hidden rounded-card border border-line bg-white">
+                @foreach ($addressRows as [$suffix, $line, $planNames])
+                    <div class="grid gap-x-6 gap-y-1.5 border-t border-divider px-5 py-4.5 first:border-t-0 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1.6fr)_auto] lg:items-center">
+                        <span class="truncate text-start font-mono text-16 font-semibold text-primary-strong" dir="ltr"><span x-text="$store.claim.name">alrashid</span>{{ $suffix }}</span>
+                        <span class="text-15 leading-[1.7] text-ink-soft">{{ $line }}</span>
+                        <span class="w-fit rounded-full bg-divider px-3 py-1 text-13 font-semibold text-body">{{ $planNames }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
         {{-- Compliance --}}
         <section id="compliance" class="mt-18 scroll-mt-20 border-y border-line bg-white lg:mt-30">
             <div class="mx-auto flex max-w-[1160px] flex-col gap-9 px-4 py-14 lg:px-5 lg:py-24">
@@ -354,6 +377,25 @@
                             <span class="text-15 leading-[1.7] text-ink-soft">{{ $how }}</span>
                             <span class="text-14 leading-[1.7] text-muted">{{ $where }}</span>
                         </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        {{-- What it is and isn't --}}
+        <section class="mx-auto flex max-w-[1160px] flex-col gap-7 px-4 pt-18 lg:px-5 lg:pt-30">
+            <h2 class="text-[clamp(26px,3vw,34px)] font-bold leading-[1.4] text-balance">ما هو تخوم، وما ليس هو</h2>
+            <div class="grid gap-x-12 gap-y-6 md:grid-cols-2">
+                <div class="flex flex-col">
+                    <span class="border-b-2 border-primary pb-3 text-14 font-bold text-primary">تخوم هو</span>
+                    @foreach ($isList as $line)
+                        <p class="border-b border-line py-3.5 text-16 leading-[1.75]">{{ $line }}</p>
+                    @endforeach
+                </div>
+                <div class="flex flex-col">
+                    <span class="border-b-2 border-faint pb-3 text-14 font-bold text-muted">تخوم ليس</span>
+                    @foreach ($notList as $line)
+                        <p class="border-b border-line py-3.5 text-16 leading-[1.75] text-body">{{ $line }}</p>
                     @endforeach
                 </div>
             </div>
@@ -398,13 +440,14 @@
                         </span>
                         <dl class="flex flex-1 flex-col">
                             @foreach ($planRows[$plan->value] as [$label, $value])
-                                <div class="flex justify-between gap-3 border-t border-divider py-2.5 text-14">
-                                    <dt class="text-muted">{{ $label }}</dt>
-                                    <dd class="text-left font-semibold">{{ $value }}</dd>
+                                @php $domainRow = $label === 'النطاق الخاص'; @endphp
+                                <div @class(['flex justify-between gap-3 border-t border-divider py-2.5 text-14', '-mx-3 rounded-lg border-t-transparent bg-primary-tint px-3' => $domainRow])>
+                                    <dt @class(['text-muted' => ! $domainRow, 'font-semibold text-primary-strong' => $domainRow])>{{ $label }}</dt>
+                                    <dd @class(['text-left font-semibold', 'text-primary-strong' => $domainRow && $value !== '—'])>{{ $value }}</dd>
                                 </div>
                             @endforeach
                         </dl>
-                        <a href="{{ route('signup') }}" @class([
+                        <a href="{{ route('signup') }}" x-on:click="$store.claim.start($event)" @class([
                             'rounded-field border p-3.5 text-center text-15 font-semibold hover:no-underline',
                             'border-primary bg-primary text-white hover:bg-primary-strong hover:text-white' => $popular,
                             'border-line-strong bg-white text-ink hover:text-ink' => ! $popular,
@@ -452,18 +495,27 @@
             </div>
         </section>
 
+        {{-- Final address form --}}
+        <section class="mx-auto max-w-[1160px] px-4 pt-18 lg:px-5 lg:pt-30">
+            <div class="mx-auto flex max-w-[720px] flex-col gap-6 rounded-2xl bg-primary-soft p-5 sm:p-8 lg:p-10">
+                <h2 class="text-[clamp(24px,2.8vw,32px)] font-bold leading-[1.4] text-balance">اختر عنوان موقعك وابدأ التجربة</h2>
+                <div class="rounded-card border border-line bg-white p-4 sm:p-5">
+                    <livewire:claim-site-address :with-label="false" />
+                </div>
+            </div>
+        </section>
+
         {{-- Company --}}
         <section id="company" class="mx-auto max-w-[1160px] scroll-mt-20 px-4 py-18 lg:px-5 lg:py-30">
             <div class="grid overflow-hidden rounded-2xl border border-line bg-white lg:grid-cols-2">
                 <div class="flex flex-col gap-4.5 border-line p-7 lg:border-l lg:p-12">
                     <h2 class="text-[clamp(24px,2.8vw,30px)] font-bold leading-[1.4]">من يقف خلف تخوم</h2>
                     <p class="text-16 leading-[1.85] text-body text-pretty">شركة سعودية تبني أدوات لقطاع الوساطة العقارية. فريق الدعم يرد بالعربية خلال ساعات العمل.</p>
-                    <div class="mt-1.5 flex flex-wrap gap-2.5">
-                        <a href="{{ route('signup') }}" class="flex items-center whitespace-nowrap rounded-field bg-primary px-5 py-3 text-15 font-semibold text-white hover:bg-primary-strong hover:text-white hover:no-underline">ابدأ تجربة {{ config('tokhoom.trial_days') }} يوماً</a>
-                        @if ($whatsappUrl)
+                    @if ($whatsappUrl)
+                        <div class="mt-1.5 flex flex-wrap gap-2.5">
                             <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="flex items-center gap-2 whitespace-nowrap rounded-field border border-line-strong px-4.5 py-3 text-15 font-semibold text-ink hover:text-ink hover:no-underline"><i class="ti ti-brand-whatsapp text-[19px]"></i>تحدث مع الفريق</a>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
                 <dl class="flex flex-col bg-canvas p-7 lg:p-12">
                     @foreach ($company as [$label, $value, $direction])
