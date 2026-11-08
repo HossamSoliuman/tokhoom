@@ -246,11 +246,16 @@ test('an office signs up step by step and waits for approval', function () {
     $component->assertSee('طلبك قيد المراجعة');
 });
 
-test('signup starts with the site address picked on the landing page', function () {
-    Livewire::withQueryParams(['slug' => 'AlNakheel'])
+test('signup starts with the site address and account type picked on the landing page', function () {
+    Livewire::withQueryParams(['slug' => 'AlNakheel', 'kind' => 'agent'])
         ->test(Signup::class)
         ->assertSet('slug', 'alnakheel')
+        ->assertSet('kind', 'agent')
         ->assertSet('step', 1);
+
+    Livewire::withQueryParams(['kind' => 'shop'])
+        ->test(Signup::class)
+        ->assertSet('kind', 'office');
 });
 
 test('an expired license cannot be used to sign up', function () {

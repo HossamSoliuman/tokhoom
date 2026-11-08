@@ -59,6 +59,7 @@ class Signup extends Component
     public function mount(): void
     {
         $this->slug = SiteAddress::clean((string) request()->query('slug', ''));
+        $this->kind = WorkspaceKind::tryFrom((string) request()->query('kind'))?->value ?? $this->kind;
 
         if (Auth::check()) {
             $this->step = 2;
