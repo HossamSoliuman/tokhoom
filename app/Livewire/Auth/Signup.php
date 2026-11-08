@@ -58,6 +58,8 @@ class Signup extends Component
 
     public function mount(): void
     {
+        $this->slug = SiteAddress::clean((string) request()->query('slug', ''));
+
         if (Auth::check()) {
             $this->step = 2;
             $this->name = Auth::user()->name;
@@ -104,12 +106,7 @@ class Signup extends Component
     #[Computed]
     public function slugState(): string
     {
-        return match (true) {
-            $this->slug === '' => 'empty',
-            ! SiteAddress::isValid($this->slug) => 'invalid',
-            SiteAddress::isAvailable($this->slug) => 'available',
-            default => 'taken',
-        };
+        return SiteAddress::state($this->slug);
     }
 
     /**

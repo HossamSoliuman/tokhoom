@@ -43,6 +43,19 @@ class SiteAddress
     }
 
     /**
+     * Where an address stands for the picker: empty, invalid, available or taken.
+     */
+    public static function state(string $slug): string
+    {
+        return match (true) {
+            $slug === '' => 'empty',
+            ! self::isValid($slug) => 'invalid',
+            self::isAvailable($slug) => 'available',
+            default => 'taken',
+        };
+    }
+
+    /**
      * Available alternatives to a taken address.
      *
      * @return list<string>
