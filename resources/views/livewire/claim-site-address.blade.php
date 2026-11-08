@@ -40,20 +40,20 @@
 
     <div class="flex flex-col gap-2.5 sm:flex-row">
         <div @class([
-            'flex h-14 min-w-0 flex-1 items-center overflow-hidden rounded-field border-[1.5px] bg-white transition-colors',
+            'flex h-12 min-w-0 flex-1 items-center overflow-hidden rounded-field border-[1.5px] bg-white transition-colors',
             'border-danger' => $rejected,
             'border-success' => $state === 'available' && ! $rejected,
             'border-line-strong focus-within:border-primary' => $state !== 'available' && ! $rejected,
         ]) dir="ltr">
             <input id="claim-slug-{{ $this->getId() }}" name="slug" type="text" wire:model.live.debounce.400ms="slug" x-on:input="typed($event.target.value)"
                    placeholder="alrashid" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go"
-                   class="h-full min-w-0 flex-1 border-0 bg-transparent px-4 font-mono text-17 outline-none">
+                   class="h-full min-w-0 flex-1 border-0 bg-transparent px-4 font-mono text-16 outline-none">
             @if ($state === 'available' && ! $rejected)
                 <i wire:loading.remove wire:target="slug" class="ti ti-circle-check-filled pe-3 text-20 text-success"></i>
             @endif
             <span class="flex h-full items-center border-l border-line bg-head px-3.5 font-mono text-14 text-muted">.{{ config('tokhoom.site_domain') }}</span>
         </div>
-        <button type="submit" class="flex h-14 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-field bg-primary px-6 text-16 font-semibold text-white transition-colors hover:bg-primary-strong data-loading:opacity-70">
+        <button type="submit" class="flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-field bg-primary px-6 text-16 font-semibold text-white transition-colors hover:bg-primary-strong data-loading:opacity-70">
             ابدأ التجربة
             <i class="ti ti-arrow-left text-[19px]"></i>
         </button>
