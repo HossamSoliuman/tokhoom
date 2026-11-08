@@ -212,11 +212,13 @@
                             <span class="text-12 text-muted">{{ Arabic::date($invoice->issued_on) }}{{ ! $invoice->paid_at && $invoice->payment_attempts ? ' · '.Arabic::countWithNumber($invoice->payment_attempts, 'محاولة تحصيل', 'محاولات تحصيل', 'محاولة تحصيل') : '' }}</span>
                         </span>
                         <span class="font-semibold">{{ Arabic::money($invoice->amount) }}</span>
-                        <span @class([
-                            'flex h-6 items-center rounded-full px-2 text-12 font-semibold',
-                            'bg-success-soft text-success' => $invoice->paid_at,
-                            'bg-warning-soft text-warning' => ! $invoice->paid_at,
-                        ])>{{ $invoice->paid_at ? 'مدفوعة' : 'مستحقة' }}</span>
+                        <x-admin.invoice-status :invoice="$invoice" />
+                        @unless ($invoice->paid_at)
+                            <x-ui.button variant="primary-outline" size="xs" class="text-13" wire:click="openPayment({{ $invoice->id }})">تسجيل دفعة</x-ui.button>
+                        @endunless
+                        <a href="{{ route('admin.invoices.show', $invoice) }}" target="_blank" class="flex size-9 items-center justify-center rounded-lg text-ink hover:bg-canvas" aria-label="عرض الفاتورة">
+                            <i class="ti ti-file-invoice text-18"></i>
+                        </a>
                     </div>
                 @empty
                     <p class="m-0 border-t border-divider px-4 py-4 text-14 text-muted">لا توجد فواتير بعد.</p>
@@ -371,6 +373,10 @@
                 <x-ui.button size="lg" class="flex-1" wire:click="savePlan">حفظ</x-ui.button>
             </x-slot:footer>
         </x-ui.dialog>
+    @endif
+
+    @if ($dialog === 'payment' && $payingInvoice)
+        <x-admin.payment-dialog :invoice="$payingInvoice" />
     @endif
 
     @if ($dialog === 'domain')

@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Invoice;
+use App\Models\User;
 use App\Models\Workspace;
 use App\Notifications\InvoiceDue;
 use App\Notifications\PaymentFailed;
@@ -75,21 +76,42 @@ class Subscriptions
             return $invoice;
         }
 
-        return DB::transaction(function () use ($invoice, $charge): Invoice {
+        return self::recordPayment($invoice, ['tap_charge_id' => data_get($charge, 'id')], self::cardDetails($charge));
+    }
+
+    /**
+     * Record a payment made outside Tap, such as a bank transfer, entered by
+     * a platform admin with a note saying how it was paid.
+     */
+    public static function recordManualPayment(Invoice $invoice, User $admin, string $note): Invoice
+    {
+        return self::recordPayment($invoice, ['recorded_by' => $admin->id, 'payment_note' => $note]);
+    }
+
+    /**
+     * Mark the invoice paid and extend the paid month by one. An invoice that
+     * is already paid is left as it is.
+     *
+     * @param  array<string, mixed>  $invoiceDetails
+     * @param  array<string, mixed>  $workspaceDetails
+     */
+    private static function recordPayment(Invoice $invoice, array $invoiceDetails, array $workspaceDetails = []): Invoice
+    {
+        return DB::transaction(function () use ($invoice, $invoiceDetails, $workspaceDetails): Invoice {
             $invoice = Invoice::lockForUpdate()->find($invoice->id);
 
             if ($invoice->paid_at) {
                 return $invoice;
             }
 
-            $invoice->forceFill(['paid_at' => now(), 'tap_charge_id' => data_get($charge, 'id')])->save();
+            $invoice->forceFill(['paid_at' => now(), ...$invoiceDetails])->save();
 
             $workspace = $invoice->workspace;
             $from = $workspace->nextChargeDate()->max(Carbon::today());
 
             $workspace->forceFill([
                 'paid_until' => $from->copy()->addMonthNoOverflow()->toDateString(),
-                ...self::cardDetails($charge),
+                ...$workspaceDetails,
             ])->save();
 
             return $invoice;

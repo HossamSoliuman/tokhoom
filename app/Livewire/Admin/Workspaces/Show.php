@@ -10,14 +10,17 @@ use App\Enums\Plan;
 use App\Enums\RejectionReason;
 use App\Enums\SiteEventType;
 use App\Livewire\Concerns\HasDialogs;
+use App\Livewire\Concerns\RecordsManualPayments;
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\AdminAction;
+use App\Models\Invoice;
 use App\Models\Workspace;
 use App\Support\Arabic;
 use App\Support\DomainVerifier;
 use App\Support\Phone;
 use App\Support\SiteAddress;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -29,7 +32,7 @@ use Livewire\Component;
  */
 class Show extends Component
 {
-    use HasDialogs, ShowsToasts;
+    use HasDialogs, RecordsManualPayments, ShowsToasts;
 
     public Workspace $workspace;
 
@@ -295,6 +298,14 @@ class Show extends Component
         $this->toast('تم إلغاء ربط النطاق');
     }
 
+    /**
+     * @return Builder<Invoice>
+     */
+    protected function payableInvoices(): Builder
+    {
+        return Invoice::where('workspace_id', $this->workspace->id);
+    }
+
     public function addNote(): void
     {
         $this->validate(['note' => ['required', 'string', 'max:2000']], ['note.required' => 'اكتب الملاحظة أولاً.']);
@@ -332,6 +343,7 @@ class Show extends Component
             'licenseSoon' => $workspace->license_expires_on->lte(today()->addDays(60)),
             'canOpenSite' => $workspace->isApproved() && ! $workspace->isSuspended(),
             'cities' => SiteAddress::cities(),
+            'payingInvoice' => $this->payingInvoice(),
         ])->title($workspace->name);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Subscriptions;
 use App\Support\ZatcaQr;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +32,36 @@ class Invoice extends Model
     public function workspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class);
+    }
+
+    /**
+     * The admin who recorded a payment made outside Tap.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function recorder(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'recorded_by');
+    }
+
+    /**
+     * Unpaid after every automatic try on the saved card.
+     */
+    public function hasFailedCollection(): bool
+    {
+        return $this->paid_at === null && $this->payment_attempts >= Subscriptions::MAX_AUTOMATIC_ATTEMPTS;
+    }
+
+    /**
+     * How the invoice was settled: "Tap", "يدوي", or null while unpaid.
+     */
+    public function paymentMethod(): ?string
+    {
+        return match (true) {
+            $this->paid_at === null => null,
+            $this->recorded_by !== null || filled($this->payment_note) => 'يدوي',
+            default => 'Tap',
+        };
     }
 
     /**
