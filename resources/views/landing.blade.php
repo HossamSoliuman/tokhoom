@@ -3,7 +3,6 @@
     use App\Enums\Plan;
     use App\Support\Arabic;
 
-    $demoSite = config('tokhoom.demo_site_url');
     $seller = config('tokhoom.seller');
     $support = config('tokhoom.support');
     $whatsappUrl = $support['whatsapp'] ? 'https://wa.me/'.preg_replace('/\D/', '', $support['whatsapp']) : null;
@@ -175,75 +174,11 @@
 
     <main x-data>
         {{-- Hero --}}
-        <section class="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-10 px-4 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-14 lg:px-5 lg:pt-16">
-            <div class="flex flex-col gap-5 lg:gap-7">
-                <h1 class="text-[clamp(28px,4.2vw,50px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
+        <section class="mx-auto flex min-h-[calc(100dvh-160px)] max-w-[720px] flex-col items-center justify-center gap-7 px-4 py-12 text-center lg:gap-9 lg:py-20">
+            <h1 class="text-[clamp(28px,4.4vw,50px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
 
-                <div class="flex flex-col gap-4">
-                    <div id="start" class="scroll-mt-24 rounded-card border border-line bg-white p-4 sm:p-5">
-                        <livewire:claim-site-address />
-                    </div>
-                    @if ($demoSite)
-                        <a href="{{ $demoSite }}" class="flex w-fit items-center gap-1.5 text-15 font-semibold">
-                            <i class="ti ti-external-link text-18"></i>زر موقعاً نموذجياً
-                        </a>
-                    @endif
-                </div>
-            </div>
-
-            <div class="relative rounded-[24px] bg-primary-soft p-3 sm:p-5" aria-hidden="true">
-                <div class="overflow-hidden rounded-2xl border border-line bg-white shadow-pop">
-                    <div class="flex items-center gap-3 bg-divider px-3.5 py-2.5">
-                        <span class="flex shrink-0 gap-1.5"><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span><span class="size-2.5 rounded-full bg-line-strong"></span></span>
-                        <span class="flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 font-mono text-12 text-body" dir="ltr">
-                            <i class="ti ti-lock text-13 text-success"></i><span class="truncate" x-text="$store.claim.host">alrashid.{{ $siteDomain }}</span>
-                            <i x-show="$store.claim.state === 'available'" x-cloak class="ti ti-circle-check-filled text-14 text-success"></i>
-                        </span>
-                    </div>
-
-                    <div class="flex items-center justify-between gap-2 border-b border-divider px-4 py-3">
-                        <span class="flex min-w-0 items-center gap-2.5" x-show="$store.claim.kind !== 'agent'">
-                            <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary font-bold text-white">ر</span>
-                            <span class="flex min-w-0 flex-col items-start gap-0.5"><span class="text-14 font-semibold">مكتب الراشد العقاري</span><span class="flex items-center gap-1 rounded-full bg-primary-soft px-2 py-px text-11 font-semibold text-primary-strong"><i class="ti ti-certificate text-12"></i>فال 1200045678</span></span>
-                        </span>
-                        <span class="flex min-w-0 items-center gap-2.5" x-show="$store.claim.kind === 'agent'" x-cloak>
-                            <span class="photo-stripes size-9 shrink-0 rounded-full"></span>
-                            <span class="flex min-w-0 flex-col items-start gap-0.5"><span class="text-14 font-semibold">سارة القحطاني</span><span class="flex items-center gap-1 rounded-full bg-primary-soft px-2 py-px text-11 font-semibold text-primary-strong"><i class="ti ti-certificate text-12"></i>فال 1100012345</span></span>
-                        </span>
-                        <span class="flex items-center gap-1 rounded-lg bg-whatsapp px-3 py-1.5 text-12 font-semibold text-white"><i class="ti ti-brand-whatsapp text-15"></i>واتساب</span>
-                    </div>
-
-                    <div class="flex flex-col gap-3 p-4">
-                        <div class="photo-stripes-lg flex aspect-[16/5] items-end rounded-field p-3">
-                            <span class="rounded-lg bg-white/90 px-3 py-1.5 text-13 font-bold">عقارات للبيع والإيجار في الرياض</span>
-                        </div>
-                        <div class="flex gap-1.5 text-12 font-semibold">
-                            <span class="rounded-full bg-primary px-3 py-1 text-white">الكل</span>
-                            <span class="rounded-full border border-line px-3 py-1 text-body">للبيع</span>
-                            <span class="rounded-full border border-line px-3 py-1 text-body">للإيجار</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2.5">
-                            @foreach ([['للبيع', '3,200,000 ريال', 'فيلا · حي الملقا', '450 م² · 5 غرف'], ['للإيجار', '65,000 ريال سنوياً', 'شقة · حي النرجس', '160 م² · 3 غرف']] as [$purpose, $price, $text, $meta])
-                                <div class="overflow-hidden rounded-field border border-line">
-                                    <div class="photo-stripes relative aspect-[16/10]"><span class="absolute right-2 top-2 rounded-full bg-white px-2.5 py-0.5 text-11 font-bold text-primary">{{ $purpose }}</span></div>
-                                    <div class="flex flex-col gap-0.5 px-3 py-2.5"><span class="text-14 font-bold">{{ $price }}</span><span class="text-12 text-body">{{ $text }}</span><span class="text-12 text-muted">{{ $meta }}</span></div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <div class="absolute -top-4 end-6 hidden items-center gap-2 rounded-full border border-line bg-white py-1.5 pe-3.5 ps-1.5 text-13 font-semibold shadow-pop lg:flex">
-                    <span class="flex size-7 items-center justify-center rounded-full bg-primary-soft text-primary"><i class="ti ti-arrows-exchange text-16"></i></span>
-                    شقة النرجس تناسب طلب عبدالله
-                </div>
-
-                <div class="mt-3 flex flex-col gap-2 rounded-card border border-line bg-white p-3.5 shadow-pop lg:absolute lg:-bottom-8 lg:-start-10 lg:mt-0 lg:w-[270px]">
-                    <span class="flex items-center gap-1.5 text-12 font-bold text-warning"><i class="ti ti-clock text-15"></i>استفسار جديد · منذ 5 دقائق</span>
-                    <span class="text-14 font-semibold">منيرة السبيعي</span>
-                    <span class="text-12 text-body">تسأل عن فيلا للبيع في حي الملقا</span>
-                    <span class="flex items-center justify-center gap-1 rounded-lg bg-whatsapp py-2 text-12 font-semibold text-white"><i class="ti ti-brand-whatsapp text-15"></i>رد عبر واتساب</span>
-                </div>
+            <div id="start" class="w-full scroll-mt-24 rounded-card border border-line bg-white p-4 text-start shadow-pop sm:p-6">
+                <livewire:claim-site-address />
             </div>
         </section>
 
