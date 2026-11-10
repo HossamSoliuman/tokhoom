@@ -18,9 +18,9 @@ class Settings extends Component
 {
     use InteractsWithWorkspace, ShowsToasts, WithFileUploads;
 
-    public const SWATCHES = ['#145A55', '#1F3A5F', '#7A2E3A', '#4F5D2F', '#2E2A25', '#B8925A'];
+    public const SWATCHES = ['#1E3A4C', '#145A55', '#7A2E3A', '#4F5D2F', '#2E2A25', '#A9704F'];
 
-    public string $brandColor = '#145A55';
+    public string $brandColor = '#1E3A4C';
 
     public string $about = '';
 

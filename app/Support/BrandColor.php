@@ -8,7 +8,7 @@ namespace App\Support;
  */
 class BrandColor
 {
-    public const DEFAULT = '#145A55';
+    public const DEFAULT = '#1E3A4C';
 
     public static function normalize(?string $hex): string
     {
@@ -20,7 +20,7 @@ class BrandColor
      */
     public static function ink(?string $hex): string
     {
-        return self::luminance($hex) > 0.4 ? '#1C1915' : '#FFFFFF';
+        return self::luminance($hex) > 0.4 ? '#14120F' : '#FFFFFF';
     }
 
     /**

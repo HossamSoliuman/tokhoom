@@ -7,15 +7,15 @@
          x-data="{
              preview: false,
              ink(hex) {
-                 const value = /^#[0-9a-f]{6}$/i.test(hex) ? hex.slice(1) : '145A55';
+                 const value = /^#[0-9a-f]{6}$/i.test(hex) ? hex.slice(1) : '1E3A4C';
                  const channel = (index) => {
                      const c = parseInt(value.substr(index, 2), 16) / 255;
                      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
                  };
                  const luminance = 0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
-                 return luminance > 0.4 ? '#1C1915' : '#FFFFFF';
+                 return luminance > 0.4 ? '#14120F' : '#FFFFFF';
              },
-             color() { return /^#[0-9a-f]{6}$/i.test($wire.brandColor) ? $wire.brandColor : '#145A55' },
+             color() { return /^#[0-9a-f]{6}$/i.test($wire.brandColor) ? $wire.brandColor : '#1E3A4C' },
          }">
         <div class="flex min-w-0 flex-[1_1_400px] flex-col gap-4">
             <x-ui.button variant="secondary" size="lg" icon="ti-eye" class="lg:hidden" x-on:click="preview = true">معاينة الموقع</x-ui.button>
