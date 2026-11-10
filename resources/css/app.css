@@ -8,36 +8,40 @@
     --font-sans: var(--font-plex), 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
     --font-mono: var(--font-plex-mono), 'IBM Plex Mono', ui-monospace, monospace;
 
-    --color-primary: #145a55;
-    --color-primary-strong: #0f4c48;
-    --color-primary-deep: #0b3a37;
-    --color-primary-mid: #2a8078;
-    --color-primary-light: #9cc5c0;
-    --color-primary-soft: #e2efed;
-    --color-primary-tint: #f2f8f7;
-    --color-primary-faint: #fafcfb;
+    --color-primary: #1e3a4c;
+    --color-primary-strong: #172f3e;
+    --color-primary-deep: #11232f;
+    --color-primary-mid: #3e6175;
+    --color-primary-light: #9fb3bf;
+    --color-primary-soft: #e3e9ed;
+    --color-primary-tint: #f1f4f6;
+    --color-primary-faint: #f9fafb;
 
-    --color-sand: #b8925a;
-    --color-sand-light: #dcc6a0;
-    --color-sand-soft: #f6eedf;
-    --color-sand-ink: #7a5a22;
+    --color-gold: #c8a24a;
+    --color-clay: #a9704f;
+    --color-ivory: #f2eee6;
 
-    --color-ink: #1c1915;
-    --color-ink-soft: #2e2a25;
-    --color-body: #4a453e;
-    --color-muted: #6b645a;
-    --color-subtle: #8c857b;
-    --color-faint: #ada69c;
-    --color-line-strong: #d2ccc2;
-    --color-line: #e6e1d9;
-    --color-divider: #f1eee9;
-    --color-skeleton: #eeeae4;
-    --color-head: #f8f6f2;
-    --color-canvas: #faf8f4;
-    --color-backdrop: #e9e5de;
-    --color-photo-a: #ece6dc;
-    --color-photo-b: #e4ddd1;
-    --color-photo-label: #6f685e;
+    --color-sand: #c9b79c;
+    --color-sand-light: #ddd0bc;
+    --color-sand-soft: #f2eee6;
+    --color-sand-ink: #80523a;
+
+    --color-ink: #14120f;
+    --color-ink-soft: #2a2621;
+    --color-body: #48423a;
+    --color-muted: #6b6358;
+    --color-subtle: #8c8478;
+    --color-faint: #aea597;
+    --color-line-strong: #d5ccbe;
+    --color-line: #e6dfd4;
+    --color-divider: #efeae2;
+    --color-skeleton: #ece6dc;
+    --color-head: #f6f3ed;
+    --color-canvas: #f8f5ef;
+    --color-backdrop: #e9e3d8;
+    --color-photo-a: #ece5d9;
+    --color-photo-b: #e3dacb;
+    --color-photo-label: #6b6358;
 
     --color-success: #2f7a4b;
     --color-success-soft: #e5f2e9;
@@ -81,28 +85,28 @@
     --text-26: 26px;
     --text-28: 28px;
 
-    --shadow-pop: 0 8px 24px rgba(28, 25, 21, 0.1);
-    --shadow-fab: 0 6px 16px rgba(20, 90, 85, 0.28);
+    --shadow-pop: 0 8px 24px rgba(20, 18, 15, 0.1);
+    --shadow-fab: 0 6px 16px rgba(30, 58, 76, 0.28);
 }
 
 /* Public sites take their colour from the office's brand colour, set on <html>. */
 @theme inline {
-    --color-brand: var(--brand, #145a55);
+    --color-brand: var(--brand, #1e3a4c);
     --color-brand-ink: var(--brand-ink, #ffffff);
-    --color-brand-text: var(--brand-text, #145a55);
-    --color-brand-soft: color-mix(in oklch, var(--brand, #145a55) 10%, #fff);
+    --color-brand-text: var(--brand-text, #1e3a4c);
+    --color-brand-soft: color-mix(in oklch, var(--brand, #1e3a4c) 10%, #fff);
 }
 
-/* Dashboard palette: cool neutrals and a deep teal brand, scoped to the app layout. */
+/* Dashboard palette: cool neutrals and the deep blue brand, scoped to the app layout. */
 .theme-dash {
-    --color-primary: #0e6b5a;
-    --color-primary-strong: #0b5a4b;
-    --color-primary-deep: #08463a;
-    --color-primary-mid: #2f8a78;
-    --color-primary-light: #9bcabe;
-    --color-primary-soft: #e3f1ee;
-    --color-primary-tint: #f1f8f6;
-    --color-primary-faint: #f8fbfa;
+    --color-primary: #1e3a4c;
+    --color-primary-strong: #172f3e;
+    --color-primary-deep: #11232f;
+    --color-primary-mid: #3e6175;
+    --color-primary-light: #9fb3bf;
+    --color-primary-soft: #e3e9ed;
+    --color-primary-tint: #f1f4f6;
+    --color-primary-faint: #f9fafb;
 
     --color-ink: #17202b;
     --color-ink-soft: #27313c;
@@ -117,9 +121,9 @@
     --color-head: #f7f8f9;
     --color-canvas: #f4f5f7;
     --color-backdrop: #eceef1;
-    --color-photo-a: #dfe9e6;
-    --color-photo-b: #d4e3df;
-    --color-photo-label: #4f6b64;
+    --color-photo-a: #e1e7eb;
+    --color-photo-b: #d6dee4;
+    --color-photo-label: #4e6170;
 
     --color-success: #1d8f4e;
     --color-success-soft: #e6f4ec;
@@ -143,7 +147,7 @@
     --radius-card: 12px;
 
     --shadow-pop: 0 8px 24px rgba(15, 20, 26, 0.08);
-    --shadow-fab: 0 6px 16px rgba(14, 107, 90, 0.28);
+    --shadow-fab: 0 6px 16px rgba(30, 58, 76, 0.28);
 
     font-size: 14px;
     font-variant-numeric: tabular-nums;

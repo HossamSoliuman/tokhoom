@@ -143,7 +143,7 @@
     <title>تخوم · موقع عقاري باسم مكتبك</title>
     <x-favicons />
     <meta name="description" content="تخوم اشتراك شهري لمكاتب العقار والوسطاء المرخّصين في السعودية: موقع يعرض عقاراتك وحدها، ولوحة تحكم للعملاء والصفقات والفريق.">
-    <meta name="theme-color" content="#145a55">
+    <meta name="theme-color" content="#1e3a4c">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="تخوم">
     <meta property="og:title" content="تخوم · موقع عقاري باسم مكتبك">
