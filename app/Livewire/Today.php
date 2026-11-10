@@ -18,6 +18,7 @@ use App\Support\Metrics;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -159,6 +160,16 @@ class Today extends Component
     }
 
     /**
+     * "صباح الخير، سارة" before noon, "مساء الخير، سارة" after.
+     */
+    private function greeting(): string
+    {
+        $firstName = Str::before(trim($this->user()->name), ' ');
+
+        return (now()->hour < 12 ? 'صباح الخير' : 'مساء الخير').'، '.$firstName;
+    }
+
+    /**
      * @return Collection<int, Reminder>
      */
     private function todaysReminders(Membership $membership): Collection
@@ -192,24 +203,35 @@ class Today extends Component
             ->limit(3)
             ->get();
 
+        $warnings = $this->licenseWarnings($membership);
+        $health = $this->listingHealth($membership);
+        $matches = $matcher->forMember($membership, 3);
+
+        $openTasks = count($warnings)
+            + $awaiting->count()
+            + $reminders->whereNull('completed_at')->count()
+            + collect($health)->filter(fn (array $row) => $row['count'] > 0)->count()
+            + count($matches);
+
         $isEmpty = ! Listing::visibleTo($membership)->exists()
             && $reminders->isEmpty()
             && $inquiries->isEmpty();
 
         return view('livewire.today', [
+            'greeting' => $this->greeting(),
             'workspaceName' => $membership->workspace->name,
+            'openTasks' => $openTasks,
             'isEmpty' => $isEmpty,
-            'warnings' => $this->licenseWarnings($membership),
+            'warnings' => $warnings,
             'kpis' => $this->kpis($metrics),
             'awaiting' => $awaiting,
-            'response' => $metrics->responseTimes(now()->subDays(30), now()),
+            'response' => $metrics->responseTimes(now()->subDays(7), now()),
             'funnel' => $metrics->funnel(now()->subDays(30), now()),
-            'health' => $this->listingHealth($membership),
+            'health' => $health,
             'reminders' => $reminders,
-            'remindersLeft' => $reminders->whereNull('completed_at')->count(),
             'inquiries' => $inquiries,
             'newInquiries' => Inquiry::visibleTo($membership)->where('created_at', '>=', now()->subDay())->count(),
-            'matches' => $matcher->forMember($membership, 3),
+            'matches' => $matches,
         ]);
     }
 }
