@@ -6,7 +6,7 @@
 
     <div class="scrollbar-none -mt-2 flex max-w-full gap-1.5 overflow-x-auto">
         @foreach ($filters as $key => $option)
-            <x-ui.chip :active="$filter === $key" wire:click="$set('filter', '{{ $key }}')" wire:key="filter-{{ $key }}">
+            <x-ui.chip wire:model.live="filter" :value="$key" :active="$filter === $key" wire:key="filter-{{ $key }}">
                 {{ $option['label'] }} <span class="opacity-70">{{ $option['count'] }}</span>
             </x-ui.chip>
         @endforeach

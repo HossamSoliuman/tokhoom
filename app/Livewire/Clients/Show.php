@@ -79,16 +79,6 @@ class Show extends Component
         $this->openDialog('reminder');
     }
 
-    public function toggleRequestType(string $type): void
-    {
-        $this->requestTypes = $this->toggle($this->requestTypes, ListingType::from($type)->value);
-    }
-
-    public function toggleRequestDistrict(string $district): void
-    {
-        $this->requestDistricts = $this->toggle($this->requestDistricts, $district);
-    }
-
     public function saveRequest(): void
     {
         $this->budgetMin = (string) preg_replace('/\D/', '', $this->budgetMin);
@@ -171,17 +161,6 @@ class Show extends Component
         Activity::record($client, 'client.listing_sent', ['listing' => $listing->title, 'listing_id' => $listing->id]);
 
         $this->toast('تم إرسال العقار إلى '.$client->name.' عبر واتساب');
-    }
-
-    /**
-     * @param  list<string>  $values
-     * @return list<string>
-     */
-    private function toggle(array $values, string $value): array
-    {
-        return in_array($value, $values, true)
-            ? array_values(array_diff($values, [$value]))
-            : [...$values, $value];
     }
 
     public function render(Matcher $matcher): View

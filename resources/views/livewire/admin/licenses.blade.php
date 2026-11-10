@@ -1,7 +1,7 @@
 <x-app.page title="التراخيص">
     <div class="scrollbar-none flex max-w-full gap-1.5 overflow-x-auto">
         @foreach (['expired' => 'منتهية', '30' => 'خلال 30 يوماً', '60' => 'خلال 60 يوماً', '90' => 'خلال 90 يوماً'] as $value => $label)
-            <x-ui.chip :active="$window === (string) $value" wire:click="$set('window', '{{ $value }}')" wire:key="window-{{ $value }}">{{ $label }}</x-ui.chip>
+            <x-ui.chip wire:model.live="window" :value="$value" :active="$window === (string) $value" wire:key="window-{{ $value }}">{{ $label }}</x-ui.chip>
         @endforeach
     </div>
 

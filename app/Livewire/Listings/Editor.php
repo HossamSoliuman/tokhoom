@@ -175,13 +175,6 @@ class Editor extends Component
         array_splice($this->photos, max(0, min($position, count($this->photos))), 0, [$photo]);
     }
 
-    public function toggleFeature(string $feature): void
-    {
-        $this->features = in_array($feature, $this->features, true)
-            ? array_values(array_diff($this->features, [$feature]))
-            : [...$this->features, $feature];
-    }
-
     public function saveDraft(ChangeListingStatus $changeStatus): void
     {
         $this->save(publish: false, changeStatus: $changeStatus);

@@ -126,7 +126,7 @@
     @if ($dialog === 'plan')
         <x-ui.dialog title="تغيير الخطة">
             @foreach (\App\Enums\Plan::cases() as $case)
-                <x-ui.radio-option :active="$plan === $case->value" :label="$case->label()" :description="$case->description()" class="rounded-card" wire:click="$set('plan', '{{ $case->value }}')">
+                <x-ui.radio-option wire:model="plan" :value="$case->value" :active="$plan === $case->value" :label="$case->label()" :description="$case->description()" class="rounded-card">
                     <span class="flex flex-col items-end">
                         <span class="text-18 font-bold">{{ Arabic::number($case->monthlyPrice()) }}</span>
                         <span class="text-12 text-muted">ريال / شهرياً</span>

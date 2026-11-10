@@ -11,7 +11,7 @@
         <div class="flex flex-wrap items-center gap-2">
             <x-app.segmented>
                 @foreach ($chips as [$value, $label, $count])
-                    <x-app.segmented-option :active="$status === $value" wire:click="$set('status', '{{ $value }}')" wire:key="chip-{{ $value }}">
+                    <x-app.segmented-option wire:model.live="status" :value="$value" :active="$status === $value" wire:key="chip-{{ $value }}">
                         {{ $label }}<span class="text-11 opacity-70">{{ $count }}</span>
                     </x-app.segmented-option>
                 @endforeach

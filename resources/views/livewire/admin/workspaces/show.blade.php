@@ -257,7 +257,7 @@
         <x-ui.dialog title="رفض الطلب">
             <div class="flex flex-col gap-2">
                 @foreach (\App\Enums\RejectionReason::cases() as $case)
-                    <x-ui.radio-option :active="$reason === $case->value" :label="$case->label()" wire:click="$set('reason', '{{ $case->value }}')" wire:key="reason-{{ $case->value }}" />
+                    <x-ui.radio-option wire:model="reason" :value="$case->value" :active="$reason === $case->value" :label="$case->label()" wire:key="reason-{{ $case->value }}" />
                 @endforeach
                 @error('reason')
                     <span class="text-13 text-danger">{{ $message }}</span>
@@ -268,7 +268,7 @@
             </x-ui.field>
             <x-slot:footer>
                 <x-ui.button variant="secondary" size="lg" class="flex-1" wire:click="closeDialog">إلغاء</x-ui.button>
-                <x-ui.button variant="danger" size="lg" class="flex-1" wire:click="reject" :disabled="$reason === ''">رفض الطلب</x-ui.button>
+                <x-ui.button variant="danger" size="lg" class="flex-1" wire:click="reject" :disabled="$reason === ''" x-bind:disabled="! $wire.reason">رفض الطلب</x-ui.button>
             </x-slot:footer>
         </x-ui.dialog>
     @endif
@@ -334,7 +334,7 @@
         <x-ui.dialog title="إضافة أيام مجانية">
             <div class="flex flex-wrap gap-2">
                 @foreach ([7, 14, 30, 60] as $option)
-                    <x-ui.chip size="lg" :active="$days === $option" wire:click="$set('days', {{ $option }})" wire:key="days-{{ $option }}">{{ Arabic::days($option) }}</x-ui.chip>
+                    <x-ui.chip size="lg" wire:model.number="days" :value="$option" :active="$days === $option" wire:key="days-{{ $option }}">{{ Arabic::days($option) }}</x-ui.chip>
                 @endforeach
             </div>
             <x-ui.field label="عدد الأيام" error="days">
@@ -353,7 +353,7 @@
     @if ($dialog === 'plan')
         <x-ui.dialog title="تغيير الخطة">
             @foreach (\App\Enums\Plan::cases() as $case)
-                <x-ui.radio-option :active="$plan === $case->value" :label="$case->label()" :description="$case->description()" class="rounded-card" wire:click="$set('plan', '{{ $case->value }}')" wire:key="plan-{{ $case->value }}">
+                <x-ui.radio-option wire:model.live="plan" :value="$case->value" :active="$plan === $case->value" :label="$case->label()" :description="$case->description()" class="rounded-card" wire:key="plan-{{ $case->value }}">
                     <span class="flex flex-col items-end">
                         <span class="text-18 font-bold">{{ Arabic::number($case->monthlyPrice()) }}</span>
                         <span class="text-12 text-muted">ريال / شهرياً</span>

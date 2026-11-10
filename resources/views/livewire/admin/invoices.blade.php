@@ -30,7 +30,7 @@
 
     <div class="scrollbar-none -mt-2 flex max-w-full gap-1.5 overflow-x-auto">
         @foreach (['all' => 'الكل', 'open' => 'مستحقة', 'failed' => 'تعثّر التحصيل', 'paid' => 'مدفوعة'] as $value => $label)
-            <x-ui.chip :active="$status === $value" wire:click="$set('status', '{{ $value }}')" wire:key="status-{{ $value }}">{{ $label }}</x-ui.chip>
+            <x-ui.chip wire:model.live="status" :value="$value" :active="$status === $value" wire:key="status-{{ $value }}">{{ $label }}</x-ui.chip>
         @endforeach
     </div>
 

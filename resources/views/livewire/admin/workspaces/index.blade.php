@@ -18,9 +18,9 @@
     </div>
 
     <div class="scrollbar-none -mt-2 flex max-w-full gap-1.5 overflow-x-auto">
-        <x-ui.chip :active="$status === 'all'" wire:click="$set('status', 'all')">الكل <span class="opacity-70">{{ $counts->sum() }}</span></x-ui.chip>
+        <x-ui.chip wire:model.live="status" value="all" :active="$status === 'all'">الكل <span class="opacity-70">{{ $counts->sum() }}</span></x-ui.chip>
         @foreach (\App\Enums\WorkspaceStatus::cases() as $case)
-            <x-ui.chip :active="$status === $case->value" wire:click="$set('status', '{{ $case->value }}')" wire:key="status-{{ $case->value }}">
+            <x-ui.chip wire:model.live="status" :value="$case->value" :active="$status === $case->value" wire:key="status-{{ $case->value }}">
                 {{ $case->label() }} <span class="opacity-70">{{ $counts[$case->value] }}</span>
             </x-ui.chip>
         @endforeach

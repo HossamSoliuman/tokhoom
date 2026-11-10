@@ -15,8 +15,8 @@
         @else
             @if ($canUseMobile)
                 <div class="grid grid-cols-2 gap-2">
-                    <x-ui.choice :active="$method === 'email'" wire:click="$set('method', 'email')" class="h-11 text-14">البريد الإلكتروني</x-ui.choice>
-                    <x-ui.choice :active="$method === 'mobile'" wire:click="$set('method', 'mobile')" class="h-11 text-14">رقم الجوال</x-ui.choice>
+                    <x-ui.choice wire:model.live="method" value="email" :active="$method === 'email'" class="h-11 text-14">البريد الإلكتروني</x-ui.choice>
+                    <x-ui.choice wire:model.live="method" value="mobile" :active="$method === 'mobile'" class="h-11 text-14">رقم الجوال</x-ui.choice>
                 </div>
             @endif
 
@@ -39,10 +39,11 @@
                             <input type="text" wire:model="code" class="field text-center font-mono tracking-[0.4em]" dir="ltr" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="6" autofocus>
                         </x-ui.field>
 
-                        <button type="button" wire:click="$toggle('remember')" class="flex items-center gap-2.5 self-start text-14 text-ink">
-                            <x-ui.checkbox :checked="$remember" size="sm" />
+                        <label class="group/check relative flex cursor-pointer items-center gap-2.5 self-start text-14 text-ink">
+                            <input type="checkbox" wire:model="remember" @checked($remember) class="sr-only">
+                            <x-ui.checkbox size="sm" />
                             تذكرني على هذا الجهاز
-                        </button>
+                        </label>
 
                         <x-ui.button type="submit" size="lg" class="mt-1 w-full">تسجيل الدخول</x-ui.button>
 
@@ -63,10 +64,11 @@
                     </x-ui.field>
 
                     <div class="flex items-center justify-between gap-3">
-                        <button type="button" wire:click="$toggle('remember')" class="flex items-center gap-2.5 text-14 text-ink">
-                            <x-ui.checkbox :checked="$remember" size="sm" />
+                        <label class="group/check relative flex cursor-pointer items-center gap-2.5 text-14 text-ink">
+                            <input type="checkbox" wire:model="remember" @checked($remember) class="sr-only">
+                            <x-ui.checkbox size="sm" />
                             تذكرني على هذا الجهاز
-                        </button>
+                        </label>
                         <a href="{{ route('password.request') }}" wire:navigate class="text-14 font-semibold">نسيت كلمة المرور؟</a>
                     </div>
 

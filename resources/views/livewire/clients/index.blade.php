@@ -14,9 +14,9 @@
                 <input type="search" wire:model.live.debounce.300ms="search" placeholder="ابحث بالاسم أو الجوال" class="min-w-0 flex-1 border-0 bg-transparent text-14">
             </div>
             <x-app.segmented>
-                <x-app.segmented-option :active="$type === 'all'" wire:click="$set('type', 'all')">الكل</x-app.segmented-option>
+                <x-app.segmented-option wire:model.live="type" value="all" :active="$type === 'all'">الكل</x-app.segmented-option>
                 @foreach (\App\Enums\ClientType::cases() as $case)
-                    <x-app.segmented-option :active="$type === $case->value" wire:click="$set('type', '{{ $case->value }}')" wire:key="type-{{ $case->value }}">{{ $case->label() }}</x-app.segmented-option>
+                    <x-app.segmented-option wire:model.live="type" :value="$case->value" :active="$type === $case->value" wire:key="type-{{ $case->value }}">{{ $case->label() }}</x-app.segmented-option>
                 @endforeach
             </x-app.segmented>
         </div>
@@ -122,7 +122,7 @@
                 <span class="text-14 font-medium">النوع</span>
                 <div class="flex flex-wrap gap-2">
                     @foreach (\App\Enums\ClientType::cases() as $case)
-                        <x-ui.chip size="lg" :active="$clientType === $case->value" wire:click="$set('clientType', '{{ $case->value }}')">{{ $case->label() }}</x-ui.chip>
+                        <x-ui.chip size="lg" wire:model="clientType" :value="$case->value" :active="$clientType === $case->value">{{ $case->label() }}</x-ui.chip>
                     @endforeach
                 </div>
             </div>

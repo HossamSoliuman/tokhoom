@@ -65,11 +65,10 @@
         <x-ui.dialog title="دعوة عضو">
             <div class="flex gap-0.5 rounded-field border border-line-strong p-[3px]">
                 @foreach (['mobile' => 'رقم الجوال', 'email' => 'البريد الإلكتروني'] as $value => $label)
-                    <button type="button" wire:click="$set('channel', '{{ $value }}')" @class([
-                        'h-10 flex-1 rounded-[7px] text-14 font-semibold',
-                        'bg-primary text-white' => $channel === $value,
-                        'text-ink' => $channel !== $value,
-                    ])>{{ $label }}</button>
+                    <label class="relative flex h-10 flex-1 cursor-pointer items-center justify-center rounded-[7px] text-14 font-semibold text-ink has-checked:bg-primary has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-primary/30">
+                        <input type="radio" wire:model.live="channel" value="{{ $value }}" @checked($channel === $value) class="sr-only">
+                        {{ $label }}
+                    </label>
                 @endforeach
             </div>
             <x-ui.field :label="$channel === 'email' ? 'البريد الإلكتروني' : 'رقم الجوال'" error="contact">
@@ -77,8 +76,8 @@
             </x-ui.field>
             <div class="flex flex-col gap-2">
                 <span class="text-14 font-medium">الدور</span>
-                <x-ui.radio-option :active="$role === 'agent'" label="وسيط" description="يدير عقاراته وعملاءه وصفقاته فقط" wire:click="$set('role', 'agent')" />
-                <x-ui.radio-option :active="$role === 'manager'" label="مدير" description="يرى كل العقارات والعملاء والتقارير ويدير الفريق" wire:click="$set('role', 'manager')" />
+                <x-ui.radio-option wire:model="role" value="agent" :active="$role === 'agent'" label="وسيط" description="يدير عقاراته وعملاءه وصفقاته فقط" />
+                <x-ui.radio-option wire:model="role" value="manager" :active="$role === 'manager'" label="مدير" description="يرى كل العقارات والعملاء والتقارير ويدير الفريق" />
             </div>
             <span class="text-13 text-muted">{{ $seatsLeft > 0 ? 'متبقٍ '.$seatsLeft.' من مقاعد خطتك' : 'لا توجد مقاعد متاحة في خطتك' }}</span>
             <x-slot:footer>

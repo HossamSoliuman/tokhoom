@@ -87,10 +87,11 @@
                     <span class="-mt-1.5 text-13 text-danger">{{ $message }}</span>
                 @enderror
                 <div class="flex items-center justify-between gap-2">
-                    <button type="button" wire:click="$toggle('noteShared')" class="flex items-center gap-2 text-14 text-ink">
-                        <x-ui.switch :on="$noteShared" />
-                        {{ $noteShared ? 'مشتركة مع الفريق' : 'خاصة' }}
-                    </button>
+                    <label class="group/check relative flex cursor-pointer items-center gap-2 text-14 text-ink">
+                        <input type="checkbox" wire:model="noteShared" @checked($noteShared) class="sr-only">
+                        <x-ui.switch />
+                        <span x-text="$wire.noteShared ? 'مشتركة مع الفريق' : 'خاصة'">{{ $noteShared ? 'مشتركة مع الفريق' : 'خاصة' }}</span>
+                    </label>
                     <x-ui.button size="sm" class="h-[38px] rounded-lg px-3.5 text-14" wire:click="addNote">حفظ</x-ui.button>
                 </div>
                 @foreach ($notes as $note)
@@ -110,14 +111,14 @@
         <x-ui.dialog title="إضافة طلب">
             <div class="grid grid-cols-2 gap-2">
                 @foreach ([\App\Enums\ListingPurpose::Rent, \App\Enums\ListingPurpose::Sale] as $case)
-                    <x-ui.choice :active="$requestPurpose === $case->value" wire:click="$set('requestPurpose', '{{ $case->value }}')" class="h-[52px] text-15">{{ $case->requestLabel() }}</x-ui.choice>
+                    <x-ui.choice wire:model="requestPurpose" :value="$case->value" :active="$requestPurpose === $case->value" class="h-[52px] text-15">{{ $case->requestLabel() }}</x-ui.choice>
                 @endforeach
             </div>
             <div class="flex flex-col gap-2">
                 <span class="text-14 font-medium">أنواع العقار</span>
                 <div class="flex flex-wrap gap-2">
                     @foreach ([\App\Enums\ListingType::Apartment, \App\Enums\ListingType::Villa, \App\Enums\ListingType::Floor, \App\Enums\ListingType::Land, \App\Enums\ListingType::Commercial] as $case)
-                        <x-ui.chip size="lg" :active="in_array($case->value, $requestTypes, true)" wire:click="toggleRequestType('{{ $case->value }}')">{{ $case->label() }}</x-ui.chip>
+                        <x-ui.chip size="lg" multiple wire:model="requestTypes" :value="$case->value" :active="in_array($case->value, $requestTypes, true)">{{ $case->label() }}</x-ui.chip>
                     @endforeach
                 </div>
                 @error('requestTypes')
@@ -128,12 +129,12 @@
                 <span class="text-14 font-medium">الأحياء</span>
                 <div class="flex flex-wrap gap-2">
                     @foreach ($districtOptions as $district)
-                        <x-ui.chip size="lg" :active="in_array($district, $requestDistricts, true)" wire:click="toggleRequestDistrict('{{ $district }}')" wire:key="district-{{ $loop->index }}">{{ $district }}</x-ui.chip>
+                        <x-ui.chip size="lg" multiple wire:model="requestDistricts" :value="$district" :active="in_array($district, $requestDistricts, true)" wire:key="district-{{ $loop->index }}">{{ $district }}</x-ui.chip>
                     @endforeach
                 </div>
             </div>
             <div class="flex flex-col gap-2">
-                <span class="text-14 font-medium">{{ $requestPurpose === 'rent' ? 'الميزانية (ريال سنوياً)' : 'الميزانية (ريال)' }}</span>
+                <span class="text-14 font-medium" x-text="$wire.requestPurpose === 'rent' ? 'الميزانية (ريال سنوياً)' : 'الميزانية (ريال)'">{{ $requestPurpose === 'rent' ? 'الميزانية (ريال سنوياً)' : 'الميزانية (ريال)' }}</span>
                 <div class="flex gap-2">
                     <input type="text" inputmode="numeric" wire:model="budgetMin" placeholder="من" class="field min-w-0 flex-1">
                     <input type="text" inputmode="numeric" wire:model="budgetMax" placeholder="إلى" class="field min-w-0 flex-1">
@@ -159,7 +160,7 @@
             </x-ui.field>
             <div class="grid grid-cols-2 gap-2">
                 @foreach (\App\Enums\ReminderChannel::cases() as $case)
-                    <x-ui.choice :active="$reminderChannel === $case->value" :icon="$case->icon()" wire:click="$set('reminderChannel', '{{ $case->value }}')" class="h-16 text-14">{{ $case->label() }}</x-ui.choice>
+                    <x-ui.choice wire:model="reminderChannel" :value="$case->value" :active="$reminderChannel === $case->value" :icon="$case->icon()" class="h-16 text-14">{{ $case->label() }}</x-ui.choice>
                 @endforeach
             </div>
             <x-slot:footer>

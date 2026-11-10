@@ -90,10 +90,11 @@
                 </span>
             </x-ui.field>
             @if ($deal->listing)
-                <button type="button" wire:click="$toggle('markListing')" class="flex items-center gap-2.5 rounded-xl border border-line bg-white px-3.5 py-3 text-start text-14 text-ink">
-                    <x-ui.checkbox :checked="$markListing" size="sm" />
+                <label class="group/check relative flex cursor-pointer items-center gap-2.5 rounded-xl border border-line bg-white px-3.5 py-3 text-start text-14 text-ink">
+                    <input type="checkbox" wire:model="markListing" @checked($markListing) class="sr-only">
+                    <x-ui.checkbox size="sm" />
                     تغيير حالة العقار إلى «{{ $deal->isRental() ? 'مؤجّر' : 'مباع' }}»
-                </button>
+                </label>
             @endif
             <x-slot:footer>
                 <x-ui.button variant="secondary" size="lg" class="flex-1" wire:click="closeDialog">إلغاء</x-ui.button>
@@ -106,12 +107,12 @@
         <x-ui.dialog title="إغلاق الصفقة كخاسرة">
             <div class="flex flex-col gap-2">
                 @foreach (\App\Enums\LostReason::cases() as $reason)
-                    <x-ui.radio-option :active="$lostReason === $reason->value" :label="$reason->label()" wire:click="$set('lostReason', '{{ $reason->value }}')" />
+                    <x-ui.radio-option wire:model="lostReason" :value="$reason->value" :active="$lostReason === $reason->value" :label="$reason->label()" />
                 @endforeach
             </div>
             <x-slot:footer>
                 <x-ui.button variant="secondary" size="lg" class="flex-1" wire:click="closeDialog">إلغاء</x-ui.button>
-                <x-ui.button size="lg" class="flex-1" wire:click="confirmLoss" :disabled="$lostReason === ''">تأكيد الإغلاق</x-ui.button>
+                <x-ui.button size="lg" class="flex-1" wire:click="confirmLoss" :disabled="$lostReason === ''" x-bind:disabled="! $wire.lostReason">تأكيد الإغلاق</x-ui.button>
             </x-slot:footer>
         </x-ui.dialog>
     @endif

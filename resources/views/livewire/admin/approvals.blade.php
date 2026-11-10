@@ -39,7 +39,7 @@
             </div>
             <div class="flex flex-col gap-2">
                 @foreach (\App\Enums\RejectionReason::cases() as $case)
-                    <x-ui.radio-option :active="$reason === $case->value" :label="$case->label()" wire:click="$set('reason', '{{ $case->value }}')" />
+                    <x-ui.radio-option wire:model="reason" :value="$case->value" :active="$reason === $case->value" :label="$case->label()" />
                 @endforeach
                 @error('reason')
                     <span class="text-13 text-danger">{{ $message }}</span>
@@ -50,7 +50,7 @@
             </x-ui.field>
             <x-slot:footer>
                 <x-ui.button variant="secondary" size="lg" class="flex-1" wire:click="closeDialog">إلغاء</x-ui.button>
-                <x-ui.button variant="danger" size="lg" class="flex-1" wire:click="reject" :disabled="$reason === ''">رفض الطلب</x-ui.button>
+                <x-ui.button variant="danger" size="lg" class="flex-1" wire:click="reject" :disabled="$reason === ''" x-bind:disabled="! $wire.reason">رفض الطلب</x-ui.button>
             </x-slot:footer>
         </x-ui.dialog>
     @endif

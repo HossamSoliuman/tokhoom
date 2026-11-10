@@ -61,12 +61,12 @@
         <x-ui.card>
             <div class="grid grid-cols-2 gap-2">
                 @foreach (\App\Enums\ListingPurpose::cases() as $case)
-                    <x-ui.choice :active="$purpose === $case->value" wire:click="$set('purpose', '{{ $case->value }}')" class="h-14 text-16">{{ $case->label() }}</x-ui.choice>
+                    <x-ui.choice wire:model.live="purpose" :value="$case->value" :active="$purpose === $case->value" class="h-14 text-16">{{ $case->label() }}</x-ui.choice>
                 @endforeach
             </div>
             <div class="grid grid-cols-[repeat(auto-fit,minmax(76px,1fr))] gap-2">
                 @foreach (\App\Enums\ListingType::cases() as $case)
-                    <x-ui.choice :active="$type === $case->value" :icon="$case->icon()" wire:click="$set('type', '{{ $case->value }}')" class="h-16 text-14">{{ $case->label() }}</x-ui.choice>
+                    <x-ui.choice wire:model="type" :value="$case->value" :active="$type === $case->value" :icon="$case->icon()" class="h-16 text-14">{{ $case->label() }}</x-ui.choice>
                 @endforeach
             </div>
 
@@ -93,7 +93,7 @@
         <x-ui.card title="الموقع">
             <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2.5">
                 <x-search-picker label="المدينة" property="city" :options="\App\Support\Locations::cities()" :value="$city" error="city" />
-                <x-search-picker label="الحي" property="district" :options="$districts" :value="$district" error="district" wire:key="district-picker-{{ $city }}" />
+                <x-search-picker label="الحي" property="district" :options="$districts" :value="$district" :live="false" error="district" wire:key="district-picker-{{ $city }}" />
             </div>
 
             <div wire:ignore x-data="locationPicker({ latitude: @js($latitude), longitude: @js($longitude) })"
@@ -111,11 +111,8 @@
         <x-ui.card title="المميزات والوصف">
             <div class="flex flex-wrap gap-2">
                 @foreach (\App\Support\Locations::FEATURES as $feature)
-                    @php($on = in_array($feature, $features, true))
-                    <x-ui.chip :active="$on" class="font-medium" wire:click="toggleFeature('{{ $feature }}')" wire:key="feature-{{ $loop->index }}">
-                        @if ($on)
-                            <i class="ti ti-check text-15"></i>
-                        @endif
+                    <x-ui.chip multiple wire:model="features" :value="$feature" :active="in_array($feature, $features, true)" class="font-medium" wire:key="feature-{{ $loop->index }}">
+                        <i class="ti ti-check hidden text-15 group-has-checked/chip:inline"></i>
                         {{ $feature }}
                     </x-ui.chip>
                 @endforeach
