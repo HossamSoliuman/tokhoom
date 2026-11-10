@@ -1,6 +1,6 @@
 <x-app.page title="الصفقات">
     <x-slot:actions>
-        <x-ui.button icon="ti-plus" wire:click="openNewDeal">صفقة جديدة</x-ui.button>
+        <x-ui.button icon="ti-plus" size="sm" wire:click="openNewDeal">صفقة جديدة</x-ui.button>
     </x-slot:actions>
 
     @if (! $hasAnyDeal)
@@ -8,54 +8,63 @@
             <x-ui.button icon="ti-plus" wire:click="openNewDeal" class="px-5">صفقة جديدة</x-ui.button>
         </x-ui.empty>
     @else
-        <div class="flex flex-col items-stretch gap-4 pb-2 lg:flex-row lg:items-start lg:overflow-x-auto">
+        <div class="flex flex-wrap gap-1.5">
+            @foreach ($columns as $column)
+                <div class="flex min-w-[110px] flex-1 flex-col items-center rounded-field border border-line bg-white p-2.5 text-center" wire:key="pipe-{{ $column['stage']->value }}">
+                    <b class="text-20">{{ Arabic::number($column['deals']->count()) }}</b>
+                    <span class="flex items-center gap-1.5 text-12 text-muted"><span class="size-1.5 rounded-full {{ $column['stage']->dotClass() }}"></span>{{ $column['stage']->label() }}</span>
+                    @if ($column['total'])
+                        <span class="text-11 text-subtle">{{ Arabic::money($column['total']) }}</span>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+
+        <div class="flex flex-col items-stretch gap-2.5 pb-2 lg:grid lg:grid-cols-[repeat(6,minmax(190px,1fr))] lg:items-start lg:overflow-x-auto">
             @foreach ($columns as $column)
                 @php($stage = $column['stage'])
-                <div class="flex flex-col gap-2.5 lg:w-[264px] lg:flex-[0_0_264px] lg:rounded-card lg:bg-divider lg:p-3" wire:key="column-{{ $stage->value }}">
-                    <div class="flex items-center gap-2 px-1 py-0.5">
-                        <span class="size-2 rounded-full {{ $stage->dotClass() }}"></span>
-                        <span class="text-15 font-bold">{{ $stage->label() }}</span>
-                        <span class="text-13 text-muted">{{ $column['deals']->count() }}</span>
-                        @if ($column['total'])
-                            <span class="ms-auto text-12 text-muted">{{ Arabic::money($column['total']) }}</span>
-                        @endif
-                    </div>
+                <div class="flex flex-col gap-2 rounded-[11px] bg-backdrop p-[9px] lg:min-h-[200px]" wire:key="column-{{ $stage->value }}">
+                    <h4 class="m-0 flex items-center justify-between px-0.5 text-[12.5px] font-bold text-body">
+                        <span>{{ $stage->label() }}</span>
+                        <span>{{ $column['deals']->count() }}</span>
+                    </h4>
 
                     @forelse ($column['deals'] as $item)
-                        <div class="flex flex-col gap-2 rounded-xl border border-line bg-white p-3" wire:key="deal-{{ $item->id }}">
-                            <div class="flex items-center justify-between">
-                                <a href="{{ route('clients.show', $item->client) }}" wire:navigate class="text-15 font-semibold text-ink">{{ $item->client->name }}</a>
-                                <x-ui.avatar :initial="$item->agent->initials()" :size="28" title="{{ $item->agent->name }}" />
+                        @php($stalled = ! $stage->isClosed() && $item->updated_at->lt(now()->subDays(\App\Models\Deal::STALE_DAYS)))
+                        <div wire:key="deal-{{ $item->id }}" @class([
+                            'flex flex-col gap-1.5 rounded-[9px] border bg-white p-2.5 text-[12.5px]',
+                            'border-[#efb6b6] shadow-[inset_-3px_0_0_var(--color-danger)]' => $stalled,
+                            'border-line' => ! $stalled,
+                        ])>
+                            <div class="flex items-center justify-between gap-2">
+                                <a href="{{ route('clients.show', $item->client) }}" wire:navigate class="text-[13.5px] font-bold text-ink">{{ $item->client->name }}</a>
+                                <x-ui.avatar :initial="$item->agent->initials()" :size="24" title="{{ $item->agent->name }}" />
                             </div>
                             @if ($item->listing)
-                                <span class="flex items-center gap-1.5 text-13 text-body"><i class="ti ti-home text-15 text-muted"></i>{{ $item->listing->title }}</span>
+                                <span class="text-muted">{{ $item->listing->title }}</span>
                             @endif
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="flex flex-col">
-                                    <span class="text-15 font-bold text-primary">{{ Arabic::money($item->value) }}</span>
-                                    @if ($item->isRental())
-                                        <span class="text-12 text-muted">سنوياً</span>
-                                    @endif
+                            <span class="font-bold text-primary">{{ Arabic::money($item->value) }}{{ $item->isRental() ? ' / سنة' : '' }}</span>
+                            @if ($stage->isClosed())
+                                <span class="text-muted">
+                                    {{ $stage === \App\Enums\DealStage::Won ? 'عمولة '.Arabic::money($item->commission) : $item->lost_reason?->label() }}
                                 </span>
-                                @if ($stage->isClosed())
-                                    <span class="text-12 text-muted">
-                                        {{ $stage === \App\Enums\DealStage::Won ? 'عمولة '.Arabic::money($item->commission) : $item->lost_reason?->label() }}
-                                    </span>
-                                @else
-                                    <div class="relative">
-                                        <select x-on:change="$wire.moveTo({{ $item->id }}, $event.target.value); $event.target.value = '{{ $stage->value }}'"
-                                                class="h-[34px] cursor-pointer appearance-none rounded-lg border border-line-strong bg-white pe-7 ps-2.5 text-13 text-ink" aria-label="المرحلة">
-                                            @foreach (\App\Enums\DealStage::cases() as $option)
-                                                <option value="{{ $option->value }}" @selected($option === $stage)>{{ $option->label() }}</option>
-                                            @endforeach
-                                        </select>
-                                        <i class="ti ti-chevron-down pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-14 text-muted"></i>
-                                    </div>
+                            @else
+                                @if ($stalled)
+                                    <span class="font-semibold text-danger">بلا تحديث منذ {{ Arabic::ago($item->updated_at) }}</span>
                                 @endif
-                            </div>
+                                <div class="relative">
+                                    <select x-on:change="$wire.moveTo({{ $item->id }}, $event.target.value); $event.target.value = '{{ $stage->value }}'"
+                                            class="h-8 w-full cursor-pointer appearance-none rounded-lg border border-line bg-white pe-7 ps-2.5 text-12 text-ink" aria-label="المرحلة">
+                                        @foreach (\App\Enums\DealStage::cases() as $option)
+                                            <option value="{{ $option->value }}" @selected($option === $stage)>{{ $option->label() }}</option>
+                                        @endforeach
+                                    </select>
+                                    <i class="ti ti-chevron-down pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-13 text-muted"></i>
+                                </div>
+                            @endif
                         </div>
                     @empty
-                        <div class="rounded-xl border border-dashed border-line-strong p-4 text-center text-13 text-subtle">لا توجد صفقات</div>
+                        <div class="rounded-[9px] border border-dashed border-line-strong p-3 text-center text-12 text-subtle">لا توجد صفقات</div>
                     @endforelse
                 </div>
             @endforeach

@@ -22,6 +22,9 @@ class Deal extends Model
     /** @use HasFactory<DealFactory> */
     use HasFactory;
 
+    /** Open deals with no update for this many days are flagged on the board. */
+    public const STALE_DAYS = 7;
+
     /**
      * @return array<string, string>
      */
