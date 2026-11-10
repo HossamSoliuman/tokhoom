@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+    <style>
+        .a { fill: #1E3A4C } .b { fill: #C9B79C } .c { fill: #14120F } .d { fill: #A9704F } .t { fill: #C8A24A }
+        @media (prefers-color-scheme: dark) { .a { fill: #F2EEE6 } .c { fill: #1E3A4C } }
+    </style>
+    <rect class="t" width="600" height="50"/>
+    <rect class="a" y="50" width="275" height="400"/>
+    <rect class="t" x="275" y="50" width="50" height="550"/>
+    <rect class="b" x="325" y="50" width="275" height="275"/>
+    <rect class="c" x="325" y="375" width="275" height="225"/>
+    <rect class="d" y="500" width="275" height="100"/>
+</svg>

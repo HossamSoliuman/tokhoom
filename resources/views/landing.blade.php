@@ -141,6 +141,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>تخوم · موقع عقاري باسم مكتبك</title>
+    <x-favicons />
     <meta name="description" content="تخوم اشتراك شهري لمكاتب العقار والوسطاء المرخّصين في السعودية: موقع يعرض عقاراتك وحدها، ولوحة تحكم للعملاء والصفقات والفريق.">
     <meta name="theme-color" content="#145a55">
     <meta property="og:type" content="website">
