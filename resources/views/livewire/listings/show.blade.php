@@ -52,11 +52,10 @@
                     <h2 class="m-0 text-16 font-bold">الأداء · آخر 30 يوماً</h2>
                     <div class="flex gap-0.5 rounded-field border border-line-strong p-[3px]">
                         @foreach (['views' => 'المشاهدات', 'whatsapp' => 'واتساب', 'inquiries' => 'الاستفسارات'] as $value => $label)
-                            <button type="button" wire:click="$set('metric', '{{ $value }}')" @class([
-                                'h-[34px] rounded-[7px] px-3 text-13 font-semibold',
-                                'bg-primary text-white' => $metric === $value,
-                                'text-ink hover:bg-canvas' => $metric !== $value,
-                            ])>{{ $label }}</button>
+                            <label class="relative flex h-[34px] cursor-pointer items-center rounded-[7px] px-3 text-13 font-semibold text-ink not-has-checked:hover:bg-canvas has-checked:bg-primary has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-primary/30">
+                                <input type="radio" wire:model.live="metric" value="{{ $value }}" @checked($metric === $value) class="sr-only">
+                                {{ $label }}
+                            </label>
                         @endforeach
                     </div>
                 </x-slot:heading>

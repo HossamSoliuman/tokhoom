@@ -5,9 +5,8 @@
         'asc' => ['السعر: من الأقل إلى الأعلى', 'السعر: الأقل'],
         'desc' => ['السعر: من الأعلى إلى الأقل', 'السعر: الأعلى'],
     ];
-    $on = 'border-brand bg-brand text-brand-ink';
+    $pill = 'relative flex cursor-pointer items-center justify-center border border-line-strong bg-white text-ink has-checked:border-brand has-checked:bg-brand has-checked:text-brand-ink has-focus-visible:ring-2 has-focus-visible:ring-brand/30';
     $filterTargets = 'purpose,type,district,min,max,beds,sort,clearFilters';
-    $off = 'border-line-strong bg-white text-ink';
 @endphp
 
 <section class="mx-auto max-w-[1248px] px-5 pt-7 lg:px-6 lg:pt-12"
@@ -50,8 +49,10 @@
             {{-- Phones: purpose pills, then the filter sheet and sorting --}}
             <div class="flex gap-2 lg:hidden">
                 @foreach ($purposes as $value => $label)
-                    <button type="button" wire:click="$set('purpose', '{{ $value }}')"
-                            @class(['h-10 flex-1 rounded-full border text-14 font-semibold', $purpose === $value ? $on : $off])>{{ $label }}</button>
+                    <label class="{{ $pill }} h-10 flex-1 rounded-full text-14 font-semibold">
+                        <input type="radio" wire:model.live="purpose" value="{{ $value }}" @checked($purpose === $value) class="sr-only">
+                        {{ $label }}
+                    </label>
                 @endforeach
             </div>
             <div class="flex gap-2 lg:hidden">
@@ -75,8 +76,10 @@
             <div class="hidden flex-wrap items-center gap-3 rounded-card border border-line bg-white p-3.5 lg:flex">
                 <div class="flex gap-0.5 rounded-field border border-line-strong p-[3px]">
                     @foreach ($purposes as $value => $label)
-                        <button type="button" wire:click="$set('purpose', '{{ $value }}')"
-                                @class(['h-9 rounded-[7px] px-[18px] text-14 font-semibold', $purpose === $value ? 'bg-brand text-brand-ink' : 'bg-white text-ink'])>{{ $label }}</button>
+                        <label class="relative flex h-9 cursor-pointer items-center rounded-[7px] bg-white px-[18px] text-14 font-semibold text-ink has-checked:bg-brand has-checked:text-brand-ink has-focus-visible:ring-2 has-focus-visible:ring-brand/30">
+                            <input type="radio" wire:model.live="purpose" value="{{ $value }}" @checked($purpose === $value) class="sr-only">
+                            {{ $label }}
+                        </label>
                     @endforeach
                 </div>
                 <div class="w-40">
@@ -169,8 +172,10 @@
                         <span class="text-14 font-semibold">الغرض</span>
                         <div class="flex gap-2">
                             @foreach ($purposes as $value => $label)
-                                <button type="button" wire:click="$set('purpose', '{{ $value }}')"
-                                        @class(['h-11 flex-1 rounded-field border text-14 font-semibold', $purpose === $value ? $on : $off])>{{ $label }}</button>
+                                <label class="{{ $pill }} h-11 flex-1 rounded-field text-14 font-semibold">
+                                    <input type="radio" wire:model.live="purpose" value="{{ $value }}" @checked($purpose === $value) class="sr-only">
+                                    {{ $label }}
+                                </label>
                             @endforeach
                         </div>
                     </div>
@@ -178,11 +183,15 @@
                         <div class="flex flex-col gap-2.5">
                             <span class="text-14 font-semibold">نوع العقار</span>
                             <div class="flex flex-wrap gap-2">
-                                <button type="button" wire:click="$set('type', '')"
-                                        @class(['h-10 rounded-full border px-4 text-14 font-medium', $type === '' ? $on : $off])>الكل</button>
+                                <label class="{{ $pill }} h-10 rounded-full px-4 text-14 font-medium">
+                                    <input type="radio" wire:model.live="type" value="" @checked($type === '') class="sr-only">
+                                    الكل
+                                </label>
                                 @foreach ($types as $listingType)
-                                    <button type="button" wire:click="$set('type', '{{ $listingType->value }}')"
-                                            @class(['h-10 rounded-full border px-4 text-14 font-medium', $type === $listingType->value ? $on : $off])>{{ $listingType->label() }}</button>
+                                    <label class="{{ $pill }} h-10 rounded-full px-4 text-14 font-medium">
+                                        <input type="radio" wire:model.live="type" value="{{ $listingType->value }}" @checked($type === $listingType->value) class="sr-only">
+                                        {{ $listingType->label() }}
+                                    </label>
                                 @endforeach
                             </div>
                         </div>
@@ -211,8 +220,10 @@
                         <span class="text-14 font-semibold">غرف النوم</span>
                         <div class="flex gap-2">
                             @foreach (['' => 'الكل', '1' => '1+', '2' => '2+', '3' => '3+', '4' => '4+', '5' => '5+'] as $value => $label)
-                                <button type="button" wire:click="$set('beds', '{{ $value }}')"
-                                        @class(['h-11 flex-1 rounded-full border text-14 font-medium', (string) $beds === (string) $value ? $on : $off])>{{ $label }}</button>
+                                <label class="{{ $pill }} h-11 flex-1 rounded-full text-14 font-medium">
+                                    <input type="radio" wire:model.live="beds" value="{{ $value }}" @checked((string) $beds === (string) $value) class="sr-only">
+                                    {{ $label }}
+                                </label>
                             @endforeach
                         </div>
                     </div>

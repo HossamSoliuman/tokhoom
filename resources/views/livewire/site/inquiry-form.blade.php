@@ -30,20 +30,17 @@
     </label>
 
     <div class="flex flex-col gap-1.5">
-        <button type="button" wire:click="$toggle('consent')" role="checkbox" aria-checked="{{ $consent ? 'true' : 'false' }}"
-                class="flex items-start gap-2.5 text-start">
+        <label class="group/check relative flex cursor-pointer items-start gap-2.5 text-start">
+            <input type="checkbox" wire:model="consent" @checked($consent) class="sr-only">
             <span @class([
-                'mt-px flex size-[22px] shrink-0 items-center justify-center rounded-md border-[1.5px] text-brand-ink lg:size-5',
-                'border-brand bg-brand' => $consent,
-                'border-danger bg-white' => ! $consent && $errors->has('consent'),
-                'border-faint bg-white' => ! $consent && ! $errors->has('consent'),
+                'mt-px flex size-[22px] shrink-0 items-center justify-center rounded-md border-[1.5px] bg-white text-brand-ink lg:size-5',
+                'group-has-checked/check:border-brand group-has-checked/check:bg-brand group-has-focus-visible/check:ring-2 group-has-focus-visible/check:ring-brand/30',
+                $errors->has('consent') ? 'border-danger' : 'border-faint',
             ])>
-                @if ($consent)
-                    <i class="ti ti-check text-[15px] lg:text-14"></i>
-                @endif
+                <i class="ti ti-check invisible text-[15px] group-has-checked/check:visible lg:text-14"></i>
             </span>
             <span class="text-14 leading-[22px] text-ink-soft">أوافق على أن يتواصل معي المكتب بخصوص هذا العقار</span>
-        </button>
+        </label>
         @error('consent')
             <span class="flex items-center gap-1 text-13 text-danger"><i class="ti ti-alert-circle"></i>{{ $message }}</span>
         @enderror
