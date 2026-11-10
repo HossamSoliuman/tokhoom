@@ -59,6 +59,11 @@
     --color-closed: #edeae5;
     --color-closed-ink: #5c564e;
 
+    --color-buyer: #2f6fd1;
+    --color-buyer-soft: #e7effb;
+    --color-tenant: #7a4cc2;
+    --color-tenant-soft: #f0eafa;
+
     --radius-field: 10px;
     --radius-card: 14px;
 
@@ -86,6 +91,62 @@
     --color-brand-ink: var(--brand-ink, #ffffff);
     --color-brand-text: var(--brand-text, #145a55);
     --color-brand-soft: color-mix(in oklch, var(--brand, #145a55) 10%, #fff);
+}
+
+/* Dashboard palette: cool neutrals and a deep teal brand, scoped to the app layout. */
+.theme-dash {
+    --color-primary: #0e6b5a;
+    --color-primary-strong: #0b5a4b;
+    --color-primary-deep: #08463a;
+    --color-primary-mid: #2f8a78;
+    --color-primary-light: #9bcabe;
+    --color-primary-soft: #e3f1ee;
+    --color-primary-tint: #f1f8f6;
+    --color-primary-faint: #f8fbfa;
+
+    --color-ink: #17202b;
+    --color-ink-soft: #27313c;
+    --color-body: #3b4550;
+    --color-muted: #69727d;
+    --color-subtle: #8a929b;
+    --color-faint: #b3b9c0;
+    --color-line-strong: #d6dadf;
+    --color-line: #e4e7eb;
+    --color-divider: #f0f2f4;
+    --color-skeleton: #eceef1;
+    --color-head: #f7f8f9;
+    --color-canvas: #f4f5f7;
+    --color-backdrop: #eceef1;
+    --color-photo-a: #dfe9e6;
+    --color-photo-b: #d4e3df;
+    --color-photo-label: #4f6b64;
+
+    --color-success: #1d8f4e;
+    --color-success-soft: #e6f4ec;
+    --color-warning: #b7770a;
+    --color-warning-dot: #d99a24;
+    --color-warning-soft: #fdf3df;
+    --color-notice: #fdf6e8;
+    --color-notice-line: #f0dcae;
+    --color-danger: #c93c3c;
+    --color-danger-ink: #a52f2f;
+    --color-danger-soft: #fbe9e9;
+    --color-closed: #eef0f2;
+    --color-closed-ink: #59626c;
+
+    --color-buyer: #2f6fd1;
+    --color-buyer-soft: #e7effb;
+    --color-tenant: #7a4cc2;
+    --color-tenant-soft: #f0eafa;
+
+    --radius-field: 9px;
+    --radius-card: 12px;
+
+    --shadow-pop: 0 8px 24px rgba(15, 20, 26, 0.08);
+    --shadow-fab: 0 6px 16px rgba(14, 107, 90, 0.28);
+
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
 }
 
 @layer base {
