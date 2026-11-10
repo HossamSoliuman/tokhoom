@@ -11,7 +11,7 @@ export default defineConfig({
             fonts: [
                 google('Almarai', {
                     alias: 'almarai',
-                    weights: [300, 400, 700, 800],
+                    weights: [400, 700, 800],
                     subsets: ['arabic', 'latin'],
                 }),
                 google('Space Grotesk', {
