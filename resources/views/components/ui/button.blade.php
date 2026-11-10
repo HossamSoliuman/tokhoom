@@ -9,7 +9,7 @@
 @php
     $sizes = [
         'xs' => 'h-9 px-3 text-13',
-        'sm' => 'h-10 px-3.5 text-14',
+        'sm' => 'h-9 px-3.5 text-13',
         'md' => 'h-11 px-4 text-15',
         'lg' => 'h-12 px-5 text-15',
     ];
