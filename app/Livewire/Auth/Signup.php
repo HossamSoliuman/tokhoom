@@ -72,9 +72,9 @@ class Signup extends Component
         $this->slug = SiteAddress::clean($value);
     }
 
-    public function pickKind(string $kind): void
+    public function updatedKind(string $value): void
     {
-        $this->kind = WorkspaceKind::from($kind)->value;
+        $this->kind = WorkspaceKind::tryFrom($value)?->value ?? WorkspaceKind::Office->value;
     }
 
     public function useSuggestion(string $slug): void

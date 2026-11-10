@@ -39,25 +39,15 @@
                     ['office', 'مكتب عقاري', 'ti-building', 'لديك سجل تجاري وفريق من الوسطاء'],
                     ['agent', 'وسيط مستقل', 'ti-user', 'تعمل بشكل مستقل برخصة فال شخصية'],
                 ] as [$value, $label, $icon, $description])
-                    @php($active = $kind === $value)
-                    <button type="button" wire:click="pickKind('{{ $value }}')" @class([
-                        'relative flex flex-col items-start gap-2.5 rounded-card border-2 p-5 text-start text-ink',
-                        'border-primary bg-primary-tint' => $active,
-                        'border-line bg-white hover:bg-canvas' => ! $active,
-                    ])>
-                        <span @class([
-                            'flex size-[52px] items-center justify-center rounded-xl',
-                            'bg-primary text-white' => $active,
-                            'bg-divider text-body' => ! $active,
-                        ])>
+                    <label class="group/kind relative flex cursor-pointer flex-col items-start gap-2.5 rounded-card border-2 border-line bg-white p-5 text-start text-ink not-has-checked:hover:bg-canvas has-checked:border-primary has-checked:bg-primary-tint has-focus-visible:ring-2 has-focus-visible:ring-primary/30">
+                        <input type="radio" wire:model="kind" value="{{ $value }}" @checked($kind === $value) class="sr-only">
+                        <span class="flex size-[52px] items-center justify-center rounded-xl bg-divider text-body group-has-checked/kind:bg-primary group-has-checked/kind:text-white">
                             <i class="ti {{ $icon }} text-28"></i>
                         </span>
                         <span class="text-17 font-bold">{{ $label }}</span>
                         <span class="text-14 leading-[22px] text-body">{{ $description }}</span>
-                        @if ($active)
-                            <i class="ti ti-circle-check-filled absolute left-3.5 top-3.5 text-24 text-primary"></i>
-                        @endif
-                    </button>
+                        <i class="ti ti-circle-check-filled absolute left-3.5 top-3.5 hidden text-24 text-primary group-has-checked/kind:inline"></i>
+                    </label>
                 @endforeach
             </div>
         @endif

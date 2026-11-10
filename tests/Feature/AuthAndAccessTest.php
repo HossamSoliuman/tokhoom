@@ -217,7 +217,7 @@ test('an office signs up step by step and waits for approval', function () {
         ->set('password', 'password1')
         ->call('next')
         ->assertSet('step', 2)
-        ->call('pickKind', 'office')
+        ->set('kind', 'office')
         ->call('next')
         ->assertSet('step', 3)
         ->set('tradeName', 'مكتب الراشد العقاري')
@@ -258,10 +258,17 @@ test('signup starts with the site address and account type picked on the landing
         ->assertSet('kind', 'office');
 });
 
+test('an unknown account type picked during signup falls back to an office', function () {
+    Livewire::test(Signup::class)
+        ->set('kind', 'agent')
+        ->set('kind', 'shop')
+        ->assertSet('kind', 'office');
+});
+
 test('an expired license cannot be used to sign up', function () {
     Livewire::test(Signup::class)
         ->set('step', 3)
-        ->call('pickKind', 'agent')
+        ->set('kind', 'agent')
         ->set('name', 'سارة القحطاني')
         ->set('falNumber', '1100012345')
         ->set('licenseExpiresOn', now()->subDay()->toDateString())
