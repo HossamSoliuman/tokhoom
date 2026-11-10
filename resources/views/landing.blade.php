@@ -3,6 +3,7 @@
     use App\Enums\Plan;
     use App\Support\Arabic;
 
+    $demoSite = config('tokhoom.demo_site_url');
     $seller = config('tokhoom.seller');
     $support = config('tokhoom.support');
     $whatsappUrl = $support['whatsapp'] ? 'https://wa.me/'.preg_replace('/\D/', '', $support['whatsapp']) : null;
@@ -164,6 +165,9 @@
                 <a href="#pricing" class="text-body">الأسعار</a>
                 <a href="#faq" class="text-body">الأسئلة</a>
                 <a href="#company" class="text-body">عن تخوم</a>
+                @if ($demoSite)
+                    <a href="{{ $demoSite }}" class="flex items-center gap-1 font-semibold">زر موقعاً نموذجياً<i class="ti ti-external-link text-16"></i></a>
+                @endif
             </nav>
             <div class="ms-auto flex items-center gap-1.5">
                 <a href="{{ route('login') }}" class="flex h-11 items-center whitespace-nowrap px-3.5 text-15 font-semibold text-ink">دخول</a>
