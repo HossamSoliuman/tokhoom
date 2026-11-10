@@ -1,6 +1,6 @@
 <x-app.page title="العملاء">
     <x-slot:actions>
-        <x-ui.button icon="ti-user-plus" wire:click="openAddClient">إضافة عميل</x-ui.button>
+        <x-ui.button icon="ti-user-plus" size="sm" wire:click="openAddClient">إضافة عميل</x-ui.button>
     </x-slot:actions>
 
     @if (! $hasAnyClient)
@@ -9,16 +9,16 @@
         </x-ui.empty>
     @else
         <div class="flex flex-wrap items-center gap-2">
-            <div class="flex h-11 max-w-[360px] flex-[1_1_240px] items-center gap-2 rounded-field border border-line-strong bg-white px-3 focus-within:border-primary">
+            <div class="flex h-[38px] max-w-[320px] flex-[1_1_220px] items-center gap-2 rounded-field border border-line bg-white px-3 focus-within:border-primary">
                 <i class="ti ti-search text-muted"></i>
-                <input type="search" wire:model.live.debounce.300ms="search" placeholder="ابحث بالاسم أو الجوال" class="min-w-0 flex-1 border-0 bg-transparent text-15">
+                <input type="search" wire:model.live.debounce.300ms="search" placeholder="ابحث بالاسم أو الجوال" class="min-w-0 flex-1 border-0 bg-transparent text-14">
             </div>
-            <div class="scrollbar-none flex max-w-full gap-1.5 overflow-x-auto">
-                <x-ui.chip :active="$type === 'all'" wire:click="$set('type', 'all')">الكل</x-ui.chip>
+            <x-app.segmented>
+                <x-app.segmented-option :active="$type === 'all'" wire:click="$set('type', 'all')">الكل</x-app.segmented-option>
                 @foreach (\App\Enums\ClientType::cases() as $case)
-                    <x-ui.chip :active="$type === $case->value" wire:click="$set('type', '{{ $case->value }}')" wire:key="type-{{ $case->value }}">{{ $case->label() }}</x-ui.chip>
+                    <x-app.segmented-option :active="$type === $case->value" wire:click="$set('type', '{{ $case->value }}')" wire:key="type-{{ $case->value }}">{{ $case->label() }}</x-app.segmented-option>
                 @endforeach
-            </div>
+            </x-app.segmented>
         </div>
 
         @if ($clients->isEmpty())
@@ -29,46 +29,63 @@
             </div>
         @else
             {{-- Desktop table --}}
-            <div class="hidden overflow-hidden rounded-card border border-line bg-white lg:block">
-                <div class="grid h-11 grid-cols-[1.6fr_1.2fr_1fr_1fr_1.3fr_1.3fr] items-center bg-head px-5 text-13 font-semibold text-muted">
-                    <span>العميل</span><span>الجوال</span><span>النوع</span><span>المصدر</span><span>الوسيط</span><span>التذكير القادم</span>
-                </div>
-                @foreach ($clients as $client)
-                    @php($next = $client->nextReminder)
-                    <a href="{{ route('clients.show', $client) }}" wire:navigate wire:key="row-{{ $client->id }}"
-                       class="grid h-[60px] grid-cols-[1.6fr_1.2fr_1fr_1fr_1.3fr_1.3fr] items-center border-t border-divider px-5 text-14 text-ink hover:bg-canvas hover:no-underline">
-                        <span class="flex items-center gap-2.5 font-semibold">
-                            <x-ui.avatar :initial="$client->initial()" :size="34" />{{ $client->name }}
-                        </span>
-                        <span class="text-right" dir="ltr">{{ Phone::display($client->mobile) }}</span>
-                        <span><span class="inline-flex h-[26px] items-center rounded-full bg-divider px-2.5 text-13">{{ $client->type->label() }}</span></span>
-                        <span class="text-body">{{ $client->source->label() }}</span>
-                        <span class="text-body">{{ $client->agent->name }}</span>
-                        <span @class(['flex items-center gap-1.5', 'font-semibold text-warning' => $next?->isDue(), 'text-body' => ! $next?->isDue()])>
-                            <i class="ti ti-bell text-16"></i>{{ $next ? Arabic::dayAndTime($next->due_at) : '—' }}
-                        </span>
-                    </a>
-                @endforeach
+            <div class="hidden overflow-x-auto rounded-card border border-line bg-white px-4 py-2 lg:block">
+                <table class="w-full border-collapse text-13">
+                    <thead>
+                        <tr class="text-right text-12 text-muted">
+                            <th class="whitespace-nowrap border-b border-line px-2.5 py-2 font-semibold">العميل</th>
+                            <th class="whitespace-nowrap border-b border-line px-2.5 py-2 font-semibold">الجوال</th>
+                            <th class="whitespace-nowrap border-b border-line px-2.5 py-2 font-semibold">النوع</th>
+                            <th class="whitespace-nowrap border-b border-line px-2.5 py-2 font-semibold">المصدر</th>
+                            <th class="whitespace-nowrap border-b border-line px-2.5 py-2 font-semibold">الوسيط</th>
+                            <th class="whitespace-nowrap border-b border-line px-2.5 py-2 font-semibold">التذكير القادم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($clients as $client)
+                            @php($next = $client->nextReminder)
+                            <tr wire:key="row-{{ $client->id }}" class="group cursor-pointer" x-on:click="$event.target.closest('a') || Livewire.navigate(@js(route('clients.show', $client)))">
+                                <td class="border-b border-divider px-2.5 py-2.5 group-last:border-b-0 group-hover:bg-head">
+                                    <a href="{{ route('clients.show', $client) }}" wire:navigate class="flex items-center gap-2.5 font-bold text-ink hover:no-underline">
+                                        <x-ui.avatar :initial="$client->initial()" :size="30" />{{ $client->name }}
+                                    </a>
+                                </td>
+                                <td class="border-b border-divider px-2.5 py-2.5 text-right group-last:border-b-0 group-hover:bg-head" dir="ltr">{{ Phone::display($client->mobile) }}</td>
+                                <td class="border-b border-divider px-2.5 py-2.5 group-last:border-b-0 group-hover:bg-head"><x-app.tag :tone="$client->type->tone()">{{ $client->type->label() }}</x-app.tag></td>
+                                <td class="border-b border-divider px-2.5 py-2.5 text-body group-last:border-b-0 group-hover:bg-head">{{ $client->source->label() }}</td>
+                                <td class="border-b border-divider px-2.5 py-2.5 text-body group-last:border-b-0 group-hover:bg-head">{{ $client->agent->name }}</td>
+                                <td class="border-b border-divider px-2.5 py-2.5 group-last:border-b-0 group-hover:bg-head">
+                                    @if ($next)
+                                        <x-app.tag :tone="$next->isDue() ? 'bad' : 'gray'"><i class="ti ti-bell"></i>{{ Arabic::dayAndTime($next->due_at) }}</x-app.tag>
+                                    @else
+                                        <span class="text-subtle">—</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
             {{-- Mobile cards --}}
-            <div class="flex flex-col gap-2.5 lg:hidden">
+            <div class="flex flex-col gap-2 lg:hidden">
                 @foreach ($clients as $client)
                     @php($next = $client->nextReminder)
                     <a href="{{ route('clients.show', $client) }}" wire:navigate wire:key="card-{{ $client->id }}"
-                       class="flex flex-col gap-2.5 rounded-card border border-line bg-white p-3.5 text-ink hover:no-underline">
-                        <div class="flex items-center gap-2.5">
-                            <x-ui.avatar :initial="$client->initial()" :size="40" />
-                            <div class="flex flex-1 flex-col">
-                                <span class="text-15 font-semibold">{{ $client->name }}</span>
-                                <span class="text-right text-13 text-muted" dir="ltr">{{ Phone::display($client->mobile) }}</span>
-                            </div>
-                            <span class="inline-flex h-[26px] items-center rounded-full bg-divider px-2.5 text-13">{{ $client->type->label() }}</span>
+                       @class([
+                           'flex flex-col gap-1.5 rounded-[9px] border bg-white p-2.5 text-[12.5px] text-ink hover:no-underline',
+                           'border-[#efb6b6] shadow-[inset_-3px_0_0_var(--color-danger)]' => $next?->isDue(),
+                           'border-line' => ! $next?->isDue(),
+                       ])>
+                        <div class="flex items-center gap-2">
+                            <span class="flex-1 text-[13.5px] font-bold">{{ $client->name }}</span>
+                            <x-app.tag :tone="$client->type->tone()">{{ $client->type->label() }}</x-app.tag>
                         </div>
-                        <div class="flex flex-wrap justify-between gap-2 text-13 text-body">
+                        <span class="text-right text-muted" dir="ltr">{{ Phone::display($client->mobile) }}</span>
+                        <div class="flex flex-wrap justify-between gap-2 text-muted">
                             <span>{{ $client->source->label() }} · {{ $client->agent->name }}</span>
-                            <span @class(['flex items-center gap-1', 'font-semibold text-warning' => $next?->isDue()])>
-                                <i class="ti ti-bell text-15"></i>{{ $next ? Arabic::dayAndTime($next->due_at) : '—' }}
+                            <span @class(['flex items-center gap-1', 'font-semibold text-danger' => $next?->isDue()])>
+                                <i class="ti ti-bell"></i>{{ $next ? Arabic::dayAndTime($next->due_at) : '—' }}
                             </span>
                         </div>
                     </a>
