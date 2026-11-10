@@ -4,12 +4,18 @@
     </x-slot:actions>
 
     <div class="relative flex flex-wrap items-center gap-2" x-data="{ calendar: false }" x-on:keydown.escape="calendar = false">
-        @foreach (['7' => 'آخر 7 أيام', '30' => 'آخر 30 يوماً', 'month' => 'هذا الشهر'] as $value => $label)
-            <x-ui.chip :active="$range === (string) $value" class="h-10" wire:click="preset('{{ $value }}')">{{ $label }}</x-ui.chip>
-        @endforeach
+        <div class="flex gap-1 rounded-field border border-line bg-white p-[3px]">
+            @foreach (['7' => 'آخر 7 أيام', '30' => 'آخر 30 يوماً', 'month' => 'هذا الشهر'] as $value => $label)
+                <button type="button" wire:click="preset('{{ $value }}')" @class([
+                    'h-8 rounded-[7px] px-3 text-[12.5px]',
+                    'bg-ink font-semibold text-white' => $range === (string) $value,
+                    'text-muted hover:text-ink' => $range !== (string) $value,
+                ])>{{ $label }}</button>
+            @endforeach
+        </div>
         <button type="button" x-on:click="calendar = ! calendar"
-                :class="calendar ? 'border-primary' : 'border-line-strong'"
-                class="flex h-10 items-center gap-2 rounded-field border bg-white px-3.5 text-14 font-semibold text-ink">
+                :class="calendar ? 'border-primary' : 'border-line'"
+                class="flex h-[38px] items-center gap-2 rounded-field border bg-white px-3 text-13 font-semibold text-ink">
             <i class="ti ti-calendar text-18"></i>{{ $this->rangeLabel() }}
         </button>
 
@@ -47,7 +53,16 @@
     @if (! $data)
         <x-ui.error-state />
     @else
-        <div class="flex flex-wrap gap-4">
+        @php($totals = collect($data['agents'])->firstWhere('total', true) ?? collect($data['agents'])->first())
+        <div class="grid grid-cols-2 gap-3.5 md:grid-cols-3 xl:grid-cols-5">
+            <x-app.kpi label="زيارات الموقع" :value="Arabic::number($data['visitTotal'])" />
+            <x-app.kpi label="العملاء الجدد" :value="Arabic::number(collect($data['sources'])->sum('count'))" />
+            <x-app.kpi label="الصفقات الناجحة" :value="Arabic::number($totals['won'] ?? 0)" />
+            <x-app.kpi label="العمولة" :value="($totals['commission'] ?? 0) ? Arabic::money($totals['commission']) : '—'" />
+            <x-app.kpi label="متوسط زمن الرد" :value="($totals['response'] ?? null) !== null ? Arabic::minutesShort($totals['response']) : '—'" />
+        </div>
+
+        <div class="flex flex-wrap gap-3.5">
             <x-ui.card class="min-w-0 flex-[2_1_460px]">
                 <x-slot:heading>
                     <h2 class="m-0 text-16 font-bold">زيارات الموقع</h2>
@@ -74,7 +89,7 @@
             </x-ui.card>
         </div>
 
-        <div class="flex flex-wrap items-start gap-4">
+        <div class="flex flex-wrap items-start gap-3.5">
             <x-ui.card title="مسار العملاء" class="min-w-0 flex-[1_1_380px] gap-3">
                 <x-funnel :steps="$data['funnel']" rate-suffix="من السابق" />
             </x-ui.card>
