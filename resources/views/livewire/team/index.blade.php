@@ -1,10 +1,10 @@
 <x-app.page title="الفريق">
     <x-slot:actions>
-        <x-ui.button icon="ti-user-plus" wire:click="openInvite">دعوة عضو</x-ui.button>
+        <x-ui.button icon="ti-user-plus" size="sm" wire:click="openInvite">دعوة عضو</x-ui.button>
     </x-slot:actions>
 
     <div class="overflow-hidden rounded-card border border-line bg-white">
-        <div class="hidden h-11 grid-cols-[2fr_1.2fr_1.4fr_1fr_150px] items-center bg-head px-5 text-13 font-semibold text-muted lg:grid">
+        <div class="hidden h-10 grid-cols-[2fr_1.2fr_1.4fr_1fr_150px] items-center border-b border-line px-5 text-12 font-semibold text-muted lg:grid">
             <span>العضو</span><span>الدور</span><span>انتهاء رخصة فال</span><span>عقارات نشطة</span><span></span>
         </div>
 
@@ -13,24 +13,22 @@
             @php($count = $activeCounts->get($member->user_id, 0))
             <div class="grid grid-cols-2 items-center gap-x-4 gap-y-2 border-t border-divider px-5 py-3.5 text-14 first:border-t-0 lg:grid-cols-[2fr_1.2fr_1.4fr_1fr_150px] lg:first:border-t" wire:key="member-{{ $member->id }}">
                 <span class="col-span-2 flex items-center gap-3 lg:col-span-1">
-                    <x-ui.avatar :initial="$member->user->initials()" :size="44" tone="brand" />
+                    <x-ui.avatar :initial="$member->user->initials()" :size="34" tone="brand" />
                     <span class="flex flex-col">
-                        <span class="text-15 font-semibold">{{ $member->user->name }}</span>
+                        <span class="text-14 font-bold">{{ $member->user->name }}</span>
                         <span class="text-right text-12 text-muted" dir="ltr">{{ $member->role === \App\Enums\MemberRole::Owner ? $member->user->email : Phone::display($member->user->mobile ?: $member->user->email) }}</span>
                     </span>
                 </span>
                 <span>
-                    <span @class([
-                        'inline-flex h-[26px] items-center rounded-full px-2.5 text-13 font-medium',
-                        'bg-primary-soft text-primary-strong' => $member->role === \App\Enums\MemberRole::Owner,
-                        'bg-divider text-body' => $member->role !== \App\Enums\MemberRole::Owner,
-                    ])>{{ $member->roleLabel() }}</span>
+                    <x-app.tag :tone="$member->role === \App\Enums\MemberRole::Owner ? 'brand' : 'gray'">{{ $member->roleLabel() }}</x-app.tag>
                 </span>
-                <span @class(['flex items-center gap-1.5', 'font-semibold text-warning' => $warn, 'text-body' => ! $warn])>
-                    @if ($warn)
-                        <i class="ti ti-alert-triangle text-16"></i>
-                    @endif
-                    <span class="lg:hidden">فال:</span> {{ Arabic::date($member->fal_expires_on) }}
+                <span>
+                    <x-app.tag :tone="$warn ? 'warn' : 'good'">
+                        @if ($warn)
+                            <i class="ti ti-alert-triangle"></i>
+                        @endif
+                        <span class="lg:hidden">فال:</span> {{ Arabic::date($member->fal_expires_on) }}
+                    </x-app.tag>
                 </span>
                 <span class="text-body">{{ $count }}<span class="lg:hidden"> عقارات نشطة</span></span>
                 <span class="flex justify-end">
@@ -44,13 +42,13 @@
         @foreach ($invitations as $invitation)
             <div class="grid grid-cols-2 items-center gap-x-4 gap-y-2 border-t border-divider px-5 py-3.5 text-14 lg:grid-cols-[2fr_1.2fr_1.4fr_1fr_150px]" wire:key="invitation-{{ $invitation->id }}">
                 <span class="col-span-2 flex items-center gap-3 lg:col-span-1">
-                    <span class="photo-stripes size-11 shrink-0 rounded-full"></span>
+                    <span class="photo-stripes size-[34px] shrink-0 rounded-full"></span>
                     <span class="flex flex-col">
                         <span class="text-15 font-semibold">{{ $invitation->name ?? ($invitation->channel === \App\Enums\InvitationChannel::Mobile ? Phone::display($invitation->contact) : $invitation->contact) }}</span>
                         <span class="text-right text-12 text-muted" dir="ltr">{{ $invitation->channel === \App\Enums\InvitationChannel::Mobile ? Phone::display($invitation->contact) : $invitation->contact }}</span>
                     </span>
                 </span>
-                <span><span class="inline-flex h-[26px] items-center rounded-full bg-warning-soft px-2.5 text-13 font-medium text-warning">دعوة معلّقة</span></span>
+                <span><x-app.tag tone="warn">دعوة معلّقة</x-app.tag></span>
                 <span class="text-body">—</span>
                 <span class="text-body">—</span>
                 <span class="flex justify-end gap-1.5">
