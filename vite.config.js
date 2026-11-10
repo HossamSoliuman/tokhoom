@@ -9,10 +9,16 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js', 'resources/js/site.js'],
             refresh: true,
             fonts: [
-                google('IBM Plex Sans Arabic', {
-                    alias: 'plex',
-                    weights: [400, 500, 600, 700],
+                google('Almarai', {
+                    alias: 'almarai',
+                    weights: [300, 400, 700, 800],
                     subsets: ['arabic', 'latin'],
+                }),
+                google('Space Grotesk', {
+                    alias: 'grotesk',
+                    weights: [500, 700],
+                    subsets: ['latin'],
+                    preload: false,
                 }),
                 google('IBM Plex Mono', {
                     alias: 'plex-mono',

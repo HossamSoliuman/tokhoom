@@ -5,7 +5,8 @@
 @source '../../app';
 
 @theme {
-    --font-sans: var(--font-plex), 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: var(--font-almarai), 'Almarai', ui-sans-serif, system-ui, sans-serif;
+    --font-latin: var(--font-grotesk), 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
     --font-mono: var(--font-plex-mono), 'IBM Plex Mono', ui-monospace, monospace;
 
     --color-primary: #1e3a4c;
