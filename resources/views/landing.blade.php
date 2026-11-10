@@ -174,24 +174,35 @@
 
     <main x-data>
         {{-- Hero --}}
-        <section class="mx-auto flex min-h-[calc(100dvh-160px)] max-w-[720px] flex-col items-center justify-center gap-7 px-4 py-12 text-center lg:gap-9 lg:py-20">
-            <h1 class="text-[clamp(28px,4.4vw,50px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
+        <section class="relative isolate overflow-hidden bg-primary-deep text-white">
+            <div class="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]" aria-hidden="true"></div>
+            <div class="absolute -top-40 left-1/2 -z-10 size-[720px] -translate-x-1/2 rounded-full bg-primary-mid/40 blur-[120px]" aria-hidden="true"></div>
 
-            <div id="start" class="w-full scroll-mt-24 rounded-card border border-line bg-white p-4 text-start shadow-pop sm:p-6">
-                <livewire:claim-site-address />
+            <div class="mx-auto flex max-w-[1160px] flex-col items-center px-4 pt-14 lg:px-5 lg:pt-24">
+                <div class="flex w-full max-w-[760px] flex-col items-center gap-8 text-center lg:gap-10">
+                    <h1 class="text-[clamp(30px,4.6vw,54px)] font-bold leading-[1.3] text-balance">موقع عقاري باسم مكتبك، ولوحة تحكم تدير بها عملك اليومي.</h1>
+
+                    <div id="start" class="w-full scroll-mt-24 rounded-card bg-white p-4 text-start text-ink shadow-[0_24px_60px_rgba(0,0,0,0.25)] sm:p-6">
+                        <livewire:claim-site-address />
+                    </div>
+
+                    <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2.5 text-15 text-white/85">
+                        @foreach (['بلا عمولة على صفقاتك', 'بلا بطاقة دفع للتجربة', 'رقم رخصة فال ظاهر في موقعك'] as $point)
+                            <li class="flex items-center gap-1.5"><i class="ti ti-circle-check-filled text-18 text-primary-light"></i>{{ $point }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                <dl class="mt-14 grid w-full grid-cols-1 gap-x-8 gap-y-5 border-t border-white/15 py-8 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
+                    @foreach ($facts as [$label, $value])
+                        <div class="flex flex-col gap-1">
+                            <dt class="text-13 text-white/60">{{ $label }}</dt>
+                            <dd class="text-16 font-semibold leading-normal">{{ $value }}</dd>
+                        </div>
+                    @endforeach
+                </dl>
             </div>
         </section>
-
-        <div class="mx-auto max-w-[1160px] px-4 pt-14 lg:px-5 lg:pt-24">
-            <dl class="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach ($facts as [$label, $value])
-                    <div class="flex flex-col gap-1 border-t border-line-strong pt-3.5">
-                        <dt class="text-13 text-muted">{{ $label }}</dt>
-                        <dd class="text-16 font-semibold leading-normal">{{ $value }}</dd>
-                    </div>
-                @endforeach
-            </dl>
-        </div>
 
         {{-- How it works --}}
         <section class="mx-auto flex max-w-[1160px] flex-col gap-8 px-4 pt-18 lg:px-5 lg:pt-30">
