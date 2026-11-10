@@ -2,6 +2,9 @@
 
 namespace App\View\Composers;
 
+use App\Models\Inquiry;
+use App\Models\Membership;
+use App\Models\Reminder;
 use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Support\Facades\Gate;
@@ -34,7 +37,7 @@ class ShellComposer
             'membership' => $membership,
             'workspace' => $membership?->workspace,
             'roleLabel' => $admin ? ($user->gender === 'female' ? 'مشرفة المنصة' : 'مشرف المنصة') : $membership?->roleLabel(),
-            'nav' => $admin ? $this->adminNav() : $this->workspaceNav(),
+            'nav' => $admin ? $this->adminNav() : $this->workspaceNav($membership),
             'tabs' => $admin ? $this->adminTabs() : $this->workspaceTabs(),
             'workspaces' => $admin ? collect() : $user->workspaces()->orderBy('memberships.id')->get(),
             'unread' => $user->unreadNotifications()->count(),
@@ -68,16 +71,40 @@ class ShellComposer
     /**
      * @return list<array{label: string, icon: string, url: string, active: bool, badge?: int}>
      */
-    private function workspaceNav(): array
+    private function workspaceNav(?Membership $membership): array
     {
+        $today = $this->item('اليوم', 'ti-sun', 'today', 'today');
+
+        if ($membership) {
+            $today['badge'] = $this->openTaskCount($membership);
+        }
+
         $items = [
-            $this->item('اليوم', 'ti-sun', 'today', 'today'),
+            $today,
             $this->item('العقارات', 'ti-home', 'listings.index', 'listings.*'),
             $this->item('العملاء', 'ti-users', 'clients.index', 'clients.*'),
             $this->item('الصفقات', 'ti-layout-kanban', 'deals.index', 'deals.*'),
         ];
 
         return array_merge($items, $this->settingsItems());
+    }
+
+    /**
+     * Follow-ups due by the end of today plus inquiries still waiting for a reply.
+     */
+    public function openTaskCount(Membership $membership): int
+    {
+        $reminders = Reminder::visibleTo($membership)
+            ->whereNull('completed_at')
+            ->where('due_at', '<=', now()->endOfDay())
+            ->count();
+
+        $inquiries = Inquiry::visibleTo($membership)
+            ->awaitingReply()
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
+
+        return $reminders + $inquiries;
     }
 
     /**

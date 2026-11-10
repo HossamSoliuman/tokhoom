@@ -4,7 +4,7 @@
 
     <div x-cloak x-show="$store.shell.notifications"
          x-on:keydown.escape.window="$store.shell.notifications = false"
-         class="fixed inset-0 z-[26] flex flex-col overflow-hidden bg-white lg:inset-auto lg:left-10 lg:top-[88px] lg:max-h-[min(640px,calc(100dvh-120px))] lg:w-[420px] lg:rounded-card lg:border lg:border-line lg:shadow-pop">
+         class="fixed inset-0 z-[26] flex flex-col overflow-hidden bg-white lg:inset-auto lg:left-5 lg:top-[64px] lg:max-h-[min(640px,calc(100dvh-120px))] lg:w-[420px] lg:rounded-card lg:border lg:border-line lg:shadow-pop">
         <div class="flex items-center justify-between border-b border-divider py-3 pe-3 ps-4">
             <span class="text-17 font-bold">الإشعارات</span>
             <div class="flex items-center gap-1">

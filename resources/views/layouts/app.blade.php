@@ -11,14 +11,18 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="min-h-dvh">
-    <div class="lg:flex"
+<body class="theme-dash min-h-dvh bg-canvas">
+    <div
          x-data
          x-init="$store.shell.unread = @js($shell['unread'] > 0); $store.shell.switcher = false; $store.shell.notifications = false">
-        <x-app.sidebar :shell="$shell" />
+        <x-app.topbar :shell="$shell" />
 
-        <div class="min-w-0 flex-1">
-            {{ $slot }}
+        <div class="lg:flex">
+            <x-app.sidebar :shell="$shell" />
+
+            <main class="min-w-0 flex-1">
+                {{ $slot }}
+            </main>
         </div>
     </div>
 

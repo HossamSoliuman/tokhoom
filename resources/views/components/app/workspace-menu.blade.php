@@ -2,7 +2,7 @@
 
 <div x-cloak x-show="$store.shell.switcher" x-on:click="$store.shell.switcher = false" class="fixed inset-0 z-[25]"></div>
 <div x-cloak x-show="$store.shell.switcher" x-transition.opacity.duration.100ms
-     class="fixed right-2 top-[60px] z-[26] flex w-[300px] flex-col gap-0.5 rounded-card border border-line bg-white p-2 shadow-pop lg:right-4 lg:top-[132px] lg:w-[280px]">
+     class="fixed right-2 top-[56px] z-[26] flex w-[300px] flex-col gap-0.5 rounded-card border border-line bg-white p-2 shadow-pop lg:right-3 lg:top-[126px] lg:w-[260px]">
     @foreach ($shell['workspaces'] as $workspace)
         @php($current = $workspace->id === $shell['workspace']->id)
         <form method="POST" action="{{ route('workspaces.switch', $workspace) }}">

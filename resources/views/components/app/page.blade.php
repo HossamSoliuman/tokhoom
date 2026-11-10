@@ -1,6 +1,6 @@
 {{--
-    Dashboard page frame: the mobile top bar, the page heading row with its
-    actions and the content column.
+    Dashboard page frame: the page heading row with its actions and the
+    content column. The top bar and sidebar come from the layout.
 --}}
 @props([
     'title' => null,
@@ -9,35 +9,20 @@
     'heading' => true,
 ])
 
-<div {{ $attributes->class('min-h-dvh') }}>
-    <div class="sticky top-0 z-20 flex h-[60px] items-center justify-between border-b border-line bg-white pe-3 ps-2 lg:hidden">
-        @if ($back)
-            <a href="{{ $back }}" wire:navigate class="flex h-11 items-center gap-1.5 px-2 text-16 font-semibold text-ink hover:no-underline">
-                <i class="ti ti-arrow-right text-20"></i>
-                {{ $backLabel }}
-            </a>
-        @else
-            <x-app.mobile-switcher />
+<div {{ $attributes->class('px-3 pb-28 pt-4 lg:px-[26px] lg:pb-14 lg:pt-[22px]') }}>
+    <div class="flex max-w-[1280px] flex-col gap-3.5">
+        @if ($heading)
+            <div class="mb-1 flex min-h-10 flex-wrap items-center gap-3">
+                @if ($back)
+                    <a href="{{ $back }}" wire:navigate class="flex size-9 items-center justify-center rounded-field border border-line bg-white text-ink hover:bg-divider" aria-label="{{ $backLabel }}">
+                        <i class="ti ti-arrow-right text-18"></i>
+                    </a>
+                @endif
+                <h1 class="m-0 min-w-0 flex-1 text-20 font-bold leading-[1.4] lg:text-[21px]">{{ $title }}</h1>
+                {{ $actions ?? '' }}
+            </div>
         @endif
-        <x-app.bell mobile />
-    </div>
 
-    <div class="px-4 pb-24 pt-4 lg:px-10 lg:pb-12 lg:pt-8">
-        <div class="flex max-w-[1240px] flex-col gap-6">
-            @if ($heading)
-                <div class="flex min-h-12 flex-wrap items-center gap-3">
-                    @if ($back)
-                        <a href="{{ $back }}" wire:navigate class="hidden size-10 items-center justify-center rounded-field border border-line-strong bg-white text-ink hover:bg-canvas lg:flex" aria-label="{{ $backLabel }}">
-                            <i class="ti ti-arrow-right text-[19px]"></i>
-                        </a>
-                    @endif
-                    <h1 class="m-0 min-w-0 flex-1 text-22 font-bold leading-[1.4] lg:text-28">{{ $title }}</h1>
-                    {{ $actions ?? '' }}
-                    <x-app.bell class="max-lg:hidden" />
-                </div>
-            @endif
-
-            {{ $slot }}
-        </div>
+        {{ $slot }}
     </div>
 </div>
