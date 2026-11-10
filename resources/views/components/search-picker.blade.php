@@ -1,15 +1,16 @@
-{{-- Dropdown with a search box. Picking an option sets the given Livewire property. --}}
-@props(['label', 'property', 'options', 'value' => '', 'error' => null])
+{{-- Dropdown with a search box. Picking an option sets the given Livewire property, without a request unless live. --}}
+@props(['label', 'property', 'options', 'value' => '', 'error' => null, 'live' => true])
 
 <div {{ $attributes->class('relative flex flex-col gap-1.5') }}
-     x-data="{ open: false, q: '', options: @js(array_values($options)), get filtered() { return this.options.filter((option) => option.includes(this.q.trim())) } }"
+     x-data="{ open: false, q: '', options: @js(array_values($options)), get filtered() { return this.options.filter((option) => option.includes(this.q.trim())) }, get picked() { return this.$wire.$get(@js($property)) } }"
      x-on:click.outside="open = false"
      x-on:keydown.escape="open = false">
     <span class="text-14 font-medium">{{ $label }}</span>
     <button type="button" x-on:click="open = ! open; q = ''; $nextTick(() => open && $refs.search.focus())"
             :class="open ? 'border-primary' : 'border-line-strong'"
             class="flex h-12 items-center justify-between rounded-field border-[1.5px] bg-white px-3.5 text-15">
-        <span @class(['text-ink' => $value, 'text-subtle' => ! $value])>{{ $value ?: 'اختر '.$label }}</span>
+        <span @class(['text-ink' => $value, 'text-subtle' => ! $value]) :class="{ 'text-ink': picked, 'text-subtle': ! picked }"
+              x-text="picked || @js('اختر '.$label)">{{ $value ?: 'اختر '.$label }}</span>
         <i class="ti ti-chevron-down text-muted"></i>
     </button>
 
@@ -21,11 +22,11 @@
         </div>
         <div class="flex max-h-[200px] flex-col gap-0.5 overflow-y-auto">
             <template x-for="option in filtered" :key="option">
-                <button type="button" x-on:click="$wire.set('{{ $property }}', option); open = false"
-                        :class="option === @js($value) ? 'bg-primary-tint font-semibold text-primary' : 'text-ink hover:bg-canvas'"
+                <button type="button" x-on:click="$wire.$set(@js($property), option, @js((bool) $live)); open = false"
+                        :class="option === picked ? 'bg-primary-tint font-semibold text-primary' : 'text-ink hover:bg-canvas'"
                         class="flex h-10 shrink-0 items-center justify-between rounded-lg px-2.5 text-start text-15">
                     <span x-text="option"></span>
-                    <i x-show="option === @js($value)" class="ti ti-check"></i>
+                    <i x-show="option === picked" class="ti ti-check"></i>
                 </button>
             </template>
             <span x-show="filtered.length === 0" class="p-2.5 text-14 text-muted">لا توجد نتائج</span>
