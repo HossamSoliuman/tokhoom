@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>فاتورة {{ $invoice->number }} · تخوم</title>
+    <title>فاتورة {{ $invoice->number }} · تخوم العقار</title>
     <x-favicons />
     @fonts
     @vite(['resources/css/app.css'])

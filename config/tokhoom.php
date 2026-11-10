@@ -85,7 +85,7 @@ return [
     */
 
     'seller' => [
-        'name' => env('TOKHOOM_SELLER_NAME', 'تخوم'),
+        'name' => env('TOKHOOM_SELLER_NAME', 'تخوم العقار'),
         'vat_number' => env('TOKHOOM_VAT_NUMBER'),
         'cr_number' => env('TOKHOOM_CR_NUMBER'),
         'address' => env('TOKHOOM_SELLER_ADDRESS'),
