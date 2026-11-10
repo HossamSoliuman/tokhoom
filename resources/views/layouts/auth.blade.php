@@ -13,9 +13,8 @@
 </head>
 <body class="min-h-dvh">
     <div class="flex min-h-dvh flex-col items-center gap-6 px-4 pb-10 pt-7 lg:px-6 lg:py-14">
-        <a href="{{ url('/') }}" class="flex items-center gap-2.5 hover:no-underline">
-            <x-logo class="size-10" />
-            <span class="text-28 font-bold text-primary">تخوم</span>
+        <a href="{{ url('/') }}" class="hover:no-underline">
+            <x-brand size="lg" latin />
         </a>
         {{ $slot }}
     </div>

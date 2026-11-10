@@ -121,7 +121,7 @@
             <div class="flex items-center justify-between gap-3 border-t border-divider pt-3.5 text-12 text-muted lg:pt-[18px] lg:text-13">
                 <span>© {{ now()->year }} {{ $workspace->name }}</span>
                 <a href="https://{{ config('tokhoom.site_domain') }}" target="_blank" rel="noopener" class="flex items-center gap-1.5 text-muted hover:text-ink">
-                    مدعوم من تخوم
+                    مدعوم من تخوم العقار
                     <x-logo class="size-4 lg:size-[18px]" />
                 </a>
             </div>

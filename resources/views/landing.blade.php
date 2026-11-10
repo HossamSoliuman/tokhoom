@@ -156,9 +156,8 @@
 <body class="bg-canvas" data-site-domain="{{ $siteDomain }}" data-signup-url="{{ route('signup') }}">
     <header class="sticky top-0 z-20 border-b border-line bg-canvas/95 backdrop-blur" x-data>
         <div class="mx-auto flex min-h-[68px] max-w-[1160px] items-center gap-8 px-4 lg:px-5">
-            <a href="{{ route('home') }}" class="flex items-center gap-2.5 hover:no-underline">
-                <x-logo class="size-8" />
-                <span class="text-22 font-bold text-primary">تخوم</span>
+            <a href="{{ route('home') }}" class="hover:no-underline">
+                <x-brand latin />
             </a>
             <nav class="hidden flex-1 gap-7 text-15 lg:flex">
                 <a href="#product" class="text-body">المنتج</a>
@@ -477,7 +476,7 @@
     <footer class="border-t border-line bg-white">
         <div class="mx-auto flex max-w-[1160px] flex-col gap-7 px-4 pb-7 pt-10 lg:px-5">
             <div class="flex flex-wrap justify-between gap-7">
-                <span class="flex items-center gap-2.5"><x-logo class="size-7" /><span class="text-20 font-bold text-primary">تخوم</span></span>
+                <x-brand latin />
                 <nav class="flex flex-wrap gap-x-7 gap-y-3 text-14">
                     <a href="{{ route('login') }}" class="text-body">دخول</a>
                     <a href="{{ route('signup') }}" class="text-body">إنشاء حساب</a>

@@ -16,10 +16,7 @@
 <body class="bg-white">
     <main class="mx-auto flex max-w-[720px] flex-col gap-8 px-6 py-10">
         <div class="flex items-start justify-between">
-            <div class="flex items-center gap-2.5">
-                <x-logo class="size-10" />
-                <span class="text-24 font-bold text-primary">تخوم</span>
-            </div>
+            <x-brand size="lg" latin />
             <div class="flex flex-col items-end gap-1 text-14">
                 <span class="text-20 font-bold">{{ $taxInvoice ? 'فاتورة ضريبية مبسطة' : 'فاتورة' }}</span>
                 <span class="font-mono text-muted" dir="ltr">{{ $invoice->number }}</span>

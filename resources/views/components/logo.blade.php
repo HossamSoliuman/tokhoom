@@ -9,7 +9,7 @@
     };
 @endphp
 
-<svg viewBox="0 0 600 600" {{ $attributes->merge(['class' => 'size-8 shrink-0', 'aria-hidden' => 'true']) }}>
+<svg viewBox="0 0 600 600" {{ $attributes->merge(['class' => 'shrink-0', 'aria-hidden' => 'true']) }}>
     <rect width="600" height="50" fill="{{ $boundary }}"></rect>
     <rect y="50" width="275" height="400" fill="{{ $plotA }}"></rect>
     <rect x="275" y="50" width="50" height="550" fill="{{ $boundary }}"></rect>

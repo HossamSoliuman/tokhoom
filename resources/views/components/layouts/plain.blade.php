@@ -14,10 +14,7 @@
 </head>
 <body class="min-h-dvh">
     <div class="flex min-h-dvh flex-col items-center gap-6 px-4 pb-10 pt-7 lg:py-14">
-        <span class="flex items-center gap-2.5">
-            <x-logo class="size-10" />
-            <span class="text-28 font-bold text-primary">تخوم</span>
-        </span>
+        <x-brand size="lg" latin />
         <div class="w-full max-w-[520px]">
             {{ $slot }}
         </div>
