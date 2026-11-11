@@ -49,7 +49,7 @@ class Invoice extends Model
      */
     public function hasFailedCollection(): bool
     {
-        return $this->paid_at === null && $this->payment_attempts >= Subscriptions::MAX_AUTOMATIC_ATTEMPTS;
+        return $this->paid_at === null && $this->payment_attempts >= Subscriptions::maxAutomaticAttempts();
     }
 
     /**

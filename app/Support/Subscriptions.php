@@ -24,7 +24,10 @@ class Subscriptions
     /**
      * Automatic tries on the saved card, one a day, before the owner has to pay by hand.
      */
-    public const MAX_AUTOMATIC_ATTEMPTS = 3;
+    public static function maxAutomaticAttempts(): int
+    {
+        return max(1, (int) config('tokhoom.collection_attempts'));
+    }
 
     /**
      * The workspace's unpaid invoice, issued now for the coming month if there is none.
@@ -184,7 +187,7 @@ class Subscriptions
             return;
         }
 
-        if ($invoice->payment_attempts >= self::MAX_AUTOMATIC_ATTEMPTS || $invoice->last_attempted_at?->isToday()) {
+        if ($invoice->payment_attempts >= self::maxAutomaticAttempts() || $invoice->last_attempted_at?->isToday()) {
             return;
         }
 
@@ -200,7 +203,7 @@ class Subscriptions
         if (! self::settle($charge)?->paid_at) {
             $owner?->notify(new PaymentFailed);
 
-            if ($invoice->payment_attempts >= self::MAX_AUTOMATIC_ATTEMPTS) {
+            if ($invoice->payment_attempts >= self::maxAutomaticAttempts()) {
                 Notification::send(User::where('is_platform_admin', true)->get(), new CollectionFailed($workspace, $invoice->payment_attempts));
             }
         }

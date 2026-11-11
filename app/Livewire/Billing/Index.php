@@ -208,7 +208,7 @@ class Index extends Component
             'workspace' => $workspace,
             'usedSeats' => $workspace->usedSeats(),
             'extraSeats' => $extra,
-            'extraCost' => $extra * Plan::EXTRA_SEAT_PRICE,
+            'extraCost' => $extra * Plan::extraSeatPrice(),
             'minimumSeats' => $this->minimumSeats($workspace),
             'invoices' => $workspace->invoices()->latest('issued_on')->latest('id')->limit(12)->get(),
             'canPay' => Tap::configured(),

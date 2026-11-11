@@ -405,7 +405,7 @@ class Workspace extends Model
 
     public function monthlyTotal(): int
     {
-        return $this->plan->monthlyPrice() + $this->extraSeats() * Plan::EXTRA_SEAT_PRICE;
+        return $this->plan->monthlyPrice() + $this->extraSeats() * Plan::extraSeatPrice();
     }
 
     /**

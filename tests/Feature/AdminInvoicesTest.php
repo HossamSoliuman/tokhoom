@@ -22,7 +22,7 @@ function invoiceFor(Workspace $workspace, string $number, array $attributes = []
 
 test('the invoices page lists every workspace and filters failed collections', function () {
     invoiceFor(Workspace::factory()->create(), 'TKH-OPEN');
-    invoiceFor(Workspace::factory()->create(), 'TKH-FAILED', ['payment_attempts' => Subscriptions::MAX_AUTOMATIC_ATTEMPTS]);
+    invoiceFor(Workspace::factory()->create(), 'TKH-FAILED', ['payment_attempts' => Subscriptions::maxAutomaticAttempts()]);
     invoiceFor(Workspace::factory()->create(), 'TKH-PAID', ['paid_at' => now()]);
 
     $this->actingAs($this->admin)->get(route('admin.invoices'))

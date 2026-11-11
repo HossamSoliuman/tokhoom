@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use App\Support\Arabic;
+
 enum Plan: string
 {
     case Agent = 'agent';
@@ -11,7 +13,10 @@ enum Plan: string
     /**
      * Monthly price of one seat beyond what the plan includes.
      */
-    public const EXTRA_SEAT_PRICE = 49;
+    public static function extraSeatPrice(): int
+    {
+        return (int) config('tokhoom.extra_seat_price');
+    }
 
     public function label(): string
     {
@@ -34,32 +39,24 @@ enum Plan: string
     public function description(): string
     {
         return match ($this) {
-            self::Agent => 'وسيط واحد · 30 عقاراً',
-            self::Office => 'حتى 5 مقاعد · عقارات غير محدودة',
-            self::Plus => 'حتى 15 مقعداً · نطاق خاص وتقارير متقدمة',
+            self::Agent => 'وسيط واحد · '.Arabic::countWithNumber($this->listingLimit(), 'عقار', 'عقارات', 'عقاراً'),
+            self::Office => 'حتى '.Arabic::countWithNumber($this->includedSeats(), 'مقعد', 'مقاعد', 'مقعداً').' · عقارات غير محدودة',
+            self::Plus => 'حتى '.Arabic::countWithNumber($this->includedSeats(), 'مقعد', 'مقاعد', 'مقعداً').' · نطاق خاص وتقارير متقدمة',
         };
     }
 
     public function monthlyPrice(): int
     {
-        return match ($this) {
-            self::Agent => 99,
-            self::Office => 349,
-            self::Plus => 799,
-        };
+        return (int) config('tokhoom.plans.'.$this->value.'.price');
     }
 
     public function includedSeats(): int
     {
-        return match ($this) {
-            self::Agent => 1,
-            self::Office => 5,
-            self::Plus => 15,
-        };
+        return $this === self::Agent ? 1 : (int) config('tokhoom.plans.'.$this->value.'.seats');
     }
 
     public function listingLimit(): ?int
     {
-        return $this === self::Agent ? 30 : null;
+        return $this === self::Agent ? (int) config('tokhoom.plans.agent.listing_limit') : null;
     }
 }

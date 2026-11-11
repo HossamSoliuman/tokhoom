@@ -186,8 +186,8 @@ test('a declined renewal is retried once a day, three times, and the owner is to
 
     expect($workspace->invoices()->sole())
         ->paid_at->toBeNull()
-        ->payment_attempts->toBe(Subscriptions::MAX_AUTOMATIC_ATTEMPTS);
-    Notification::assertSentToTimes($owner, PaymentFailed::class, Subscriptions::MAX_AUTOMATIC_ATTEMPTS);
+        ->payment_attempts->toBe(Subscriptions::maxAutomaticAttempts());
+    Notification::assertSentToTimes($owner, PaymentFailed::class, Subscriptions::maxAutomaticAttempts());
     Notification::assertSentToTimes($admin, CollectionFailed::class, 1);
 });
 

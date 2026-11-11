@@ -72,7 +72,7 @@ class Invoices extends Component
                 ->orWhereHas('workspace', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'))))
             ->when($month, fn (Builder $query) => $query->whereBetween('issued_on', [$month->toDateString(), $month->copy()->endOfMonth()->toDateString()]))
             ->when($status === 'open', fn (Builder $query) => $query->whereNull('paid_at'))
-            ->when($status === 'failed', fn (Builder $query) => $query->whereNull('paid_at')->where('payment_attempts', '>=', Subscriptions::MAX_AUTOMATIC_ATTEMPTS))
+            ->when($status === 'failed', fn (Builder $query) => $query->whereNull('paid_at')->where('payment_attempts', '>=', Subscriptions::maxAutomaticAttempts()))
             ->when($status === 'paid', fn (Builder $query) => $query->whereNotNull('paid_at'));
     }
 
@@ -102,8 +102,8 @@ class Invoices extends Component
             ],
             [
                 'label' => 'تعثّر التحصيل',
-                'value' => Arabic::number((clone $open)->where('payment_attempts', '>=', Subscriptions::MAX_AUTOMATIC_ATTEMPTS)->count()),
-                'note' => 'بعد '.Subscriptions::MAX_AUTOMATIC_ATTEMPTS.' محاولات على البطاقة',
+                'value' => Arabic::number((clone $open)->where('payment_attempts', '>=', Subscriptions::maxAutomaticAttempts())->count()),
+                'note' => 'بعد '.Arabic::count(Subscriptions::maxAutomaticAttempts(), 'محاولة واحدة', 'محاولتين', 'محاولات', 'محاولة').' على البطاقة',
                 'tone' => 'danger',
             ],
             [

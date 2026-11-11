@@ -27,7 +27,7 @@ test('monthly recurring revenue counts paying workspaces at their plan and seats
     Workspace::factory()->suspended()->create(['trial_ends_at' => now()->subDay()]);
     Workspace::factory()->pending()->create(['trial_ends_at' => now()->subDay()]);
 
-    expect((new PlatformStats)->monthlyRecurringRevenue())->toBe(349 + 2 * Plan::EXTRA_SEAT_PRICE + 99);
+    expect((new PlatformStats)->monthlyRecurringRevenue())->toBe(349 + 2 * Plan::extraSeatPrice() + 99);
 });
 
 test('revenue is grouped by the month it was collected', function () {

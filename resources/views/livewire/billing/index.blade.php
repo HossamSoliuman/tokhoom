@@ -172,7 +172,7 @@
                 </div>
             </div>
             <div class="flex justify-between text-14 text-body">
-                <span>{{ $extraSeats ? $extraSeats.' مقاعد إضافية × '.\App\Enums\Plan::EXTRA_SEAT_PRICE.' ريال' : 'الخطة تشمل '.$workspace->plan->includedSeats().' مقاعد' }}</span>
+                <span>{{ $extraSeats ? $extraSeats.' مقاعد إضافية × '.\App\Enums\Plan::extraSeatPrice().' ريال' : 'الخطة تشمل '.$workspace->plan->includedSeats().' مقاعد' }}</span>
                 <span class="font-semibold text-ink">{{ Arabic::money($extraCost) }} / شهرياً</span>
             </div>
             <x-slot:footer>

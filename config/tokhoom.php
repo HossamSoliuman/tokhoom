@@ -94,6 +94,38 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Plans
+    |--------------------------------------------------------------------------
+    |
+    | Monthly prices in riyals (VAT included), the seats each plan includes
+    | and the agent plan's listing limit. Seats beyond what a plan includes
+    | cost extra_seat_price each a month. Platform admins can change these
+    | from the admin settings.
+    |
+    */
+
+    'plans' => [
+        'agent' => ['price' => 99, 'seats' => 1, 'listing_limit' => 30],
+        'office' => ['price' => 349, 'seats' => 5],
+        'plus' => ['price' => 799, 'seats' => 15],
+    ],
+
+    'extra_seat_price' => 49,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Card collection
+    |--------------------------------------------------------------------------
+    |
+    | Automatic tries on a saved card, one a day, before the owner has to pay
+    | by hand and platform admins are told.
+    |
+    */
+
+    'collection_attempts' => 3,
+
+    /*
+    |--------------------------------------------------------------------------
     | Invoicing
     |--------------------------------------------------------------------------
     |
