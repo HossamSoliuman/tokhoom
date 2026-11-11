@@ -189,6 +189,12 @@ class Login extends Component
      */
     private function passedFirstStep(User $user): void
     {
+        if ($user->isBlocked()) {
+            $this->addError($this->codeMobile !== '' ? 'code' : 'email', 'هذا الحساب موقوف. تواصل مع دعم تخوم.');
+
+            return;
+        }
+
         if (! $user->hasTwoFactor()) {
             Auth::login($user, $this->remember);
             $this->signedIn();

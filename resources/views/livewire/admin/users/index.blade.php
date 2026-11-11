@@ -31,6 +31,9 @@
                         <span class="flex min-w-0 flex-col">
                             <span class="flex items-center gap-1.5 font-semibold">
                                 <span class="truncate">{{ $user->name }}</span>
+                                @if ($user->isBlocked())
+                                    <span class="inline-flex h-[22px] shrink-0 items-center rounded-full bg-danger-soft px-2 text-12 font-semibold text-danger">موقوف</span>
+                                @endif
                                 @if ($user->hasTwoFactor())
                                     <i class="ti ti-shield-check text-16 text-success" title="التحقق بخطوتين مفعّل"></i>
                                 @endif

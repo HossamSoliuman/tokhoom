@@ -39,6 +39,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_platform_admin' => 'boolean',
+            'blocked_at' => 'datetime',
             'two_factor_secret' => 'encrypted',
             'two_factor_recovery_codes' => 'array',
             'two_factor_confirmed_at' => 'datetime',
@@ -111,6 +112,14 @@ class User extends Authenticatable
     public function initials(): string
     {
         return Arabic::initial($this->name);
+    }
+
+    /**
+     * Whether a platform admin stopped this account from signing in.
+     */
+    public function isBlocked(): bool
+    {
+        return $this->blocked_at !== null;
     }
 
     public function isPendingApproval(): bool

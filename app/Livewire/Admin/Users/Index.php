@@ -67,6 +67,7 @@ class Index extends Component
         match ($filter) {
             'admins' => $query->where('is_platform_admin', true),
             'two-factor' => $query->whereNotNull('two_factor_confirmed_at'),
+            'blocked' => $query->whereNotNull('blocked_at'),
             'no-workspace' => $query->whereDoesntHave('memberships', fn (Builder $query) => $query->whereNull('deactivated_at')),
             default => null,
         };
@@ -74,7 +75,7 @@ class Index extends Component
 
     public function render(): View
     {
-        $filters = ['all' => 'الكل', 'admins' => 'مشرفو المنصة', 'two-factor' => 'التحقق بخطوتين', 'no-workspace' => 'بلا مساحة عمل'];
+        $filters = ['all' => 'الكل', 'admins' => 'مشرفو المنصة', 'two-factor' => 'التحقق بخطوتين', 'no-workspace' => 'بلا مساحة عمل', 'blocked' => 'موقوفون'];
 
         $query = $this->searched()
             ->tap(fn (Builder $query) => $this->applyFilter($query, $this->filter))

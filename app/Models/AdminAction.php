@@ -98,6 +98,14 @@ class AdminAction extends Model
             'user.admin_revoked' => 'سحب صلاحية إدارة المنصة',
             'user.two_factor_reset' => 'إلغاء التحقق بخطوتين',
             'user.password_reset_sent' => 'إرسال رابط إعادة تعيين كلمة المرور',
+            'user.details_updated' => 'تعديل بيانات الحساب: '.implode('، ', array_map(fn (string $field) => match ($field) {
+                'name' => 'الاسم',
+                'email' => 'البريد الإلكتروني',
+                'mobile' => 'الجوال',
+                default => $field,
+            }, $p['fields'] ?? [])),
+            'user.blocked' => 'إيقاف الحساب عن تسجيل الدخول',
+            'user.unblocked' => 'إعادة تفعيل الحساب',
             'settings.updated' => 'تعديل '.(PlatformSettings::SECTIONS[$p['section'] ?? '']['label'] ?? 'الإعدادات').': '
                 .implode('، ', array_map(PlatformSettings::label(...), $p['fields'] ?? [])),
             default => $this->type,
@@ -123,6 +131,9 @@ class AdminAction extends Model
             'user.two_factor_reset' => 'ti-shield-off',
             'user.password_reset_sent' => 'ti-key',
             'settings.updated' => 'ti-settings',
+            'user.details_updated' => 'ti-user-edit',
+            'user.blocked' => 'ti-user-off',
+            'user.unblocked' => 'ti-user-check',
             default => 'ti-point',
         };
     }

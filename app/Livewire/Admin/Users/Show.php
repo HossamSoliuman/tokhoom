@@ -6,11 +6,14 @@ use App\Livewire\Concerns\HasDialogs;
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\AdminAction;
 use App\Models\User;
+use App\Support\Phone;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 /**
@@ -22,6 +25,12 @@ class Show extends Component
     use HasDialogs, ShowsToasts;
 
     public User $user;
+
+    public string $name = '';
+
+    public string $email = '';
+
+    public string $mobile = '';
 
     public function boot(): void
     {
@@ -54,6 +63,70 @@ class Show extends Component
 
         $this->closeDialog();
         $this->toast($granting ? 'أصبح '.$this->user->name.' مشرفاً على المنصة' : 'سُحبت صلاحية إدارة المنصة من '.$this->user->name);
+    }
+
+    public function openDetails(): void
+    {
+        $this->name = $this->user->name;
+        $this->email = $this->user->email;
+        $this->mobile = (string) $this->user->mobile;
+        $this->openDialog('details');
+    }
+
+    /**
+     * Correct someone's name, email or mobile, such as when they lost access
+     * to the email they signed up with.
+     */
+    public function saveDetails(): void
+    {
+        $this->email = Str::lower(trim($this->email));
+        $this->mobile = trim($this->mobile) !== '' ? Phone::normalize($this->mobile) : '';
+
+        $this->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->user)],
+            'mobile' => ['nullable', 'regex:/^05\d{8}$/', Rule::unique('users', 'mobile')->ignore($this->user)],
+        ], [
+            'email.unique' => 'هذا البريد مستخدم في حساب آخر',
+            'mobile.regex' => 'أدخل رقم جوال صحيح يبدأ بـ 05',
+            'mobile.unique' => 'هذا الرقم مستخدم في حساب آخر',
+        ], ['name' => 'الاسم']);
+
+        $this->user->fill(['name' => trim($this->name), 'email' => $this->email, 'mobile' => $this->mobile ?: null]);
+        $changed = array_keys($this->user->getDirty());
+        $this->user->save();
+
+        if ($changed !== []) {
+            AdminAction::record('user.details_updated', user: $this->user, properties: ['fields' => $changed]);
+        }
+
+        $this->closeDialog();
+        $this->toast('تم حفظ بيانات '.$this->user->name);
+    }
+
+    public function confirmBlock(): void
+    {
+        abort_if($this->user->is(auth()->user()), 403);
+
+        $this->openDialog('block');
+    }
+
+    /**
+     * Stop the account from signing in, or let it back in. A blocked person is
+     * signed out on their next request; their workspaces keep their data.
+     * Admins cannot block themselves.
+     */
+    public function toggleBlock(): void
+    {
+        abort_if($this->user->is(auth()->user()), 403);
+
+        $blocking = ! $this->user->isBlocked();
+
+        $this->user->forceFill(['blocked_at' => $blocking ? now() : null])->save();
+        AdminAction::record($blocking ? 'user.blocked' : 'user.unblocked', user: $this->user);
+
+        $this->closeDialog();
+        $this->toast($blocking ? 'أُوقف حساب '.$this->user->name : 'أُعيد تفعيل حساب '.$this->user->name);
     }
 
     public function confirmTwoFactorReset(): void

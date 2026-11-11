@@ -1,5 +1,6 @@
 <x-app.page :title="$user->name" :back="route('admin.users')" back-label="المستخدمون">
     <x-slot:actions>
+        <x-ui.button variant="secondary" icon="ti-pencil" wire:click="openDetails">تعديل البيانات</x-ui.button>
         <x-ui.button variant="secondary" icon="ti-key" wire:click="sendPasswordReset">إرسال رابط كلمة المرور</x-ui.button>
     </x-slot:actions>
 
@@ -10,6 +11,9 @@
                 <span class="text-15 font-semibold" dir="ltr">{{ $user->email }}</span>
                 @if ($user->is_platform_admin)
                     <span class="inline-flex h-[22px] items-center rounded-full bg-sand-soft px-2 text-12 font-semibold text-sand-ink">إدارة المنصة</span>
+                @endif
+                @if ($user->isBlocked())
+                    <span class="inline-flex h-[22px] items-center rounded-full bg-danger-soft px-2 text-12 font-semibold text-danger">موقوف</span>
                 @endif
             </div>
             <span class="flex flex-wrap gap-x-3 text-13 text-muted">
@@ -46,6 +50,18 @@
             </x-ui.card>
 
             <x-ui.card title="الأمان والصلاحيات" flush>
+                <div class="flex items-center gap-3 border-t border-divider px-4 py-3.5">
+                    <i class="ti ti-login-2 text-22 text-body"></i>
+                    <span class="flex flex-1 flex-col">
+                        <span class="text-14 font-semibold">تسجيل الدخول</span>
+                        <span @class(['text-13', 'text-danger' => $user->isBlocked(), 'text-muted' => ! $user->isBlocked()])>{{ $user->isBlocked() ? 'موقوف منذ '.Arabic::date($user->blocked_at) : 'مسموح' }}</span>
+                    </span>
+                    @unless ($isSelf)
+                        <x-ui.button :variant="$user->isBlocked() ? 'primary-outline' : 'danger-outline'" size="xs" class="text-13" wire:click="confirmBlock">
+                            {{ $user->isBlocked() ? 'إعادة التفعيل' : 'إيقاف الحساب' }}
+                        </x-ui.button>
+                    @endunless
+                </div>
                 <div class="flex items-center gap-3 border-t border-divider px-4 py-3.5">
                     <i class="ti ti-shield-lock text-22 text-body"></i>
                     <span class="flex flex-1 flex-col">
@@ -99,6 +115,44 @@
                 <x-ui.button variant="secondary" size="lg" class="flex-1" wire:click="closeDialog">إلغاء</x-ui.button>
                 <x-ui.button :variant="$user->is_platform_admin ? 'danger' : 'primary'" size="lg" class="flex-1" wire:click="toggleAdmin">
                     {{ $user->is_platform_admin ? 'سحب الصلاحية' : 'منح الصلاحية' }}
+                </x-ui.button>
+            </x-slot:footer>
+        </x-ui.dialog>
+    @endif
+
+    @if ($dialog === 'details')
+        <x-ui.dialog title="تعديل بيانات الحساب">
+            <form id="details-form" wire:submit="saveDetails" class="flex flex-col gap-4">
+                <x-ui.field label="الاسم" error="name">
+                    <input type="text" wire:model="name" class="field" autocomplete="off">
+                </x-ui.field>
+                <x-ui.field label="البريد الإلكتروني" error="email">
+                    <input type="email" wire:model="email" class="field text-right" dir="ltr" autocomplete="off">
+                </x-ui.field>
+                <x-ui.field label="رقم الجوال" error="mobile" optional>
+                    <input type="tel" wire:model="mobile" class="field text-right" dir="ltr" placeholder="05XXXXXXXX" inputmode="tel" autocomplete="off">
+                </x-ui.field>
+            </form>
+            <x-slot:footer>
+                <x-ui.button variant="secondary" size="lg" class="flex-1" wire:click="closeDialog">إلغاء</x-ui.button>
+                <x-ui.button type="submit" form="details-form" size="lg" class="flex-1">حفظ</x-ui.button>
+            </x-slot:footer>
+        </x-ui.dialog>
+    @endif
+
+    @if ($dialog === 'block')
+        <x-ui.dialog :title="$user->isBlocked() ? 'إعادة تفعيل الحساب' : 'إيقاف الحساب'">
+            <p class="m-0 text-15 leading-[26px] text-pretty text-ink-soft">
+                @if ($user->isBlocked())
+                    سيتمكن {{ $user->name }} من تسجيل الدخول مرة أخرى بكلمة المرور نفسها.
+                @else
+                    لن يتمكن {{ $user->name }} من تسجيل الدخول، ويخرج من جلساته المفتوحة. تبقى عضويته في مساحات العمل وبياناتها كما هي.
+                @endif
+            </p>
+            <x-slot:footer>
+                <x-ui.button variant="secondary" size="lg" class="flex-1" wire:click="closeDialog">إلغاء</x-ui.button>
+                <x-ui.button :variant="$user->isBlocked() ? 'primary' : 'danger'" size="lg" class="flex-1" wire:click="toggleBlock">
+                    {{ $user->isBlocked() ? 'إعادة التفعيل' : 'إيقاف الحساب' }}
                 </x-ui.button>
             </x-slot:footer>
         </x-ui.dialog>
