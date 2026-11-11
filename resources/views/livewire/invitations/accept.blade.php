@@ -27,6 +27,10 @@
             @endguest
 
             <x-ui.button type="submit" size="lg" class="w-full">{{ auth()->check() ? 'قبول الدعوة' : 'إنشاء الحساب والانضمام' }}</x-ui.button>
+
+            @guest
+                <span class="text-center text-13 leading-[21px] text-muted">بإنشاء الحساب توافق على <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener">شروط الاستخدام</a> و<a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener">سياسة الخصوصية</a>.</span>
+            @endguest
         </form>
 
         @guest
