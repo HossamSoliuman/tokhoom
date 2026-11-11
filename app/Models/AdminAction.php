@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Plan;
 use App\Enums\RejectionReason;
 use App\Support\Arabic;
+use App\Support\PlatformSettings;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -97,6 +98,8 @@ class AdminAction extends Model
             'user.admin_revoked' => 'سحب صلاحية إدارة المنصة',
             'user.two_factor_reset' => 'إلغاء التحقق بخطوتين',
             'user.password_reset_sent' => 'إرسال رابط إعادة تعيين كلمة المرور',
+            'settings.updated' => 'تعديل '.(PlatformSettings::SECTIONS[$p['section'] ?? '']['label'] ?? 'الإعدادات').': '
+                .implode('، ', array_map(PlatformSettings::label(...), $p['fields'] ?? [])),
             default => $this->type,
         };
     }
@@ -119,6 +122,7 @@ class AdminAction extends Model
             'user.admin_granted', 'user.admin_revoked' => 'ti-shield',
             'user.two_factor_reset' => 'ti-shield-off',
             'user.password_reset_sent' => 'ti-key',
+            'settings.updated' => 'ti-settings',
             default => 'ti-point',
         };
     }

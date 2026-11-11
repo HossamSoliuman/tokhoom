@@ -6,7 +6,7 @@
     $demoSite = config('tokhoom.demo_site_url');
     $seller = config('tokhoom.seller');
     $support = config('tokhoom.support');
-    $whatsappUrl = $support['whatsapp'] ? 'https://wa.me/'.preg_replace('/\D/', '', $support['whatsapp']) : null;
+    $whatsappUrl = $support['whatsapp'] ? Phone::whatsappUrl($support['whatsapp']) : null;
 
     $facts = [
         ['لمن', 'مكاتب العقار والوسطاء المرخّصون'],
