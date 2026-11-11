@@ -1,6 +1,6 @@
 <x-ui.card title="التسجيل" class="gap-4">
     <label class="group/check flex cursor-pointer items-center gap-3">
-        <input type="checkbox" wire:model="form.signups_open" class="peer sr-only">
+        <input type="checkbox" wire:model="form.signups_open" @checked($form['signups_open']) class="peer sr-only">
         <span class="flex flex-1 flex-col gap-0.5">
             <span class="text-15 font-semibold">استقبال حسابات جديدة</span>
             <span class="text-13 text-muted">عند الإيقاف لا يمكن إنشاء مساحة عمل جديدة، ويبقى الانضمام بالدعوات متاحاً.</span>
