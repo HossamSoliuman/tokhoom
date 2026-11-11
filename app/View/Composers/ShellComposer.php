@@ -167,6 +167,7 @@ class ShellComposer
             $this->item('المستخدمون', 'ti-users', 'admin.users', 'admin.users*'),
             $this->item('العقارات', 'ti-home-search', 'admin.listings', 'admin.listings'),
             $this->item('التراخيص', 'ti-id-badge-2', 'admin.licenses', 'admin.licenses'),
+            $this->item('سجل الإدارة', 'ti-history', 'admin.log', 'admin.log'),
             $this->item('الإعدادات', 'ti-settings', 'admin.settings', 'admin.settings'),
         ];
     }
@@ -177,7 +178,7 @@ class ShellComposer
     private function adminTabs(): array
     {
         $more = $this->item('المزيد', 'ti-dots', 'admin.more', 'admin.more');
-        $more['active'] = Request::routeIs('admin.more', 'admin.account', 'admin.users*', 'admin.listings', 'admin.licenses', 'admin.settings');
+        $more['active'] = Request::routeIs('admin.more', 'admin.account', 'admin.users*', 'admin.listings', 'admin.licenses', 'admin.log', 'admin.settings');
 
         return [
             $this->item('نظرة عامة', 'ti-layout-dashboard', 'admin.overview', 'admin.overview'),

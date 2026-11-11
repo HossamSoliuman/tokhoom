@@ -110,6 +110,7 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
             Route::get('/invoices/{invoice}', AdminHttp\InvoiceController::class)->name('invoices.show');
             Route::livewire('/listings', Admin\Listings::class)->name('listings');
             Route::livewire('/licenses', Admin\Licenses::class)->name('licenses');
+            Route::livewire('/log', Admin\Log::class)->name('log');
             Route::livewire('/settings', Admin\Settings::class)->name('settings');
             Route::livewire('/more', Admin\More::class)->name('more');
             Route::livewire('/account', Account::class)->name('account');

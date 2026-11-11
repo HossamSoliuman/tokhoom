@@ -109,6 +109,9 @@
     </div>
 
     <x-ui.card title="آخر إجراءات الإدارة" flush>
+        <x-slot:heading>
+            <a href="{{ route('admin.log') }}" wire:navigate class="text-13 font-semibold">السجل كاملاً</a>
+        </x-slot:heading>
         @forelse ($actions as $entry)
             <div class="flex items-center gap-3 border-t border-divider px-4 py-3" wire:key="action-{{ $entry->id }}">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-divider text-body"><i class="ti {{ $entry->icon() }} text-16"></i></span>
