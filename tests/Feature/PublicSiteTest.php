@@ -48,7 +48,22 @@ test('a custom domain serves the site only once it is active', function (DomainS
 })->with([
     'active' => [DomainStatus::Active, 200],
     'pending' => [DomainStatus::Pending, 404],
+    'securing' => [DomainStatus::Securing, 404],
 ]);
+
+test('a custom domain with a live certificate moves plain visits to HTTPS', function () {
+    Workspace::factory()->create([
+        'custom_domain' => 'www.alrashid.sa',
+        'domain_status' => DomainStatus::Active,
+        'domain_certificate_expires_at' => now()->addDays(60),
+    ]);
+
+    $this->get(hostUrl('www.alrashid.sa', '/listings/abc?ref=qr'))
+        ->assertMovedPermanently()
+        ->assertRedirect('https://www.alrashid.sa/listings/abc?ref=qr');
+
+    $this->get('https://www.alrashid.sa/')->assertOk();
+});
 
 test('dashboard pages are not served on a site host', function () {
     Workspace::factory()->create(['slug' => 'alrashid']);
