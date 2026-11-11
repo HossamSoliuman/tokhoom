@@ -293,6 +293,14 @@ class Workspace extends Model
         return max(1, (int) today()->diffInDays($this->trial_ends_at->copy()->startOfDay(), true));
     }
 
+    /**
+     * Whether the custom domain has a certificate that has not run out yet.
+     */
+    public function hasLiveCertificate(): bool
+    {
+        return $this->domain_certificate_expires_at?->isFuture() ?? false;
+    }
+
     public function siteHost(): string
     {
         if ($this->custom_domain && $this->domain_status === DomainStatus::Active) {

@@ -11,3 +11,4 @@ Artisan::command('inspire', function () {
 Schedule::command('tokhoom:send-due-reminders')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('tokhoom:check-licenses')->dailyAt('07:00')->withoutOverlapping();
 Schedule::command('tokhoom:renew-subscriptions')->dailyAt('06:00')->withoutOverlapping();
+Schedule::command('tokhoom:secure-domains')->everyMinute()->withoutOverlapping()->runInBackground();

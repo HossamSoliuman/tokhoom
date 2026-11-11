@@ -1,10 +1,19 @@
 <?php
 
+use App\Actions\SecureCustomDomain;
+use App\Enums\DomainStatus;
+use App\Enums\MemberRole;
+use App\Models\Workspace;
+use App\Notifications\CustomDomainFailed;
+use App\Notifications\CustomDomainLive;
 use App\Support\Acme;
+use App\Support\CertificateStore;
+use App\Support\DomainVerifier;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Sleep;
 
 beforeEach(function () {
@@ -145,3 +154,84 @@ test('the challenge answer is served on any host while it is open', function () 
 
     $this->get(hostUrl('www.alrashid.sa', '/.well-known/acme-challenge/token-2'))->assertNotFound();
 });
+
+/**
+ * An office whose owner verified the CNAME for www.alrashid.sa.
+ */
+function securingWorkspace(array $attributes = []): Workspace
+{
+    $workspace = Workspace::factory()->create([
+        'custom_domain' => 'www.alrashid.sa',
+        'domain_status' => DomainStatus::Securing,
+        ...$attributes,
+    ]);
+    member(MemberRole::Owner, $workspace);
+
+    return $workspace->fresh();
+}
+
+function fakeIssuedCertificate(Closure|array|null $result = null): void
+{
+    test()->mock(DomainVerifier::class)->shouldReceive('pointsToUs')->andReturnTrue();
+
+    $acme = test()->mock(Acme::class)->shouldReceive('issue')->with('www.alrashid.sa');
+
+    $result instanceof Closure
+        ? $acme->andReturnUsing($result)
+        : $acme->andReturn($result ?? ['certificate' => 'CERTIFICATE', 'private_key' => 'KEY', 'expires_at' => now()->addDays(90)]);
+}
+
+test('a verified domain gets its certificate and goes live over HTTPS', function () {
+    Notification::fake();
+    $workspace = securingWorkspace();
+    fakeIssuedCertificate();
+
+    $this->artisan('tokhoom:secure-domains')->assertSuccessful();
+
+    $workspace->refresh();
+    expect($workspace->domain_status)->toBe(DomainStatus::Active)
+        ->and($workspace->hasLiveCertificate())->toBeTrue()
+        ->and($workspace->siteUrl())->toBe('https://www.alrashid.sa')
+        ->and(File::get(CertificateStore::path('www.alrashid.sa', 'crt')))->toBe('CERTIFICATE')
+        ->and(File::get(CertificateStore::path('www.alrashid.sa', 'key')))->toBe('KEY');
+    Notification::assertSentTo($workspace->owner(), CustomDomainLive::class);
+});
+
+test('failed tries back off and the owner hears once the domain gives up', function () {
+    Notification::fake();
+    $workspace = securingWorkspace(['domain_certificate_failures' => SecureCustomDomain::MAX_FAILURES - 2]);
+    fakeIssuedCertificate(fn () => throw new RuntimeException('Timeout during connect'));
+
+    $this->artisan('tokhoom:secure-domains');
+
+    expect($workspace->fresh())
+        ->domain_status->toBe(DomainStatus::Securing)
+        ->domain_certificate_failures->toBe(SecureCustomDomain::MAX_FAILURES - 1)
+        ->domain_certificate_error->toBe('Timeout during connect');
+
+    $this->artisan('tokhoom:secure-domains');
+    expect($workspace->fresh()->domain_certificate_failures)->toBe(SecureCustomDomain::MAX_FAILURES - 1);
+
+    $this->travel(3)->hours();
+    $this->artisan('tokhoom:secure-domains');
+
+    expect($workspace->fresh()->domain_status)->toBe(DomainStatus::Error);
+    Notification::assertSentTo($workspace->owner(), CustomDomainFailed::class);
+});
+
+test('live certificates are renewed a month before they run out', function (int $daysLeft, bool $renewed) {
+    Notification::fake();
+    $workspace = securingWorkspace([
+        'domain_status' => DomainStatus::Active,
+        'domain_certificate_expires_at' => now()->addDays($daysLeft),
+    ]);
+    fakeIssuedCertificate();
+
+    $this->artisan('tokhoom:secure-domains');
+
+    expect($workspace->fresh()->domain_certificate_expires_at->isAfter(now()->addDays(80)))->toBe($renewed);
+    Notification::assertNothingSent();
+})->with([
+    'due' => [10, true],
+    'not yet' => [60, false],
+]);
