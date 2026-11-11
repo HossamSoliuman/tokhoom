@@ -52,6 +52,8 @@ class Workspace extends Model
             'trial_ends_at' => 'datetime',
             'paid_until' => 'date',
             'domain_checked_at' => 'datetime',
+            'domain_certificate_expires_at' => 'datetime',
+            'domain_certificate_attempted_at' => 'datetime',
             'terms_accepted_at' => 'datetime',
         ];
     }
