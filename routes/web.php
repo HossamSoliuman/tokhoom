@@ -46,6 +46,8 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
     Route::get('/s/{code}', ShortLinkController::class)->name('short-link');
 
     Route::get('/', HomeController::class)->name('home');
+    Route::view('/terms', 'legal.terms')->name('legal.terms');
+    Route::view('/privacy', 'legal.privacy')->name('legal.privacy');
     Route::post('/webhooks/tap', TapWebhookController::class)->name('webhooks.tap');
 
     Route::middleware('guest')->group(function () {

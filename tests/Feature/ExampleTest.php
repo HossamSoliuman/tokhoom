@@ -104,3 +104,15 @@ test('signed-in people skip the landing page', function () {
         ->get('/')
         ->assertRedirect();
 });
+
+test('the terms and privacy policy are public and linked from the landing page', function (string $route, string $title) {
+    $this->get('/')->assertSee(route($route));
+
+    $this->get(route($route))
+        ->assertOk()
+        ->assertSee($title)
+        ->assertSee('المشترك');
+})->with([
+    'terms' => ['legal.terms', 'شروط الاستخدام'],
+    'privacy' => ['legal.privacy', 'سياسة الخصوصية'],
+]);
