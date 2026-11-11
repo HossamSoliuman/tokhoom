@@ -53,6 +53,8 @@ class Signup extends Component
 
     public string $slug = '';
 
+    public bool $acceptsTerms = false;
+
     #[Locked]
     public ?int $workspaceId = null;
 
@@ -191,6 +193,10 @@ class Signup extends Component
 
             return;
         }
+
+        $this->validate(['acceptsTerms' => ['accepted']], [
+            'acceptsTerms.accepted' => 'وافق على شروط الاستخدام وسياسة الخصوصية لإنشاء الحساب.',
+        ]);
 
         $user = Auth::user() ?? $this->createUser();
 

@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Notification;
 
 /**
  * Create an office or independent-agent workspace, owned by the signing-up user
- * and waiting for license approval.
+ * and waiting for license approval. The caller has had the owner accept the
+ * terms of use and privacy policy, and the acceptance time is recorded here.
  */
 class CreateWorkspace
 {
@@ -35,6 +36,7 @@ class CreateWorkspace
                 'phone' => $owner->mobile,
             ]);
             $workspace->approval_status = ApprovalStatus::Pending;
+            $workspace->terms_accepted_at = now();
             $workspace->save();
 
             $workspace->memberships()->create([

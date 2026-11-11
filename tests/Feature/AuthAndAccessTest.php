@@ -232,6 +232,10 @@ test('an office signs up step by step and waits for approval', function () {
         ->call('useSuggestion', 'alrashid-re')
         ->assertSee('العنوان متاح')
         ->call('next')
+        ->assertHasErrors('acceptsTerms')
+        ->assertSet('step', 4)
+        ->set('acceptsTerms', true)
+        ->call('next')
         ->assertSet('step', 5);
 
     $user = User::where('email', 'k.alrashid@alrashid.sa')->sole();
@@ -240,6 +244,7 @@ test('an office signs up step by step and waits for approval', function () {
     expect($workspace->slug)->toBe('alrashid-re')
         ->and($workspace->approval_status)->toBe(ApprovalStatus::Pending)
         ->and($workspace->plan)->toBe(Plan::Office)
+        ->and($workspace->terms_accepted_at)->not->toBeNull()
         ->and($user->currentMembership()->role)->toBe(MemberRole::Owner);
     $this->assertAuthenticatedAs($user);
     Notification::assertSentTo($admin, ApprovalRequested::class);

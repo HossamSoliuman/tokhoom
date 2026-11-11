@@ -130,6 +130,19 @@
                     <span class="text-13 text-danger">{{ $message }}</span>
                 @enderror
             </div>
+
+            <div class="flex flex-col gap-1.5 border-t border-divider pt-4">
+                <label class="group/check flex cursor-pointer items-start gap-2.5 text-start">
+                    <input type="checkbox" wire:model="acceptsTerms" @checked($acceptsTerms) class="sr-only">
+                    <x-ui.checkbox size="sm" class="mt-px group-has-focus-visible/check:ring-2 group-has-focus-visible/check:ring-primary/30" />
+                    <span class="text-14 leading-[22px] text-body">
+                        أوافق على <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener">شروط الاستخدام</a> و<a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener">سياسة الخصوصية</a>، وأتحمّل مسؤولية تراخيصي وإعلاناتي.
+                    </span>
+                </label>
+                @error('acceptsTerms')
+                    <span class="text-13 text-danger">{{ $message }}</span>
+                @enderror
+            </div>
         @endif
 
         @if ($step === 5 && $this->workspace)
