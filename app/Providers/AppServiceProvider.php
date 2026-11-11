@@ -6,12 +6,16 @@ use App\Http\Middleware\EnsureWorkspace;
 use App\Models\User;
 use App\Support\Arabic;
 use App\Support\Phone;
+use App\Support\PlatformSettings;
 use App\View\Composers\ShellComposer;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use PDOException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,11 +34,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->applyPlatformSettings();
         $this->defineGates();
 
         View::composer(['layouts.app', 'layouts::app'], ShellComposer::class);
 
         Livewire::addPersistentMiddleware([EnsureWorkspace::class]);
+    }
+
+    /**
+     * Override config with the settings saved in the admin panel. Before the
+     * first migration, or without a database, the config files apply as they are.
+     */
+    private function applyPlatformSettings(): void
+    {
+        try {
+            PlatformSettings::apply();
+        } catch (QueryException|PDOException|SQLiteDatabaseDoesNotExistException) {
+            return;
+        }
     }
 
     /**
