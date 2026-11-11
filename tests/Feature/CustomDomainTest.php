@@ -3,6 +3,7 @@
 use App\Actions\SecureCustomDomain;
 use App\Enums\DomainStatus;
 use App\Enums\MemberRole;
+use App\Livewire\Billing\Index as Billing;
 use App\Models\Workspace;
 use App\Notifications\CustomDomainFailed;
 use App\Notifications\CustomDomainLive;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Sleep;
+use Livewire\Livewire;
 
 beforeEach(function () {
     config([
@@ -235,3 +237,28 @@ test('live certificates are renewed a month before they run out', function (int 
     'due' => [10, true],
     'not yet' => [60, false],
 ]);
+
+test('checking a live domain again keeps it live, and switching domains drops the old certificate', function () {
+    $workspace = securingWorkspace([
+        'domain_status' => DomainStatus::Active,
+        'domain_certificate_expires_at' => now()->addDays(60),
+    ]);
+    CertificateStore::put('www.alrashid.sa', 'CERTIFICATE', 'KEY');
+    $this->mock(DomainVerifier::class)->shouldReceive('pointsToUs')->andReturnTrue();
+    $owner = $workspace->owner();
+
+    Livewire::actingAs($owner)->test(Billing::class)->call('verifyDomain');
+
+    expect($workspace->fresh()->domain_status)->toBe(DomainStatus::Active);
+
+    Livewire::actingAs($owner)->test(Billing::class)
+        ->set('domain', 'www.alrashid.com.sa')
+        ->call('verifyDomain')
+        ->assertSee('نصدر شهادة الأمان الآن، ويعمل النطاق خلال دقائق');
+
+    expect($workspace->fresh())
+        ->custom_domain->toBe('www.alrashid.com.sa')
+        ->domain_status->toBe(DomainStatus::Securing)
+        ->domain_certificate_expires_at->toBeNull()
+        ->and(File::exists(CertificateStore::path('www.alrashid.sa', 'crt')))->toBeFalse();
+});

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Workspaces;
 
 use App\Actions\ApproveWorkspace;
+use App\Actions\CheckCustomDomain;
 use App\Actions\RejectWorkspace;
 use App\Enums\ApprovalStatus;
 use App\Enums\DomainStatus;
@@ -16,7 +17,6 @@ use App\Models\AdminAction;
 use App\Models\Invoice;
 use App\Models\Workspace;
 use App\Support\Arabic;
-use App\Support\DomainVerifier;
 use App\Support\Phone;
 use App\Support\SiteAddress;
 use Illuminate\Contracts\View\View;
@@ -263,20 +263,15 @@ class Show extends Component
         $this->toast('تم تغيير الخطة إلى '.$plan->label());
     }
 
-    public function checkDomain(DomainVerifier $verifier): void
+    public function checkDomain(CheckCustomDomain $checkCustomDomain): void
     {
         abort_unless(filled($this->workspace->custom_domain), 404);
 
-        $active = $verifier->pointsToUs($this->workspace->custom_domain);
-
-        $this->workspace->forceFill([
-            'domain_status' => $active ? DomainStatus::Active : DomainStatus::Error,
-            'domain_checked_at' => now(),
-        ])->save();
-
-        $active
-            ? $this->toast('النطاق يشير إلى تخوم ومفعّل')
-            : $this->toast('لم نعثر على سجل CNAME الصحيح', 'err');
+        match ($checkCustomDomain->handle($this->workspace, $this->workspace->custom_domain)) {
+            DomainStatus::Active => $this->toast('النطاق يشير إلى تخوم ومفعّل'),
+            DomainStatus::Securing => $this->toast('النطاق يشير إلى تخوم. جارٍ إصدار شهادة الأمان'),
+            default => $this->toast('لم نعثر على سجل CNAME الصحيح', 'err'),
+        };
     }
 
     public function openRemoveDomain(): void
@@ -291,7 +286,7 @@ class Show extends Component
         $domain = $this->workspace->custom_domain;
         abort_unless(filled($domain), 404);
 
-        $this->workspace->forceFill(['custom_domain' => null, 'domain_status' => null, 'domain_checked_at' => null])->save();
+        CheckCustomDomain::remove($this->workspace);
         AdminAction::record('workspace.domain_removed', $this->workspace, properties: ['domain' => $domain]);
 
         $this->closeDialog();

@@ -102,10 +102,24 @@
         @error('domain')
             <span class="text-13 text-danger">{{ $message }}</span>
         @enderror
-        @if ($domainStatus === \App\Enums\DomainStatus::Error)
+        @if ($domainStatus === \App\Enums\DomainStatus::Securing)
+            <div wire:poll.10s class="flex items-center gap-2 rounded-field bg-primary-tint px-3 py-2.5 text-14 text-primary">
+                <i class="ti ti-loader-2 animate-spin text-18"></i>
+                السجل صحيح. نصدر شهادة الأمان الآن، ويعمل النطاق خلال دقائق.
+            </div>
+        @elseif ($domainStatus === \App\Enums\DomainStatus::Active)
+            <div class="flex items-center gap-2 rounded-field bg-success-soft px-3 py-2.5 text-14 text-success">
+                <i class="ti ti-lock text-18"></i>
+                <span>موقعك يعمل على <a href="{{ $workspace->siteUrl() }}" target="_blank" rel="noopener" class="font-semibold text-success" dir="ltr">{{ $workspace->custom_domain }}</a>، وتتجدد شهادة الأمان تلقائياً.</span>
+            </div>
+        @elseif ($domainStatus === \App\Enums\DomainStatus::Error)
             <div class="flex items-center gap-2 rounded-field bg-danger-soft px-3 py-2.5 text-14 text-danger-ink">
                 <i class="ti ti-alert-circle text-18"></i>
-                لم نعثر على سجل CNAME الصحيح. تأكد من إضافة السجل أدناه لدى مزوّد النطاق.
+                @if ($certificateFailed)
+                    تعذّر إصدار شهادة الأمان بعد عدة محاولات. تأكد أن السجل أدناه هو السجل الوحيد للنطاق، ثم اضغط تحقق الآن.
+                @else
+                    لم نعثر على سجل CNAME الصحيح. تأكد من إضافة السجل أدناه لدى مزوّد النطاق.
+                @endif
             </div>
         @endif
         <div class="overflow-hidden rounded-xl border border-line">

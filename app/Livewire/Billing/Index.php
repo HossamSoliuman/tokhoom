@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Billing;
 
+use App\Actions\CheckCustomDomain;
+use App\Actions\SecureCustomDomain;
 use App\Enums\DomainStatus;
 use App\Enums\Plan;
 use App\Livewire\Concerns\HasDialogs;
@@ -161,7 +163,11 @@ class Index extends Component
         $this->redirect($url);
     }
 
-    public function verifyDomain(DomainVerifier $verifier): void
+    /**
+     * Check the CNAME record. Once it points at us the certificate is issued
+     * in the background and the page follows along until the domain is live.
+     */
+    public function verifyDomain(CheckCustomDomain $checkCustomDomain): void
     {
         $this->domain = DomainVerifier::clean($this->domain);
 
@@ -179,18 +185,11 @@ class Index extends Component
             return;
         }
 
-        $active = $verifier->pointsToUs($this->domain);
-
-        $workspace = $this->workspace();
-        $workspace->custom_domain = $this->domain;
-        $workspace->forceFill([
-            'domain_status' => $active ? DomainStatus::Active : DomainStatus::Error,
-            'domain_checked_at' => now(),
-        ])->save();
-
-        $active
-            ? $this->toast('تم تفعيل النطاق بنجاح')
-            : $this->toast('لم يكتمل إعداد النطاق بعد', 'err');
+        match ($checkCustomDomain->handle($this->workspace(), $this->domain)) {
+            DomainStatus::Active => $this->toast('النطاق مفعّل ويعمل'),
+            DomainStatus::Securing => $this->toast('السجل صحيح. نصدر شهادة الأمان الآن'),
+            default => $this->toast('لم يكتمل إعداد النطاق بعد', 'err'),
+        };
     }
 
     private function minimumSeats(Workspace $workspace): int
@@ -216,6 +215,7 @@ class Index extends Component
             'openInvoice' => $workspace->invoices()->whereNull('paid_at')->latest('id')->first(),
             'recordName' => DomainVerifier::recordName($previewDomain),
             'domainStatus' => $workspace->custom_domain ? ($workspace->domain_status ?? DomainStatus::Pending) : null,
+            'certificateFailed' => $workspace->domain_status === DomainStatus::Error && $workspace->domain_certificate_failures >= SecureCustomDomain::MAX_FAILURES,
         ]);
     }
 }

@@ -92,7 +92,7 @@ test('an office with several members cannot move to the single agent plan', func
     expect($workspace->fresh()->plan)->toBe(Plan::Office);
 });
 
-test('a custom domain becomes active when its CNAME points at us', function (bool $pointsToUs, DomainStatus $status) {
+test('a custom domain moves on to its certificate once its CNAME points at us', function (bool $pointsToUs, DomainStatus $status) {
     [$owner, $workspace] = member();
     $this->mock(DomainVerifier::class)->shouldReceive('pointsToUs')->with('www.alrashid.sa')->andReturn($pointsToUs);
 
@@ -103,7 +103,7 @@ test('a custom domain becomes active when its CNAME points at us', function (boo
     expect($workspace->fresh()->custom_domain)->toBe('www.alrashid.sa')
         ->and($workspace->fresh()->domain_status)->toBe($status);
 })->with([
-    'pointing' => [true, DomainStatus::Active],
+    'pointing' => [true, DomainStatus::Securing],
     'missing record' => [false, DomainStatus::Error],
 ]);
 

@@ -180,6 +180,12 @@
                     @if ($workspace->domain_checked_at)
                         <span class="text-13 text-muted">آخر تحقق {{ Arabic::dayAndTime($workspace->domain_checked_at) }}</span>
                     @endif
+                    @if ($workspace->domain_certificate_expires_at)
+                        <span class="text-13 text-muted">شهادة الأمان سارية حتى {{ Arabic::date($workspace->domain_certificate_expires_at) }}</span>
+                    @endif
+                    @if ($workspace->domain_certificate_error)
+                        <span class="text-13 text-danger" dir="ltr">{{ $workspace->domain_certificate_error }}</span>
+                    @endif
                 </x-ui.card>
             @endif
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Actions\SecureCustomDomain;
 use App\Enums\ApprovalStatus;
 use App\Enums\DomainStatus;
 use App\Enums\MemberRole;
@@ -128,7 +129,9 @@ class Overview extends Component
             $items[] = [
                 'icon' => 'ti-world-off',
                 'tone' => 'warning',
-                'text' => 'النطاق '.$workspace->custom_domain.' لا يشير إلى تخوم',
+                'text' => $workspace->domain_certificate_failures >= SecureCustomDomain::MAX_FAILURES
+                    ? 'تعذّر إصدار شهادة أمان للنطاق '.$workspace->custom_domain
+                    : 'النطاق '.$workspace->custom_domain.' لا يشير إلى تخوم',
                 'meta' => $workspace->name,
                 'url' => route('admin.workspaces.show', $workspace),
             ];

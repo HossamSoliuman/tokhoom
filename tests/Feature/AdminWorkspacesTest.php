@@ -11,6 +11,8 @@ use App\Models\Membership;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Notifications\WorkspaceApproved;
+use App\Support\CertificateStore;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 
@@ -165,7 +167,9 @@ test('an office with a team cannot move to the agent plan', function () {
     expect($workspace->fresh())->plan->toBe(Plan::Plus)->seats->toBe(15);
 });
 
-test('a custom domain can be unlinked', function () {
+test('a custom domain can be unlinked along with its certificate', function () {
+    config(['tokhoom.certificates.path' => storage_path('framework/testing/certificates')]);
+    CertificateStore::put('www.example.sa', 'CERTIFICATE', 'KEY');
     $workspace = Workspace::factory()->create(['custom_domain' => 'www.example.sa']);
     $workspace->forceFill(['domain_status' => DomainStatus::Active])->save();
 
@@ -174,7 +178,10 @@ test('a custom domain can be unlinked', function () {
         ->call('removeDomain')
         ->assertSee('إلغاء ربط النطاق www.example.sa');
 
-    expect($workspace->fresh())->custom_domain->toBeNull()->domain_status->toBeNull();
+    expect($workspace->fresh())->custom_domain->toBeNull()->domain_status->toBeNull()
+        ->and(File::exists(CertificateStore::path('www.example.sa', 'crt')))->toBeFalse();
+
+    File::deleteDirectory(storage_path('framework/testing/certificates'));
 });
 
 test('admins leave notes in the workspace history', function () {
