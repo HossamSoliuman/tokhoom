@@ -282,6 +282,21 @@ test('an expired license cannot be used to sign up', function () {
         ->assertSet('step', 3);
 });
 
+test('no workspace can be created while signups are closed', function () {
+    config(['tokhoom.signups_open' => false]);
+
+    Livewire::test(Signup::class)
+        ->assertSee('التسجيل متوقف حالياً')
+        ->set('name', 'خالد الراشد')
+        ->set('email', 'k.alrashid@alrashid.sa')
+        ->set('mobile', '0501234567')
+        ->set('password', 'password1')
+        ->call('next')
+        ->assertSet('step', 1);
+
+    expect(User::where('email', 'k.alrashid@alrashid.sa')->exists())->toBeFalse();
+});
+
 test('signed-in users can create another workspace starting at the account type', function () {
     [$user] = member();
 

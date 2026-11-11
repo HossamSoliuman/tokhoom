@@ -93,6 +93,10 @@ class Signup extends Component
 
     public function next(CreateWorkspace $createWorkspace): void
     {
+        if ($this->isClosed()) {
+            return;
+        }
+
         match ($this->step) {
             1 => $this->validateAccount(),
             2 => null,
@@ -125,6 +129,15 @@ class Signup extends Component
     public function workspace(): ?Workspace
     {
         return $this->workspaceId ? Workspace::find($this->workspaceId) : null;
+    }
+
+    /**
+     * Whether platform admins stopped new workspaces. A workspace created just
+     * before keeps its confirmation screen.
+     */
+    public function isClosed(): bool
+    {
+        return ! config('tokhoom.signups_open') && $this->step < 5;
     }
 
     public function isOffice(): bool
@@ -234,6 +247,6 @@ class Signup extends Component
 
     public function render(): View
     {
-        return view('livewire.auth.signup');
+        return view($this->isClosed() ? 'livewire.auth.signup-closed' : 'livewire.auth.signup');
     }
 }
