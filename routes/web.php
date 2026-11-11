@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AcmeChallengeController;
 use App\Http\Controllers\Admin as AdminHttp;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
@@ -114,6 +115,10 @@ Route::domain(config('tokhoom.app_domain'))->group(function () {
         });
     });
 });
+
+Route::get('/.well-known/acme-challenge/{token}', AcmeChallengeController::class)
+    ->where('token', '[A-Za-z0-9_-]+')
+    ->name('acme-challenge');
 
 Route::middleware(ResolveSite::class)->name('site.')->group(function () {
     Route::get('/', [SiteController::class, 'home'])->name('home');

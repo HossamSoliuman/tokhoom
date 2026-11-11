@@ -56,6 +56,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Custom domain certificates
+    |--------------------------------------------------------------------------
+    |
+    | Verified custom domains get a Let's Encrypt certificate, saved as
+    | {domain}.crt and {domain}.key under the certificates path. The web
+    | server loads them by the requested host name, so new ones need no reload.
+    |
+    */
+
+    'certificates' => [
+        'directory_url' => env('TOKHOOM_ACME_DIRECTORY', 'https://acme-v02.api.letsencrypt.org/directory'),
+        'email' => env('TOKHOOM_ACME_EMAIL', env('TOKHOOM_SUPPORT_EMAIL')),
+        'path' => env('TOKHOOM_CERTIFICATES_PATH', storage_path('app/private/certificates')),
+        'account_key' => storage_path('app/private/acme/account.key'),
+        'renew_days' => 30,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Reserved site addresses
     |--------------------------------------------------------------------------
     */
